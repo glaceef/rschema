@@ -1,4 +1,4 @@
-use darling::FromAttributes;
+use darling::FromMeta;
 use serde::Serialize;
 
 mod type_regex;
@@ -15,9 +15,7 @@ JSON文字列にシリアライズして、Field構造体にデシリアライ�
 これはdarlingがserdeほど柔軟にデシリアライズできないため。
 */
 
-#[derive(Debug, FromAttributes, Serialize)]
-#[darling(attributes(field))]
-// #[darling(attributes(field), forward_attrs(cfg))]
+#[derive(Debug, FromMeta, Serialize)]
 pub struct Field {
     /* common */
     title: String,
