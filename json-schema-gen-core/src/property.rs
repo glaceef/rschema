@@ -1,4 +1,3 @@
-use darling::FromAttributes;
 use serde::{
     Serialize,
     Deserialize,
