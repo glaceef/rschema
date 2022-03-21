@@ -68,6 +68,10 @@ pub fn derive(input: TokenStream) -> TokenStream {
                     property.set_properties(
                         <#field_type as ToProperties>::to_properties()
                     );
+                    property.set_required(
+                        // <#field_type as ToProperties>::required()
+                        <#field_type as ToProperties>::REQUIRED
+                    );
                 }
             );
         }
@@ -81,11 +85,16 @@ pub fn derive(input: TokenStream) -> TokenStream {
     let properties_str = serde_json::to_string_pretty(&properties).unwrap();
 
     // dbg!(&properties_registration_token_list);
-    dbg!(required_props);
+    // dbg!(required_props);
 
     quote!{
         impl ToProperties for #struct_name {
             const PROPERTIES_STR: &'static str = #properties_str;
+            const REQUIRED: &'static[&'static str] = &[
+                #(
+                    #required_props,
+                )*
+            ];
 
             fn to_properties() -> Properties {
                 let mut properties = Self::restore_properties();
@@ -95,6 +104,10 @@ pub fn derive(input: TokenStream) -> TokenStream {
                 )*
 
                 properties
+            }
+
+            fn required() -> &'static[&'static str] {
+                Self::REQUIRED
             }
         }
     }.into()

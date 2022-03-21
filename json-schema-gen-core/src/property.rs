@@ -3,7 +3,10 @@ use serde::{
     Deserialize,
 };
 
-use crate::Properties;
+use crate::types::{
+    Properties,
+    Required,
+};
 
 mod other_props;
 mod string_prop;
@@ -33,6 +36,12 @@ impl Property {
     pub fn set_properties(&mut self, properties: Properties) {
         if let OtherProps::Object(ref mut prop) = self.other_props {
             prop.set_properties(properties);
+        }
+    }
+
+    pub fn set_required(&mut self, required: Required) {
+        if let OtherProps::Object(ref mut prop) = self.other_props {
+            prop.set_required(required);
         }
     }
 }

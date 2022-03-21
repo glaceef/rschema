@@ -61,7 +61,6 @@ fn main(){
     // println!("{}", s);
 
     let schema: Schema = SchemaBuilder::new("MyConfig")
-        .required(vec!["required_prop".into()])
         .additional_properties(false)
         .build::<Config>()
         .unwrap();
