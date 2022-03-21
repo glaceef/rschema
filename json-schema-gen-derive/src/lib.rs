@@ -18,6 +18,13 @@ mod utils;
 
 #[derive(Debug, FromAttributes)]
 #[darling(attributes(schema))]
+struct SchemaAttr {
+    #[darling(default)]
+    additional_properties: bool,
+}
+
+#[derive(Debug, FromAttributes)]
+#[darling(attributes(schema))]
 // #[darling(attributes(schema), forward_attrs(cfg))]
 struct Schema {
     field: Field,
@@ -30,7 +37,12 @@ struct Schema {
 pub fn derive(input: TokenStream) -> TokenStream {
     // Parse into AST
     let item = parse_macro_input!(input as ItemStruct);
+    // dbg!(&item);
+
     let struct_name = item.ident;
+
+    let schema_attr = SchemaAttr::from_attributes(&item.attrs).unwrap();
+    // dbg!(&schema_attr);
 
     let mut properties = Properties::new();
     let mut properties_registration_token_list = vec![];
@@ -71,6 +83,9 @@ pub fn derive(input: TokenStream) -> TokenStream {
                     property.set_required(
                         <#field_type as ToProperties>::REQUIRED
                     );
+                    property.set_additional_properties(
+                        <#field_type as ToProperties>::ADDITIONAL_PROPERTIES
+                    );
                 }
             );
         }
@@ -82,6 +97,8 @@ pub fn derive(input: TokenStream) -> TokenStream {
     }
 
     let properties_str = serde_json::to_string_pretty(&properties).unwrap();
+    let additional_properties = schema_attr.additional_properties;
+    // dbg!(additional_properties);
 
     // dbg!(&properties_registration_token_list);
     // dbg!(required_props);
@@ -94,6 +111,7 @@ pub fn derive(input: TokenStream) -> TokenStream {
                     #required_props,
                 )*
             ];
+            const ADDITIONAL_PROPERTIES: bool = #additional_properties;
 
             fn to_properties() -> Properties {
                 let mut properties = Self::restore_properties();

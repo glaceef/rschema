@@ -9,16 +9,16 @@ use crate::types::{
 };
 
 #[derive(Debug, Serialize, Deserialize)]
-// #[serde(rename_all(serialize = "camelCase"))]
+#[serde(rename_all(serialize = "camelCase"))]
 pub struct ObjectProp {
-    // #[serde(skip_serializing_if = "Option::is_none")]
-    // properties: Option<Properties>,
-
     #[serde(default)]
     properties: Properties,
 
     #[serde(default)]
     required: Vec<String>,
+
+    #[serde(default)]
+    additional_properties: bool,
 }
 
 impl ObjectProp {
@@ -30,5 +30,9 @@ impl ObjectProp {
         self.required = required.into_iter()
             .map(|&s| s.into() )
             .collect();
+    }
+
+    pub fn set_additional_properties(&mut self, additional_properties: bool) {
+        self.additional_properties = additional_properties;
     }
 }

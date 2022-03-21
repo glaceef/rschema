@@ -5,6 +5,7 @@ type Required = &'static[&'static str];
 pub trait ToProperties {
     const PROPERTIES_STR: &'static str;
     const REQUIRED: Required;
+    const ADDITIONAL_PROPERTIES: bool;
 
     // serde_json を隠ぺいするため
     fn restore_properties() -> Properties {

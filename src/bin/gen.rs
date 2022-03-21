@@ -3,7 +3,6 @@
 use json_schema_gen::{
     Properties,
     Schema,
-    SchemaBuilder,
     ToProperties,
 };
 
@@ -24,8 +23,6 @@ struct Config {
         required = true,
     )]
     version: String,
-    // いつかこの String を置き換えるやり方も試してみたい。
-    // Deref, DerefMut を実装したらまったく同じように動かせるだろうか？
 
     #[schema(
         field(
@@ -45,6 +42,7 @@ struct Config {
 }
 
 #[derive(Debug, Schema)]
+#[schema(additional_properties)]
 struct Data {
     #[schema(field(
         title = "データサイズ。",
@@ -57,13 +55,8 @@ struct Data {
 }
 
 fn main(){
-    // let s = <Config as ToProperties>::PROPERTIES_STR;
-    // println!("{}", s);
+    let schema = Schema::new::<Config>("MyConfig");
 
-    let schema: Schema = SchemaBuilder::new("MyConfig")
-        .additional_properties(false)
-        .build::<Config>()
-        .unwrap();
     // println!("{}", schema.to_string_pretty().unwrap());
     std::fs::write("schema.json", schema.to_string_pretty().unwrap()).unwrap();
 }
