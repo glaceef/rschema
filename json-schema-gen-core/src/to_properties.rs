@@ -12,6 +12,4 @@ pub trait ToProperties {
     }
 
     fn to_properties() -> Properties;
-
-    fn required() -> Required;
 }
