@@ -2,7 +2,7 @@ use serde::Serialize;
 
 use crate::{
     Properties,
-    ToProperties,
+    Schematic,
 };
 
 #[derive(Debug, Serialize)]
@@ -21,7 +21,7 @@ pub struct Schema {
 }
 
 impl Schema {
-    pub fn new<T: ToProperties>(title: &str) -> Self {
+    pub fn new<T: Schematic>(title: &str) -> Self {
         Schema {
             title: title.into(),
             ty: "object".into(),

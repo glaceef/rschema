@@ -2,7 +2,7 @@ use crate::types::Properties;
 
 type Required = &'static[&'static str];
 
-pub trait ToProperties {
+pub trait Schematic {
     const PROPERTIES_STR: &'static str;
     const REQUIRED: Required;
     const ADDITIONAL_PROPERTIES: bool;

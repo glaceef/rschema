@@ -3,13 +3,13 @@
 use json_schema_gen::{
     Properties,
     Schema,
-    ToProperties,
+    Schematic,
 };
 
 #[derive(Debug)]
 struct CustomString(String);
 
-#[derive(Debug, Schema)]
+#[derive(Debug, Schematic)]
 struct Config {
     #[schema(
         field(
@@ -41,8 +41,12 @@ struct Config {
     data: Data,
 }
 
-#[derive(Debug, Schema)]
-#[schema(additional_properties)]
+#[derive(Debug, Schematic)]
+#[schema(
+    // title = "デフォルトのタイトルです。",
+    // description = "デフォルトの説明です。",
+    additional_properties,
+)]
 struct Data {
     #[schema(field(
         title = "データサイズ。",

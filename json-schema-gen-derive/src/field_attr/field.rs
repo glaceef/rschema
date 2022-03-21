@@ -62,7 +62,7 @@ pub struct Field {
 
 impl Field {
     // ex) string, number, array, ...(lowercase)
-    // OtherPropsのヴァリアントに対応している。
+    // OtherPropsのバリアントに対応している。
     pub fn set_type(&mut self, type_str: &str) {
         // アトリビュートで指定されていたらそれを優先する。
         if self.ty.is_some() {
