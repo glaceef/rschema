@@ -1,7 +1,3 @@
-// #[macro_use]
-// extern crate darling;
-// extern crate proc_macro;
-
 use json_schema_gen_core::{
     Properties,
     Property,
@@ -11,8 +7,6 @@ use darling::FromAttributes;
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{
-    AttributeArgs,
-    Fields,
     ItemStruct,
     parse_macro_input,
 };
@@ -88,6 +82,4 @@ pub fn derive(input: TokenStream) -> TokenStream {
             }
         }
     }.into()
-
-    // TokenStream::new()
 }

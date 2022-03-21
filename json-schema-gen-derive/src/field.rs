@@ -1,10 +1,5 @@
-use darling::{
-    FromAttributes,
-    FromMeta,
-};
+use darling::FromAttributes;
 use serde::Serialize;
-
-use crate::utils;
 
 mod type_regex;
 use type_regex::{
