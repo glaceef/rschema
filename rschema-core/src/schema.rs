@@ -25,7 +25,7 @@ impl Schema {
         Schema {
             title: title.into(),
             ty: "object".into(),
-            properties: T::to_properties(),
+            properties: T::properties(),
             required: T::REQUIRED,
             additional_properties: T::ADDITIONAL_PROPERTIES,
         }

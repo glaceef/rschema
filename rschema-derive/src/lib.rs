@@ -23,7 +23,7 @@ use utils::{
     get_field_type,
 };
 
-#[proc_macro_derive(Schematic, attributes(schema))]
+#[proc_macro_derive(Schematic, attributes(rschema))]
 pub fn derive_schema(input: TokenStream) -> TokenStream {
     let item = parse_macro_input!(input as ItemStruct);
 
@@ -54,7 +54,7 @@ pub fn derive_schema(input: TokenStream) -> TokenStream {
                 quote! {
                     let ref mut property = properties[#field_name];
                     property.set_properties(
-                        <#field_type as Schematic>::to_properties()
+                        <#field_type as Schematic>::properties()
                     );
                     property.set_required(
                         <#field_type as Schematic>::REQUIRED
@@ -85,7 +85,7 @@ pub fn derive_schema(input: TokenStream) -> TokenStream {
             ];
             const ADDITIONAL_PROPERTIES: bool = #additional_properties;
 
-            fn to_properties() -> Properties {
+            fn properties() -> Properties {
                 let mut properties = Self::restore_properties();
 
                 #(

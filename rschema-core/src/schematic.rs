@@ -12,5 +12,5 @@ pub trait Schematic {
         serde_json::from_str(Self::PROPERTIES_STR).unwrap()
     }
 
-    fn to_properties() -> Properties;
+    fn properties() -> Properties;
 }

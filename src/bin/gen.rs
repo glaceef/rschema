@@ -11,7 +11,7 @@ struct CustomString(String);
 
 #[derive(Debug, Schematic)]
 struct Config {
-    #[schema(
+    #[rschema(
         field(
             title = "バージョン。",
             description = "バージョンです。",
@@ -24,7 +24,7 @@ struct Config {
     )]
     version: String,
 
-    #[schema(
+    #[rschema(
         field(
             title = "カスタム文字列型。",
             description = "カスタム文字列型です。",
@@ -34,7 +34,7 @@ struct Config {
     )]
     custom_str: CustomString,
 
-    #[schema(field(
+    #[rschema(field(
         title = "データ",
         description = "データです。",
     ))]
@@ -42,19 +42,19 @@ struct Config {
 }
 
 #[derive(Debug, Schematic)]
-#[schema(
+#[rschema(
     // title = "デフォルトのタイトルです。",
     // description = "デフォルトの説明です。",
     additional_properties,
 )]
 struct Data {
-    #[schema(field(
+    #[rschema(field(
         title = "データサイズ。",
         description = "データサイズです。",
         minimum = 0,
         maximum = 100,
     ))]
-    #[schema(required)] // 分割してもよい
+    #[rschema(required)] // 分割してもよい
     size: i32,
 }
 

@@ -4,8 +4,8 @@ mod field;
 use field::Field;
 
 #[derive(Debug, FromAttributes)]
-#[darling(attributes(schema))]
-// #[darling(attributes(schema), forward_attrs(cfg))]
+#[darling(attributes(rschema))]
+// #[darling(attributes(rschema), forward_attrs(cfg))]
 pub struct FieldAttr {
     pub field: Field,
 
