@@ -29,7 +29,6 @@ impl SchemaBuilder {
             title,
             ty: "object".into(),
             properties: T::to_properties(),
-            // required: T::required(),
             required: T::REQUIRED,
             additional_properties,
         })

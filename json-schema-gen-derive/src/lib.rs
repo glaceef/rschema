@@ -69,7 +69,6 @@ pub fn derive(input: TokenStream) -> TokenStream {
                         <#field_type as ToProperties>::to_properties()
                     );
                     property.set_required(
-                        // <#field_type as ToProperties>::required()
                         <#field_type as ToProperties>::REQUIRED
                     );
                 }
@@ -104,10 +103,6 @@ pub fn derive(input: TokenStream) -> TokenStream {
                 )*
 
                 properties
-            }
-
-            fn required() -> &'static[&'static str] {
-                Self::REQUIRED
             }
         }
     }.into()
