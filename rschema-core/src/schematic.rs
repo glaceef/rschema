@@ -13,4 +13,15 @@ pub trait Schematic {
     }
 
     fn properties() -> Properties;
+
+    fn required() -> Vec<String> {
+        Self::REQUIRED
+            .into_iter()
+            .map(|&s| s.into() )
+            .collect()
+    }
+
+    fn additional_properties() -> bool {
+        Self::ADDITIONAL_PROPERTIES
+    }
 }
