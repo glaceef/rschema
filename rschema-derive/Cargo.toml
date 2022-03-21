@@ -1,12 +1,19 @@
 [package]
-name = "json-schema-gen-core"
+name = "rschema-derive"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[lib]
+proc-macro = true
+
 [dependencies]
+rschema-core = { path = "../rschema-core" }
 darling = "*"
-indexmap = { version = "*", features = ["serde"] }
+once_cell = "*"
+quote = "*"
+regex = "*"
 serde = { version = "*", features = ["derive"] }
 serde_json = "*"
+syn = { version = "*", features = ["full", "extra-traits"] }

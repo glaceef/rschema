@@ -1,4 +1,4 @@
-use json_schema_gen_core::{
+use rschema_core::{
     Properties,
     Property,
 };
@@ -76,7 +76,7 @@ pub fn derive_schema(input: TokenStream) -> TokenStream {
     let additional_properties = struct_attr.additional_properties;
 
     quote!{
-        impl json_schema_gen::Schematic for #struct_name {
+        impl rschema::Schematic for #struct_name {
             const PROPERTIES_STR: &'static str = #properties_str;
             const REQUIRED: &'static[&'static str] = &[
                 #(

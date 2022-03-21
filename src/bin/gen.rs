@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use json_schema_gen::{
+use rschema::{
     Properties,
     Schema,
     Schematic,

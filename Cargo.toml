@@ -1,5 +1,5 @@
 [package]
-name = "json-schema-gen"
+name = "rschema"
 version = "0.1.0"
 edition = "2021"
 
@@ -10,5 +10,5 @@ name = "gen"
 path = "src/bin/gen.rs"
 
 [dependencies]
-json-schema-gen-core = { path = "json-schema-gen-core" }
-json-schema-gen-derive = { path = "json-schema-gen-derive" }
+rschema-core = { path = "rschema-core" }
+rschema-derive = { path = "rschema-derive" }
