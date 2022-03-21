@@ -8,7 +8,6 @@ use crate::{
 #[derive(Debug, Default)]
 pub struct SchemaBuilder {
     pub title: String,
-    pub required: Vec<String>,
     pub additional_properties: bool,
 }
 
@@ -23,7 +22,6 @@ impl SchemaBuilder {
     pub fn build<T: ToProperties>(self) -> Result<Schema, String> {
         let SchemaBuilder {
             title,
-            required,
             additional_properties,
         } = self;
 
@@ -31,23 +29,13 @@ impl SchemaBuilder {
             title,
             ty: "object".into(),
             properties: T::to_properties(),
-            required,
+            required: T::REQUIRED,
             additional_properties,
         })
     }
 
-    pub fn required(mut self, required: Vec<String>) -> Self {
-        self.required = required;
-        self
-    }
-
     pub fn additional_properties(mut self, b: bool) -> Self {
         self.additional_properties = b;
-        self
-    }
-
-    pub fn with_required(&mut self, required: Vec<String>) -> &mut Self {
-        self.required = required;
         self
     }
 
@@ -67,7 +55,7 @@ pub struct Schema {
 
     properties: Properties,
 
-    required: Vec<String>,
+    required: &'static[&'static str],
 
     additional_properties: bool,
 }

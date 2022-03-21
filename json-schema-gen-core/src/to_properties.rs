@@ -1,7 +1,10 @@
 use crate::types::Properties;
 
+type Required = &'static[&'static str];
+
 pub trait ToProperties {
     const PROPERTIES_STR: &'static str;
+    const REQUIRED: Required;
 
     // serde_json を隠ぺいするため
     fn restore_properties() -> Properties {
@@ -9,4 +12,6 @@ pub trait ToProperties {
     }
 
     fn to_properties() -> Properties;
+
+    fn required() -> Required;
 }

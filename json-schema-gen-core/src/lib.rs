@@ -10,5 +10,5 @@ pub use schema::{
 pub mod to_properties;
 pub use to_properties::ToProperties;
 
-pub mod types;
+mod types;
 pub use types::Properties;

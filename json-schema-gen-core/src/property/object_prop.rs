@@ -3,7 +3,10 @@ use serde::{
     Deserialize,
 };
 
-use crate::Properties;
+use crate::types::{
+    Properties,
+    Required,
+};
 
 #[derive(Debug, Serialize, Deserialize)]
 // #[serde(rename_all(serialize = "camelCase"))]
@@ -13,10 +16,19 @@ pub struct ObjectProp {
 
     #[serde(default)]
     properties: Properties,
+
+    #[serde(default)]
+    required: Vec<String>,
 }
 
 impl ObjectProp {
     pub fn set_properties(&mut self, properties: Properties) {
         self.properties = properties;
+    }
+
+    pub fn set_required(&mut self, required: Required) {
+        self.required = required.into_iter()
+            .map(|&s| s.into() )
+            .collect();
     }
 }

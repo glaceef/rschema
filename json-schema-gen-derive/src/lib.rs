@@ -16,7 +16,17 @@ use field::Field;
 
 mod utils;
 
-#[proc_macro_derive(Schema, attributes(field))]
+#[derive(Debug, FromAttributes)]
+#[darling(attributes(schema))]
+// #[darling(attributes(schema), forward_attrs(cfg))]
+struct Schema {
+    field: Field,
+
+    #[darling(default)]
+    required: bool,
+}
+
+#[proc_macro_derive(Schema, attributes(schema))]
 pub fn derive(input: TokenStream) -> TokenStream {
     // Parse into AST
     let item = parse_macro_input!(input as ItemStruct);
@@ -24,6 +34,7 @@ pub fn derive(input: TokenStream) -> TokenStream {
 
     let mut properties = Properties::new();
     let mut properties_registration_token_list = vec![];
+    let mut required_props = vec![];
 
     for struct_field in item.fields {
         // タプル構造体の場合、フィールド名がないためNoneになる。
@@ -31,24 +42,24 @@ pub fn derive(input: TokenStream) -> TokenStream {
         // dbg!(&field_name);
 
         // dbg!(&struct_field.attrs);
-        let mut field = match Field::from_attributes(&struct_field.attrs) {
+        let mut schema = match Schema::from_attributes(&struct_field.attrs) {
             Ok(v)  => v,
             Err(_) => continue,
         };
-        // dbg!(&field);
+        // dbg!(&schema);
 
         let type_str = utils::get_type_str(&struct_field.ty);
         // dbg!(&type_str);
-        field.set_type(&type_str);
+        schema.field.set_type(&type_str);
 
-        let field_str = serde_json::to_string(&field).unwrap();
+        let field_str = serde_json::to_string(&schema.field).unwrap();
         // let field = serde_json::to_string_pretty(&field).unwrap();
         // println!("{}", field);
 
         let property: Property = serde_json::from_str(&field_str).unwrap();
         // dbg!(&property);
 
-        if field.is_object() {
+        if schema.field.is_object() {
             // let field_name = struct_field.ident;
             let field_type = struct_field.ty;
             properties_registration_token_list.push(
@@ -57,8 +68,15 @@ pub fn derive(input: TokenStream) -> TokenStream {
                     property.set_properties(
                         <#field_type as ToProperties>::to_properties()
                     );
+                    property.set_required(
+                        <#field_type as ToProperties>::REQUIRED
+                    );
                 }
             );
+        }
+
+        if schema.required {
+            required_props.push(field_name.clone());
         }
         properties.insert(field_name, property); // field_attrをそのまま渡してもよいかもしれない
     }
@@ -66,10 +84,16 @@ pub fn derive(input: TokenStream) -> TokenStream {
     let properties_str = serde_json::to_string_pretty(&properties).unwrap();
 
     // dbg!(&properties_registration_token_list);
+    // dbg!(required_props);
 
     quote!{
         impl ToProperties for #struct_name {
             const PROPERTIES_STR: &'static str = #properties_str;
+            const REQUIRED: &'static[&'static str] = &[
+                #(
+                    #required_props,
+                )*
+            ];
 
             fn to_properties() -> Properties {
                 let mut properties = Self::restore_properties();
