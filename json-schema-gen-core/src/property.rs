@@ -44,4 +44,10 @@ impl Property {
             prop.set_required(required);
         }
     }
+
+    pub fn set_additional_properties(&mut self, additional_properties: bool) {
+        if let OtherProps::Object(ref mut prop) = self.other_props {
+            prop.set_additional_properties(additional_properties);
+        }
+    }
 }
