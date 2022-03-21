@@ -1,17 +1,17 @@
 #![allow(dead_code)]
 
-use json_schema_gen::{
+use rschema::{
     Properties,
     Schema,
-    ToProperties,
+    Schematic,
 };
 
 #[derive(Debug)]
 struct CustomString(String);
 
-#[derive(Debug, Schema)]
+#[derive(Debug, Schematic)]
 struct Config {
-    #[schema(
+    #[rschema(
         field(
             title = "バージョン。",
             description = "バージョンです。",
@@ -24,7 +24,7 @@ struct Config {
     )]
     version: String,
 
-    #[schema(
+    #[rschema(
         field(
             title = "カスタム文字列型。",
             description = "カスタム文字列型です。",
@@ -34,23 +34,27 @@ struct Config {
     )]
     custom_str: CustomString,
 
-    #[schema(field(
+    #[rschema(field(
         title = "データ",
         description = "データです。",
     ))]
     data: Data,
 }
 
-#[derive(Debug, Schema)]
-#[schema(additional_properties)]
+#[derive(Debug, Schematic)]
+#[rschema(
+    // title = "デフォルトのタイトルです。",
+    // description = "デフォルトの説明です。",
+    additional_properties,
+)]
 struct Data {
-    #[schema(field(
+    #[rschema(field(
         title = "データサイズ。",
         description = "データサイズです。",
         minimum = 0,
         maximum = 100,
     ))]
-    #[schema(required)] // 分割してもよい
+    #[rschema(required)] // 分割してもよい
     size: i32,
 }
 

@@ -2,7 +2,7 @@ use crate::types::Properties;
 
 type Required = &'static[&'static str];
 
-pub trait ToProperties {
+pub trait Schematic {
     const PROPERTIES_STR: &'static str;
     const REQUIRED: Required;
     const ADDITIONAL_PROPERTIES: bool;
@@ -12,5 +12,16 @@ pub trait ToProperties {
         serde_json::from_str(Self::PROPERTIES_STR).unwrap()
     }
 
-    fn to_properties() -> Properties;
+    fn properties() -> Properties;
+
+    fn required() -> Vec<String> {
+        Self::REQUIRED
+            .into_iter()
+            .map(|&s| s.into() )
+            .collect()
+    }
+
+    fn additional_properties() -> bool {
+        Self::ADDITIONAL_PROPERTIES
+    }
 }

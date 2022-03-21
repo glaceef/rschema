@@ -1,6 +1,10 @@
-pub use json_schema_gen_core::{
+pub use rschema_core::{
     Properties,
     Schema,
-    ToProperties,
+    Schematic,
 };
-pub use json_schema_gen_derive::Schema;
+
+#[allow(unused_imports)]
+#[macro_use]
+extern crate rschema_derive;
+pub use rschema_derive::*;
