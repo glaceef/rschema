@@ -60,7 +60,7 @@ pub fn derive_schema(input: TokenStream) -> TokenStream {
                         <#field_type as Schematic>::required()
                     );
                     property.set_additional_properties(
-                        <#field_type as Schematic>::ADDITIONAL_PROPERTIES
+                        <#field_type as Schematic>::additional_properties()
                     );
                 }
             );
