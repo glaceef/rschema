@@ -1,0 +1,12 @@
+name: rschema
+version: '0.1.0'
+members:
+  - 'member1'
+  - 'member2'
+  - 'member3'
+data:
+  data1: 10
+  data2: 'data2'
+  data3: false
+  data4:
+    name: additional_data
