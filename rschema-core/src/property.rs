@@ -3,10 +3,7 @@ use serde::{
     Deserialize,
 };
 
-use crate::{
-    Schematic,
-    types::Properties,
-};
+use crate::Schematic;
 
 mod other_props;
 mod string_prop;
