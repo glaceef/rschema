@@ -1,10 +1,33 @@
 #![allow(dead_code)]
 
 use rschema::{
-    Properties,
     Schema,
     Schematic,
 };
+
+mod data {
+    use rschema::Schematic;
+
+    #[derive(Debug, Schematic)]
+    #[rschema(
+        // title = "デフォルトのタイトルです。",
+        // description = "デフォルトの説明です。",
+        additional_properties,
+    )]
+    pub struct Data<T> {
+        #[rschema(field(
+            title = "データサイズ。",
+            description = "データサイズです。",
+            minimum = 0,
+            maximum = 100,
+        ))]
+        #[rschema(required)] // 分割してもよい
+        size: i32,
+
+        // #[rschema(required)]
+        phantom: std::marker::PhantomData<T>,
+    }
+}
 
 #[derive(Debug)]
 struct CustomString(String);
@@ -18,7 +41,7 @@ struct Config {
 
             min_length = 0,
             max_length = 20,
-            pattern = "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+            pattern = "^[0-9]+\\.[0-9]+\\.[0-9]+$",
         ),
         required = true,
     )]
@@ -38,29 +61,25 @@ struct Config {
         title = "データ",
         description = "データです。",
     ))]
-    data: Data,
+    data: data::Data<String>,
+
+    // #[rschema(field(
+    //     title = "タプル構造体。",
+    //     description = "タプル構造体です。",
+    // ))]
+    // tdata: TupleData,
 }
 
-#[derive(Debug, Schematic)]
-#[rschema(
-    // title = "デフォルトのタイトルです。",
-    // description = "デフォルトの説明です。",
-    additional_properties,
-)]
-struct Data {
-    #[rschema(field(
-        title = "データサイズ。",
-        description = "データサイズです。",
-        minimum = 0,
-        maximum = 100,
-    ))]
-    #[rschema(required)] // 分割してもよい
-    size: i32,
-}
+// #[derive(Debug, Schematic)]
+// struct TupleData(
+//     #[rschema(field(
+//         title = "タプル構造体。",
+//         description = "タプル構造体です。",
+//     ))]
+//     String
+// );
 
 fn main(){
     let schema = Schema::new::<Config>("MyConfig");
-
-    // println!("{}", schema.to_string_pretty().unwrap());
-    std::fs::write("schema.json", schema.to_string_pretty().unwrap()).unwrap();
+    schema.write_pretty("schema.json").unwrap();
 }

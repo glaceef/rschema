@@ -19,7 +19,7 @@ JSON文字列にシリアライズして、Field構造体にデシリアライ�
 pub struct Field {
     /* common */
     title: String,
-    description: String,
+    description: Option<String>,
 
     #[darling(default)]
     #[darling(rename = "type")]
