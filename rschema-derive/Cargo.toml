@@ -12,6 +12,7 @@ proc-macro = true
 rschema-core = { path = "../rschema-core" }
 darling = "*"
 once_cell = "*"
+proc-macro2 = "*"
 quote = "*"
 regex = "*"
 serde = { version = "*", features = ["derive"] }

@@ -3,7 +3,10 @@ use serde::{
     Deserialize,
 };
 
-use crate::types::Properties;
+use crate::{
+    Schematic,
+    types::Properties,
+};
 
 mod other_props;
 mod string_prop;
@@ -30,21 +33,31 @@ pub struct Property {
 }
 
 impl Property {
-    pub fn set_properties(&mut self, properties: Properties) {
-        if let OtherProps::Object(ref mut prop) = self.other_props {
-            prop.set_properties(properties);
+    pub fn is_object(&self) -> bool {
+        match self.other_props {
+            OtherProps::Object(_) => true,
+            _ => false,
         }
     }
 
-    pub fn set_required(&mut self, required: Vec<String>) {
+    pub fn set_properties<T: Schematic>(&mut self) -> &mut Self {
         if let OtherProps::Object(ref mut prop) = self.other_props {
-            prop.set_required(required);
+            prop.set_properties(T::properties());
         }
+        self
     }
 
-    pub fn set_additional_properties(&mut self, additional_properties: bool) {
+    pub fn set_required<T: Schematic>(&mut self) -> &mut Self {
         if let OtherProps::Object(ref mut prop) = self.other_props {
-            prop.set_additional_properties(additional_properties);
+            prop.set_required(T::required());
         }
+        self
+    }
+
+    pub fn set_additional_properties<T: Schematic>(&mut self) -> &mut Self {
+        if let OtherProps::Object(ref mut prop) = self.other_props {
+            prop.set_additional_properties(T::additional_properties());
+        }
+        self
     }
 }

@@ -1,5 +1,11 @@
 use serde::Serialize;
 
+use std::{
+    fs,
+    io,
+    path::Path,
+};
+
 use crate::{
     Properties,
     Schematic,
@@ -45,21 +51,13 @@ impl Schema {
         }
     }
 
-    pub fn write<T, P>(&self, path: P) -> std::io::Result<()>
-    where
-        T: Schematic,
-        P: AsRef<std::path::Path>,
-    {
+    pub fn write(&self, path: impl AsRef<Path>) -> io::Result<()> {
         let self_str = self.to_string().unwrap();
-        std::fs::write(path, self_str)
+        fs::write(path, self_str)
     }
 
-    pub fn write_pretty<T, P>(&self, path: P) -> std::io::Result<()>
-    where
-        T: Schematic,
-        P: AsRef<std::path::Path>,
-    {
+    pub fn write_pretty(&self, path: impl AsRef<Path>) -> io::Result<()> {
         let self_str = self.to_string_pretty().unwrap();
-        std::fs::write(path, self_str)
+        fs::write(path, self_str)
     }
 }
