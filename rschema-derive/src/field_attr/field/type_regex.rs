@@ -9,11 +9,11 @@ macro_rules! regex {
     }
 }
 
-regex!(STRING_TYPE_REGEX = "String|&str");
+regex!(STRING_TYPE_REGEX = "String|str");
 
 regex!(NUMBER_TYPE_REGEX = "[iu]((8|16|32|64|128)|size)");
 
 // vector / slice / boxed-slice
 regex!(ARRAY_TYPE_REGEX = r"(Vec<.+>|\[.+;\d+\]|Box<\[.+\]>)");
 
-regex!(BOOLEAN_TYPE_REGEX = r"bool");
+regex!(BOOLEAN_TYPE_REGEX = "bool");

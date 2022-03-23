@@ -1,6 +1,7 @@
 use proc_macro2::TokenStream;
 use quote::quote;
 
+#[allow(dead_code)]
 pub fn validate_field_attrs(attrs: &Vec<syn::Attribute>) -> bool {
     // no attributes
     if attrs.is_empty() {
@@ -48,16 +49,35 @@ pub fn get_field_name(field: &syn::Field) -> Option<String> {
     field.ident.as_ref().map(ToString::to_string)
 }
 
-pub fn get_field_type_str(field: &syn::Field) -> Result<String, darling::Error> {
-    if let syn::Type::Path(syn::TypePath{ ref path, .. }) = field.ty {
+fn get_type_ident(ty: &syn::Type) -> Option<&syn::Ident> {
+    if let syn::Type::Path(syn::TypePath{ ref path, .. }) = ty {
         // `path.get_ident()` also returns its identifier,
         // but not correspond to a path like `path::to::Type`.
-        if let Some(ty) = path.segments.last() {
-            return Ok(ty.ident.to_string());
+        if let Some(seg) = path.segments.last() {
+            return Some(&seg.ident);
         }
     }
+    None
+}
 
-    Err(darling::Error::custom("Type read error.").with_span(&field.ty))
+pub fn get_field_type_str(field: &syn::Field) -> Result<String, darling::Error> {
+    let ident = match field.ty {
+        // normal type
+        ref path @ syn::Type::Path(_) => {
+            get_type_ident(path)
+        },
+        // reference type
+        syn::Type::Reference(syn::TypeReference{ ref elem, .. }) => {
+            get_type_ident(elem.as_ref())
+        },
+        // others
+        _ => None,
+    }.ok_or(
+        darling::Error::custom("Type read error.")
+            .with_span(&field.ty)
+    )?;
+
+    Ok(ident.to_string())
 }
 
 pub fn create_customizing_properties_statement_token(
