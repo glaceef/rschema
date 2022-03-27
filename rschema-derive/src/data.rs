@@ -62,7 +62,11 @@ impl Data {
                 };
 
                 Self::struct_from_ast(&variant.fields)
-                    .map(|data| Variant { attr, data } )
+                    .map(|data| Variant {
+                        attr,
+                        ident: variant.ident.clone(),
+                        data,
+                    })
             })
             .collect();
         Ok(Data::Enum(variants?))
@@ -83,6 +87,8 @@ impl Data {
             // フィールド１つのタプル構造体
             // 中のデータ型として扱う。
             syn::Fields::Unnamed(ref fields) if fields.unnamed.len() == 1 => {
+                // 現状は、バリアントはアトリビュートの有無にかかわらず対象とするため、
+                // .pop().unwrap() は必ず成功する。
                 let field = unnamed_fields_from_ast(&fields.unnamed).pop().unwrap();
                 Data::NewTypeStruct(field)
             },
