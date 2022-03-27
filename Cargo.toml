@@ -19,8 +19,8 @@ rschema-core = { path = "rschema-core" }
 rschema-derive = { path = "rschema-derive" }
 
 [dev-dependencies]
-serde = { version = "*", features = ["derive"] }
-serde_yaml = "*"
+serde = { version = "1.0.136", features = ["derive"] }
+serde_yaml = "0.8.23"
 
 [[example]]
 name = "config"
