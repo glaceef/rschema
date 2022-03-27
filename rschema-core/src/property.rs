@@ -10,7 +10,6 @@ pub struct Property {
     pub title: String,
     pub description: Option<String>,
 
-    // #[serde(rename = "type")]
     #[serde(flatten)]
     pub ty: PropType,
 }

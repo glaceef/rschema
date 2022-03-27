@@ -13,8 +13,6 @@ pub struct Schema {
     pub title: String,
     pub description: Option<String>,
 
-    // 起点がenumの場合はtypeがない
-    // シリアライズするとなくなる。
     #[serde(flatten)]
     pub ty: PropType,
 }
@@ -28,7 +26,7 @@ impl Schema {
         Schema {
             title: title.into(),
             description: None,
-            ty: T::ty2(),
+            ty: T::__type_no_attr(), // もしかしたらContainer Attributesで指定するかも
         }
     }
 }

@@ -21,11 +21,10 @@ pub use object_prop::ObjectProp;
 pub use string_prop::StringProp;
 pub use tuple_prop::TupleProp;
 
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(tag = "type", rename_all = "lowercase")]
+#[derive(Debug, Deserialize)]
 pub enum PropType {
     String(StringProp),
-    Integer(NumericProp),
+    // Integer(NumericProp),
     Number(NumericProp),
     Boolean,
     Null,
@@ -33,32 +32,30 @@ pub enum PropType {
     Object(ObjectProp),
 
     // 順序の定まっていない複合型
-    // TODO: typeを出さないようにする
     Enum(EnumProp),
 
     // タプル構造体（順序の決まった複合型）
     Tuple(TupleProp),
 }
 
-/*
-#[derive(Debug, Deserialize)]
-#[serde(tag = "type", rename_all = "lowercase")]
-pub enum PropType {
-    String(string_prop::StringProp),
-    Integer(numeric_prop::NumericProp),
-    Number(numeric_prop::NumericProp),
-    Boolean,
-    Array(array_prop::ArrayProp),
-    Object(object_prop::ObjectProp),
-    Tuple(tuple_prop::TupleProp),
-}
-
-macro_rules! match_block {
-    ($variant:ident, $target:expr, $serializer:expr) => {
+macro_rules! prop_match_block {
+    ($variant:ident, $inner:expr, $serializer:expr) => {
         {
             let wrapper = Wrapper {
                 ty: stringify!($variant),
-                inner: $target,
+                inner: $inner,
+            };
+            wrapper.serialize($serializer)
+        }
+    };
+}
+
+macro_rules! unit_match_block {
+    ($variant:ident, $serializer:expr) => {
+        {
+            let wrapper = Wrapper {
+                ty: stringify!($variant),
+                inner: &(),
             };
             wrapper.serialize($serializer)
         }
@@ -80,14 +77,15 @@ impl Serialize for PropType {
         S: Serializer,
     {
         match self {
-            PropType::String( ref prop) => match_block!( string, prop, serializer),
-            PropType::Integer(ref prop) => match_block!(integer, prop, serializer),
-            PropType::Number( ref prop) => match_block!( number, prop, serializer),
-            PropType::Boolean           => serializer.serialize_str("boolean"),
-            PropType::Array(  ref prop) => match_block!(  array, prop, serializer),
-            PropType::Object( ref prop) => match_block!( object, prop, serializer),
-            PropType::Tuple(  ref prop) => prop.serialize(serializer),
+            PropType::String( ref prop) => prop_match_block!( string, prop, serializer),
+            // PropType::Integer(ref prop) => match_block!(integer, prop, serializer),
+            PropType::Number( ref prop) => prop_match_block!( number, prop, serializer),
+            PropType::Boolean           => unit_match_block!(boolean, serializer),
+            PropType::Null              => unit_match_block!(   null, serializer),
+            PropType::Array(  ref prop) => prop_match_block!(  array, prop, serializer),
+            PropType::Object( ref prop) => prop_match_block!( object, prop, serializer),
+            PropType::Enum(   ref prop) => prop.serialize(serializer),
+            PropType::Tuple(  ref prop) => prop_match_block!(  tuple, prop, serializer),
         }
     }
 }
-*/

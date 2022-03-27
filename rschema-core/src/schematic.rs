@@ -4,12 +4,11 @@ use crate::{
     Items,
     NumericProp,
     PropType,
-    Schema,
     StringProp,
 };
 
 pub trait Schematic {
-    fn ty(
+    fn __type(
         min_length: Option<u64>,
         max_length: Option<u64>,
         pattern: Option<String>,
@@ -21,8 +20,8 @@ pub trait Schematic {
         min_items: Option<u64>,
         max_items: Option<u64>,
     ) -> PropType;
-    fn ty2() -> PropType {
-        Self::ty(
+    fn __type_no_attr() -> PropType {
+        Self::__type(
             None,
             None,
             None,
@@ -38,7 +37,7 @@ pub trait Schematic {
 }
 
 impl Schematic for String {
-    fn ty(
+    fn __type(
         min_length: Option<u64>,
         max_length: Option<u64>,
         pattern: Option<String>,
@@ -60,7 +59,7 @@ impl Schematic for String {
 }
 
 impl Schematic for i32 {
-    fn ty(
+    fn __type(
         min_length: Option<u64>,
         max_length: Option<u64>,
         pattern: Option<String>,
@@ -83,7 +82,7 @@ impl Schematic for i32 {
 }
 
 impl Schematic for usize {
-    fn ty(
+    fn __type(
         min_length: Option<u64>,
         max_length: Option<u64>,
         pattern: Option<String>,
@@ -106,7 +105,7 @@ impl Schematic for usize {
 }
 
 impl Schematic for bool {
-    fn ty(
+    fn __type(
         min_length: Option<u64>,
         max_length: Option<u64>,
         pattern: Option<String>,
@@ -123,7 +122,7 @@ impl Schematic for bool {
 }
 
 impl<T: Schematic> Schematic for Option<T> {
-    fn ty(
+    fn __type(
         min_length: Option<u64>,
         max_length: Option<u64>,
         pattern: Option<String>,
@@ -137,7 +136,7 @@ impl<T: Schematic> Schematic for Option<T> {
     ) -> PropType {
         PropType::Enum(EnumProp {
             any_of: vec![
-                T::ty2(),
+                T::__type_no_attr(),
                 PropType::Null,
             ],
         })
@@ -145,7 +144,7 @@ impl<T: Schematic> Schematic for Option<T> {
 }
 
 impl<T: Schematic> Schematic for Vec<T> {
-    fn ty(
+    fn __type(
         min_length: Option<u64>,
         max_length: Option<u64>,
         pattern: Option<String>,
@@ -158,7 +157,7 @@ impl<T: Schematic> Schematic for Vec<T> {
         max_items: Option<u64>,
     ) -> PropType {
         PropType::Array(ArrayProp {
-            items: Box::new(Items::Single(T::ty2())),
+            items: Box::new(Items::Single(T::__type_no_attr())),
             min_items,
             max_items,
         })

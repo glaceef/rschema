@@ -1,11 +1,4 @@
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_variables)]
-
-use darling::{
-    FromAttributes,
-    ToTokens,
-};
+use darling::ToTokens;
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
@@ -41,32 +34,14 @@ fn expand_derive_schematic(
     let ident = container.ident;
     let (impl_generics, _, type_generics, where_clause) = container.split_for_impl();
 
-    // let fn_init_block = fn_init("default title", "default description");
-    let fn_ty_block = fn_ty(&container); // TODO: この中身を作るためのデータを用意する。
+    let fn_ty_block = fn_ty(&container);
     let impl_block = quote! {
         impl #impl_generics rschema::Schematic for #ident #type_generics #where_clause {
-            // #fn_init_block
             #fn_ty_block
         }
     };
 
     Ok(impl_block.into())
-}
-
-fn fn_init(
-    title: &str,
-    description: &str,
-) -> TokenStream2 {
-    let fn_init_block = quote! {
-        fn init() -> rschema::Schema {
-            rschema::Schema {
-                title: #title.into(),
-                description: Some(#description.into()),
-                ty: Self::ty2(),
-            }
-        }
-    };
-    fn_init_block.into()
 }
 
 // わざわざ別関数にしなくても、トークンをfn_init_blockに差し込んでもよさそう。
@@ -125,18 +100,6 @@ fn fn_ty_enum(
                 },
                 Data::NewTypeStruct(ref field) => {
                     /*
-                    "anyOf": [
-                        {
-                            "type": "..."
-                        },
-                        {
-                            "type": "..."
-                        },
-                        ...
-                    ]
-                    */
-
-                    /*
                     現在はserdeのuntaggedと同じ扱いをしている。
                     ```
                     enum Enum {
@@ -169,21 +132,10 @@ fn fn_ty_enum(
                     let Field { ty, .. } = field;
 
                     quote! {
-                        <#ty as Schematic>::ty2()
+                        <#ty as Schematic>::__type_no_attr()
                     }
                 },
                 Data::Struct(ref fields) => {
-                    /*
-                    "type": "object",
-                    "properties": {
-                        "field1": {
-                        },
-                        "field2": {
-                        },
-                        ...
-                    }
-                    */
-
                     let stmts: Vec<TokenStream2> = fields
                         .iter()
                         .map(|field| {
@@ -214,18 +166,15 @@ fn fn_ty_enum(
 
                                         title: #title.into(),
                                         description: #description,
-                                        ty: <#ty as Schematic>::ty(
-                                            /* type: string */
+                                        ty: <#ty as Schematic>::__type(
                                             #min_length,
                                             #max_length,
                                             #pattern,
-                                            /* type: number */
                                             #minimum,
                                             #maximum,
                                             #multiple_of,
                                             #exclusive_minimum,
                                             #exclusive_maximum,
-                                            /* type: object */
                                             #min_items,
                                             #max_items,
                                         ),
@@ -250,26 +199,13 @@ fn fn_ty_enum(
                     }
                 },
                 Data::TupleStruct(ref fields) => {
-                    /*
-                    "type": "array",
-                    "items": [
-                        {
-                            "type": "...",
-                        },
-                        {
-                            "type": "...",
-                        },
-                        ...
-                    ]
-                    */
-
                     let stmts: Vec<TokenStream2> = fields
                         .iter()
                         .map(|field| {
                             let Field { ty, .. } = field;
 
                             quote! {
-                                <#ty as Schematic>::ty2()
+                                <#ty as Schematic>::__type_no_attr()
                             }
                         })
                         .collect();
@@ -294,7 +230,7 @@ fn fn_ty_enum(
         .collect();
 
     let fn_block = quote! {
-        fn ty(
+        fn __type(
             min_length: Option<u64>,
             max_length: Option<u64>,
             pattern: Option<String>,
@@ -349,18 +285,15 @@ fn fn_ty_struct(
                     rschema::Property {
                         title: #title.into(),
                         description: #description,
-                        ty: <#ty as Schematic>::ty(
-                            /* type: string */
+                        ty: <#ty as Schematic>::__type(
                             #min_length,
                             #max_length,
                             #pattern,
-                            /* type: number */
                             #minimum,
                             #maximum,
                             #multiple_of,
                             #exclusive_minimum,
                             #exclusive_maximum,
-                            /* type: object */
                             #min_items,
                             #max_items,
                         ),
@@ -371,7 +304,7 @@ fn fn_ty_struct(
         .collect();
 
     let fn_block = quote! {
-        fn ty(
+        fn __type(
             min_length: Option<u64>,
             max_length: Option<u64>,
             pattern: Option<String>,
@@ -412,7 +345,7 @@ fn fn_ty_newtype_struct(
     let Field { ty, .. } = field;
 
     let fn_block = quote! {
-        fn ty(
+        fn __type(
             min_length: Option<u64>,
             max_length: Option<u64>,
             pattern: Option<String>,
@@ -424,7 +357,7 @@ fn fn_ty_newtype_struct(
             min_items: Option<u64>,
             max_items: Option<u64>,
         ) -> rschema::PropType {
-            <#ty as Schematic>::ty2()
+            <#ty as Schematic>::__type_no_attr()
         }
     };
     fn_block.into()
@@ -440,13 +373,13 @@ fn fn_ty_tuple_struct(
             let Field { ty, .. } = field;
 
             quote! {
-                <#ty as Schematic>::ty2()
+                <#ty as Schematic>::__type_no_attr()
             }
         })
         .collect();
 
     let fn_block = quote! {
-        fn ty(
+        fn __type(
             min_length: Option<u64>,
             max_length: Option<u64>,
             pattern: Option<String>,
@@ -470,38 +403,4 @@ fn fn_ty_tuple_struct(
         }
     };
     fn_block.into()
-
-    /*
-    let stmts: Vec<TokenStream2> = fields
-        .iter()
-        .map(|field| {
-            let Field { ty, .. } = field;
-
-            quote! {
-                <#ty as Schematic>::ty2()
-            }
-        })
-        .collect();
-
-    let fn_block = quote! {
-        fn ty(
-            min_length: Option<u64>,
-            max_length: Option<u64>,
-            pattern: Option<String>,
-            minimum: Option<i64>,
-            maximum: Option<i64>,
-            min_items: Option<u64>,
-            max_items: Option<u64>,
-        ) -> rschema::PropType {
-            rschema::PropType::Tuple(rschema::TupleProp {
-                any_of: vec![
-                    #(
-                        #stmts,
-                    )*
-                ],
-            })
-        }
-    };
-    fn_block.into()
-    */
 }
