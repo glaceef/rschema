@@ -1,10 +1,7 @@
 #![allow(dead_code)]
 #![allow(unused_imports)]
 
-use serde::{
-    Serialize,
-    Deserialize,
-};
+use serde::Serialize;
 
 use rschema::{
     Schema,
@@ -108,7 +105,7 @@ struct Data {
         title = "たぶん文字列",
         description = "たぶん文字列です。",
     ))]
-    prop_oprional: Option<String>,
+    prop_optional: Option<String>,
     
     #[rschema(
         field(
