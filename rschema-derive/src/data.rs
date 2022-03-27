@@ -1,15 +1,23 @@
-use darling::FromField;
+use darling::{
+    FromAttributes,
+    FromField,
+};
 use syn::punctuated::Punctuated;
 
-use crate::field_attr::FieldAttr;
-
-mod struct_data;
-use struct_data::StructData;
+use crate::{
+    // container_attr::ContainerAttr,
+    variant_attr::{
+        StructVariantAttr,
+        UnitVariantAttr,
+    },
+};
 
 mod field;
-pub use field::Field;
-
+mod field_attr;
 mod variant;
+
+pub use field::Field;
+pub use field_attr::FieldAttr;
 pub use variant::Variant;
 
 #[derive(Debug)]
@@ -41,8 +49,20 @@ impl Data {
         let variants: darling::Result<Vec<Variant>> = variants
             .iter()
             .map(|variant| {
+                let attr = match variant.fields {
+                    // struct variant
+                    syn::Fields::Named(_) => {
+                        StructVariantAttr::from_attributes(&variant.attrs)?.into()
+                    },
+
+                    // unit / newtype / tuple variant
+                    _ => {
+                        UnitVariantAttr::from_attributes(&variant.attrs)?.into()
+                    },
+                };
+
                 Self::struct_from_ast(&variant.fields)
-                    .map(|data| Variant { data } )
+                    .map(|data| Variant { attr, data } )
             })
             .collect();
         Ok(Data::Enum(variants?))

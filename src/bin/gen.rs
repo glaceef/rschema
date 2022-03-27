@@ -52,6 +52,7 @@ enum Enum {
     // これどーしよ
     // Unit,
 
+    #[rschema(additional_properties)]
     Struct {
         #[rschema(field(
             title = "aaa",
@@ -64,6 +65,7 @@ enum Enum {
 }
 
 #[derive(Debug, Schematic)]
+#[rschema(additional_properties)]
 struct Data {
     #[rschema(
         field(

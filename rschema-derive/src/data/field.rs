@@ -1,4 +1,4 @@
-use crate::field_attr::FieldAttr;
+use super::FieldAttr;
 
 #[derive(Debug)]
 pub struct Field {

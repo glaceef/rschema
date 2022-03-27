@@ -1,7 +1,7 @@
 use darling::FromDeriveInput;
 
 use crate::{
-    struct_attr::StructAttr,
+    container_attr::ContainerAttr,
     data::Data,
 };
 
@@ -13,8 +13,8 @@ use type_generics::TypeGenerics;
 
 #[derive(Debug)]
 pub struct Container<'a> {
-    // Attributes on the structure, parsed for Serde.
-    pub attr: StructAttr,
+    // Attributes on the struct or enum.
+    pub attr: ContainerAttr,
     // The struct or enum name (without generics).
     pub ident: &'a syn::Ident,
     // The data within the struct or enum.
@@ -67,14 +67,14 @@ impl<'a> Container<'a> {
             },
         };
 
-        let attr = StructAttr::from_derive_input(&input).unwrap();
+        let attr = ContainerAttr::from_derive_input(&input).unwrap();
 
         Ok(Container {
             attr,
             ident: &input.ident,
-            data: data,
             generics: &input.generics,
-            source: input,
+            data: data,
+            source: input, // 現状不要
         })
     }
 
