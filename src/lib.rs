@@ -6,6 +6,8 @@ pub use rschema_core::{
     PropType,
     Properties,
     Property,
+    Result,
+    RschemaError,
     Schema,
     Schematic,
     StringProp,

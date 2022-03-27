@@ -5,6 +5,7 @@ use serde::{
 
 use crate::{
     PropType,
+    Result,
     Schematic,
 };
 
@@ -28,5 +29,32 @@ impl Schema {
             description: None,
             ty: T::__type_no_attr(), // もしかしたらContainer Attributesで指定するかも
         }
+    }
+
+    pub fn description(
+        &mut self,
+        description: impl Into<String>
+    ) -> &mut Self {
+        self.description = Some(description.into());
+        self
+    }
+
+    pub fn to_string(&self) -> Result<String> {
+        let schema_str = serde_json::to_string(self)?;
+        Ok(schema_str)
+    }
+
+    pub fn to_string_pretty(&self) -> Result<String> {
+        let schema_str = serde_json::to_string_pretty(self)?;
+        Ok(schema_str)
+    }
+
+    pub fn save(
+        &self,
+        path: impl AsRef<std::path::Path>,
+    ) -> Result<()> {
+        let schema_str = self.to_string_pretty()?;
+        std::fs::write(path, schema_str)?;
+        Ok(())
     }
 }

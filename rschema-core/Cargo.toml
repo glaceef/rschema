@@ -13,3 +13,4 @@ path = "src/bin/gen.rs"
 indexmap = { version = "*", features = ["serde"] }
 serde = { version = "*", features = ["derive"] }
 serde_json = "*"
+thiserror = "*"
