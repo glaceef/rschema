@@ -7,8 +7,8 @@ authors = ["glaceef <ma3ki0708.study@gmail.com>"]
 license = "MIT OR Apache-2.0"
 homepage = "https://github.com/glaceef"
 repository = "https://github.com/glaceef/rschema"
-documentation = "https://docs.rs/rschema/"
-keywords = ["json", "schema"]
+documentation = "https://docs.rs/rschema-derive/"
+keywords = ["json", "schema", "derive", "macro"]
 categories = ["encoding"]
 readme = "README.md"
 
