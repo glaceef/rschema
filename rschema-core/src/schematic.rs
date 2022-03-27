@@ -57,6 +57,7 @@ impl Schematic for String {
             max_length,
             pattern,
             format: None,
+            enm: vec![],
         })
     }
 }

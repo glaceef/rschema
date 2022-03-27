@@ -3,7 +3,7 @@ use serde::{
     Deserialize,
 };
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 #[serde(rename_all(serialize = "camelCase"))]
 pub struct StringProp {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -17,4 +17,8 @@ pub struct StringProp {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub format: Option<String>,
+
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[serde(rename = "enum")]
+    pub enm: Vec<String>,
 }

@@ -49,8 +49,8 @@ struct TupleStruct(usize, String);
 
 #[derive(Debug, Schematic)]
 enum Enum {
-    // これどーしよ
-    // Unit,
+    // rename が欲しくなるね
+    Unit,
 
     #[rschema(additional_properties)]
     Struct {

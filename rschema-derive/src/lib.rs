@@ -213,18 +213,59 @@ fn quote_items(fields: &[Field]) -> TokenStream2 {
     }
 }
 
+fn quote_enum_units(variants: &[Variant]) -> Option<TokenStream2> {
+    /*
+    enum に含まれるすべてのユニットバリアントをまとめた、
+    下記のようなプロパティを生成する。
+    ```
+    {
+        "type": "string",
+        "enum": [
+            "name1",
+            "name2",
+            ...
+        ]
+    }
+    ```
+    */
+
+    let idents: Vec<syn::Ident> = variants
+        .iter()
+        .filter_map(|variant| {
+            match variant.data {
+                Data::UnitStruct => Some(variant.ident.clone()),
+                _ => None,
+            }
+        })
+        .collect();
+
+    // ユニットバリアントが存在しない場合、トークンを埋め込まない。
+    if idents.is_empty() {
+        return None;
+    }
+
+    Some(quote! {
+        rschema::PropType::String(rschema::StringProp {
+            enm: vec![
+                #(
+                    stringify!(#idents).into(),
+                )*
+            ],
+            ..Default::default()
+        })
+    })
+}
+
 fn fn_ty_enum(
     _container: &Container,
     variants: &[Variant],
 ) -> TokenStream2 {
     let types: Vec<TokenStream2> = variants
         .iter()
-        .map(|variant| {
-            // 後で共通化を検討
+        .filter_map(|variant| {
             match variant.data {
-                Data::UnitStruct => {
-                    todo!("fn_ty_enum -> UnitStruct");
-                },
+                // ユニットバリアントは後で処理する。
+                Data::UnitStruct => None,
                 Data::NewTypeStruct(ref field) => {
                     /*
                     現在はserdeのuntaggedと同じ扱いをしている。
@@ -257,33 +298,31 @@ fn fn_ty_enum(
                     */
 
                     let Field { ty, .. } = field;
-
-                    quote! {
+                    Some(quote! {
                         <#ty as Schematic>::__type_no_attr()
-                    }
+                    })
                 },
                 Data::Struct(ref fields) => {
                     let properties = quote_properties(fields);
                     let required = quote_required(fields);
                     let additional_properties = variant.attr.additional_properties;
-                    quote! {
+                    Some(quote! {
                         rschema::PropType::Object(rschema::ObjectProp {
                             properties: #properties,
                             required: #required,
                             additional_properties: #additional_properties,
                         })
-                    }
+                    })
                 },
                 Data::TupleStruct(ref fields) => {
                     let items = quote_items(fields);
-
-                    quote! {
+                    Some(quote! {
                         rschema::PropType::Array(rschema::ArrayProp {
                             items: #items,
                             min_items: None,
                             max_items: None,
                         })
-                    }
+                    })
                 },
                 Data::Enum(_) => {
                     panic!("バリアント内enumは存在しない？");
@@ -292,12 +331,14 @@ fn fn_ty_enum(
         })
         .collect();
 
+    let enum_units = quote_enum_units(&variants);
     let fn_type_body = quote! {
         rschema::PropType::Enum(rschema::EnumProp {
             any_of: vec![
                 #(
                     #types,
                 )*
+                #enum_units // 末尾カンマ禁止
             ],
         })
     };

@@ -8,6 +8,7 @@ pub use rschema_core::{
     Property,
     Schema,
     Schematic,
+    StringProp,
     TupleProp,
 };
 
