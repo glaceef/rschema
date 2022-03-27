@@ -13,10 +13,6 @@ rschema-derive = { path = "rschema-derive" }
 serde = { version = "*", features = ["derive"] }
 serde_yaml = "*"
 
-[[bin]]
-name = "gen"
-path = "src/bin/gen.rs"
-
 [[example]]
 name = "config"
 crate-type = ["staticlib"]
