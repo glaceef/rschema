@@ -10,9 +10,19 @@ rschema-core = { path = "rschema-core" }
 rschema-derive = { path = "rschema-derive" }
 
 [dev-dependencies]
-# serde = { version = "*", features = ["derive"] }
-# serde_yaml = "*"
+serde = { version = "*", features = ["derive"] }
+serde_yaml = "*"
 
 [[bin]]
 name = "gen"
 path = "src/bin/gen.rs"
+
+[[example]]
+name = "config"
+crate-type = ["staticlib"]
+
+[[example]]
+name = "generate"
+
+[[example]]
+name = "restore"
