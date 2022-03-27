@@ -1,5 +1,6 @@
 [package]
 name = "rschema-core"
+description = "rschema's core crate"
 version = "0.1.0"
 edition = "2021"
 authors = ["glaceef <ma3ki0708.study@gmail.com>"]
