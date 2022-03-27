@@ -9,7 +9,6 @@ pub use items::Items;
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all(serialize = "camelCase"))]
 pub struct ArrayProp {
-    // #[serde(flatten)]
     pub items: Box<Items>,
 
     #[serde(skip_serializing_if = "Option::is_none")]

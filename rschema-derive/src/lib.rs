@@ -384,7 +384,10 @@ fn fn_ty_struct(
 fn fn_ty_unit_struct(
     _container: &Container,
 ) -> TokenStream2 {
-    todo!();
+    let fn_type_body = quote! {
+        rschema::PropType::Null
+    };
+    quote_impl_fn_type(fn_type_body)
 }
 
 fn fn_ty_newtype_struct(

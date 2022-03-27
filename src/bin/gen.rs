@@ -90,6 +90,15 @@ enum SingleUnitVariantEnum {
 }
 
 #[derive(Debug, Schematic)]
+struct UnitStruct;
+
+#[derive(Debug, Schematic)]
+struct EmptyTupleStruct();
+
+#[derive(Debug, Schematic)]
+struct EmptyStruct {}
+
+#[derive(Debug, Schematic)]
 #[rschema(additional_properties)]
 struct Data {
     #[rschema(
@@ -217,6 +226,24 @@ struct Data {
         description = "単一のユニットバリアントです。",
     ))]
     prop_single_unit_variant_enum: SingleUnitVariantEnum,
+
+    #[rschema(field(
+        title = "ユニット構造体",
+        description = "ユニット構造体です。",
+    ))]
+    prop_unit_struct: UnitStruct, // type: null
+
+    #[rschema(field(
+        title = "空のタプル構造体",
+        description = "空のタプル構造体です。",
+    ))]
+    prop_empty_tuple_struct: EmptyTupleStruct,
+
+    #[rschema(field(
+        title = "空の構造体",
+        description = "空の構造体です。",
+    ))]
+    prop_empty_struct: EmptyStruct,
 }
 
 fn main(){
