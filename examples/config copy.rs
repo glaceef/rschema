@@ -5,8 +5,9 @@ use rschema::{
     Schema,
     Schematic,
 };
+use serde::Deserialize;
 
-#[derive(Debug, Schematic)]
+#[derive(Debug, Schematic, Deserialize)]
 struct NestedStruct {
     #[rschema(
         field(
@@ -18,7 +19,7 @@ struct NestedStruct {
     field_number: i32,
 }
 
-#[derive(Debug, Schematic)]
+#[derive(Debug, Schematic, Deserialize)]
 struct Struct {
     #[rschema(
         field(
@@ -39,13 +40,13 @@ struct Struct {
     field_nested: NestedStruct,
 }
 
-#[derive(Debug, Schematic)]
+#[derive(Debug, Schematic, Deserialize)]
 struct NewTypeStruct(String);
 
-#[derive(Debug, Schematic)]
+#[derive(Debug, Schematic, Deserialize)]
 struct TupleStruct(usize, String);
 
-#[derive(Debug, Schematic)]
+#[derive(Debug, Schematic, Deserialize)]
 enum Enum {
     // rename が欲しくなるね
     Unit1,
@@ -66,39 +67,39 @@ enum Enum {
     Tuple(usize, String),
 }
 
-#[derive(Debug, Schematic)]
+#[derive(Debug, Schematic, Deserialize)]
 enum MultiUnitEnum {
     Unit1,
     Unit2,
     Unit3,
 }
 
-// #[derive(Debug, Schematic)]
+// #[derive(Debug, Schematic, Deserialize)]
 // enum NoVariantEnum {
 // }
 
-#[derive(Debug, Schematic)]
+#[derive(Debug, Schematic, Deserialize)]
 enum SingleVariantEnum {
     Var(String),
 }
 
-#[derive(Debug, Schematic)]
+#[derive(Debug, Schematic, Deserialize)]
 enum SingleUnitVariantEnum {
     Var,
 }
 
-#[derive(Debug, Schematic)]
+#[derive(Debug, Schematic, Deserialize)]
 struct UnitStruct;
 
-#[derive(Debug, Schematic)]
+#[derive(Debug, Schematic, Deserialize)]
 struct EmptyTupleStruct();
 
-#[derive(Debug, Schematic)]
+#[derive(Debug, Schematic, Deserialize)]
 struct EmptyStruct {}
 
-#[derive(Debug, Schematic)]
+#[derive(Debug, Schematic, Deserialize)]
 #[rschema(additional_properties)]
-struct Data {
+pub struct Config {
     #[rschema(
         field(
             title = "文字列",
@@ -242,14 +243,4 @@ struct Data {
         description = "空の構造体です。",
     ))]
     prop_empty_struct: EmptyStruct,
-}
-
-fn main() -> rschema::Result<()> {
-    let schema = Schema::new::<Data>("データ");
-    // println!("{:#?}", schema);
-
-    let schema_str = schema.to_string_pretty()?;
-    println!("{}", schema_str);
-
-    Ok(())
 }

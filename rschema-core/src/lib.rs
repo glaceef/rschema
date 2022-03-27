@@ -1,11 +1,24 @@
-pub mod property;
+mod error;
+mod prop_type;
+mod properties;
+mod property;
+mod schema;
+mod schematic;
+
+pub use error::RschemaError;
+pub use prop_type::{
+    ArrayProp,
+    EnumProp,
+    Items,
+    NumericProp,
+    ObjectProp,
+    PropType,
+    StringProp,
+    TupleProp,
+};
+pub use properties::Properties;
 pub use property::Property;
-
-pub mod schema;
 pub use schema::Schema;
-
-pub mod schematic;
 pub use schematic::Schematic;
 
-mod types;
-pub use types::Properties;
+pub type Result<T> = std::result::Result<T, RschemaError>;

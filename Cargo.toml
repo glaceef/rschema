@@ -22,7 +22,7 @@ name = "config"
 crate-type = ["staticlib"]
 
 [[example]]
-name = "generate_schema"
+name = "generate"
 
 [[example]]
-name = "restore_config"
+name = "restore"

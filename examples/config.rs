@@ -1,72 +1,249 @@
 #![allow(dead_code)]
+#![allow(unused_imports)]
 
-use rschema::Schematic;
+use rschema::{
+    Schema,
+    Schematic,
+};
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize, Schematic)]
-pub struct Config {
+#[derive(Debug, Schematic, Deserialize)]
+#[serde(untagged)]
+enum FullEnum {
+    Unit,
+
+    EmptyTuple(),
+
+    SingleFieldTuple(bool),
+
+    MultiFieldTuple(usize, String),
+
+    #[rschema(additional_properties)]
+    Struct {
+        #[rschema(field(
+            title = "Number",
+            description = "Number prop in enum's struct variant.",
+        ))]
+        field: i32,
+    },
+}
+
+#[derive(Debug, Schematic, Deserialize)]
+struct UnitStruct;
+
+#[derive(Debug, Schematic, Deserialize)]
+struct EmptyTupleStruct();
+
+#[derive(Debug, Schematic, Deserialize)]
+struct SingleTupleStruct(String);
+
+#[derive(Debug, Schematic, Deserialize)]
+struct TupleStruct(usize, String);
+
+#[derive(Debug, Schematic, Deserialize)]
+struct EmptyStruct {}
+
+#[derive(Debug, Schematic, Deserialize)]
+struct NestedStruct {
+    #[rschema(field(
+        title = "Number",
+        description = "This is number prop in nested-struct.",
+    ))]
+    field_number: i32,
+}
+
+#[derive(Debug, Schematic, Deserialize)]
+#[rschema(additional_properties)]
+struct Struct {
     #[rschema(
         field(
-            // `title` and `description` are used for all types.
-            title = "project name", // required
-            description = "This is project name.", // optional
+            title = "Number",
+            description = "This is number prop in struct.",
         ),
         required,
     )]
-    name: String,
+    field_number: i32,
 
     #[rschema(field(
-        title = "version",
-        description = "This is version.",
-
-        // `pattern` is allowed for string type only.
-        // Write in regular expression format.
-        pattern = "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+        title = "Number",
+        description = "This is number prop in struct.",
     ))]
-    #[rschema(required)] // Ok to write separately.
-    version: String,
-
-    #[rschema(field(
-        title = "project members",
-        description = "They are project members. Up to 10 members.",
-        type = "array",
-        max_length = 10,
-    ))]
-    members: Vec<String>,
-
-    // Custom data types are interpreted as object type.
-    // The type must derives `Schematic`.
-    #[rschema(field(
-        title = "data",
-        description = "This is a data.",
-    ))]
-    data: Data,
+    nested_struct: NestedStruct,
 }
 
-#[derive(Debug, Deserialize, Schematic)]
-#[rschema(additional_properties)]
-struct Data {
+#[derive(Debug, Schematic, Deserialize)]
+enum UnitVariantOnlyEnum {
+    Unit1,
+    Unit2,
+    Unit3,
+}
+
+#[derive(Debug, Schematic, Deserialize)]
+pub struct Config {
     #[rschema(field(
-        title = "number",
-        description = "This is numeric value between 0 and 100.",
+        title = "String",
+        description = "This is string.",
+        min_length = 1,
+        max_length = 15,
+        pattern = r"^\w+$",
+        format = "my format",
+    ))]
+    prop_string: String,
+    
+    #[rschema(field(
+        title = "Number (i8)",
+        description = "This is number.",
         minimum = 0,
-        maximum = 100,
+        maximum = 256,
+        exclusive_minimum = false,
+        exclusive_maximum = true,
     ))]
-    data1: i32,
+    prop_number_i8: i8,
+    
+    #[rschema(field(
+        title = "Number (i16)",
+        description = "This is number.",
+    ))]
+    prop_number_i16: i16,
+    
+    #[rschema(field(
+        title = "Number (i32)",
+        description = "This is number.",
+        multiple_of = 5,
+    ))]
+    prop_number_i32: i32,
+    
+    #[rschema(field(
+        title = "Number (i64)",
+        description = "This is number.",
+    ))]
+    prop_number_i64: i64,
+    
+    #[rschema(field(
+        title = "Number (isize)",
+        description = "This is number.",
+    ))]
+    prop_number_isize: isize,
+    
+    #[rschema(field(
+        title = "Number (u8)",
+        description = "This is number.",
+    ))]
+    prop_number_u8: u8,
+    
+    #[rschema(field(
+        title = "Number (u16)",
+        description = "This is number.",
+    ))]
+    prop_number_u16: u16,
+    
+    #[rschema(field(
+        title = "Number (u32)",
+        description = "This is number.",
+    ))]
+    prop_number_u32: u32,
+    
+    #[rschema(field(
+        title = "Number (u64)",
+        description = "This is number.",
+    ))]
+    prop_number_u64: u64,
+    
+    #[rschema(field(
+        title = "Number (usize)",
+        description = "This is number.",
+    ))]
+    prop_number_usize: usize,
+    
+    #[rschema(field(
+        title = "Boolean",
+        description = "This is boolean.",
+    ))]
+    prop_boolean: bool,
+    
+    #[rschema(field(
+        title = "Optional",
+        description = "This is optional value.",
+    ))]
+    prop_optional: Option<String>,
+    
+    #[rschema(field(
+        title = "Single-type array",
+        description = "This is single-type array.",
+        min_items = 1,
+        max_items = 10,
+    ))]
+    prop_single_type_array: Vec<String>,
+    
+    #[rschema(field(
+        title = "Composite-type array",
+        description = "This is composite-type array.",
+    ))]
+    prop_composite_type_array: Vec<FullEnum>,
 
     #[rschema(field(
-        title = "custom string",
-        description = "This is custom string value.",
-        type = "string", // Specify type
+        title = "Unit-struct",
+        description = "This is unit-struct.",
     ))]
-    data2: CustomString,
+    prop_unit_struct: UnitStruct, // => { "type": "null" }
 
     #[rschema(field(
-        title = "boolean",
-        description = "This is boolean value.",
+        title = "Empty tuple-struct",
+        description = "This is empty tuple-struct.",
     ))]
-    data3: bool,
+    prop_empty_tuple_struct: EmptyTupleStruct,
+
+    #[rschema(field(
+        title = "Single tuple struct",
+        description = "This is single tuple struct.",
+    ))]
+    prop_single_tuple_struct: SingleTupleStruct,
+
+    #[rschema(field(
+        title = "Tuple struct",
+        description = "This is tuple struct.",
+    ))]
+    prop_tuple_struct: TupleStruct,
+
+    #[rschema(field(
+        title = "Empty struct",
+        description = "This is empty struct.",
+    ))]
+    prop_empty_struct: EmptyStruct,
+
+    #[rschema(field(
+        title = "Struct",
+        description = "This is normal struct.",
+    ))]
+    prop_struct: Struct,
+
+    #[rschema(field(
+        title = "Full enum",
+        description = "This is full enum.",
+    ))]
+    prop_full_enum: FullEnum,
+
+    #[rschema(field(
+        title = "Unit-variant-only enum",
+        description = "This is unit-variant-only enum.",
+    ))]
+    prop_unit_variant_only_enum: UnitVariantOnlyEnum,
+
+    #[rschema(
+        field(
+            title = "Required prop",
+            description = "This is required prop.",
+        ),
+        required,
+    )]
+    prop_required_prop: String,
+
+    #[rschema(
+        field(
+            title = "Required prop 2",
+            description = "This is another required prop.",
+        ),
+        required,
+    )]
+    prop_required_prop2: String,
 }
-
-#[derive(Debug, Deserialize)]
-struct CustomString(String);

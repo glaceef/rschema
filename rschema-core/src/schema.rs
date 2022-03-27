@@ -1,63 +1,69 @@
-use serde::Serialize;
-
-use std::{
-    fs,
-    io,
-    path::Path,
+use serde::{
+    Serialize,
+    Deserialize,
 };
 
 use crate::{
-    Properties,
+    PropType,
+    Result,
     Schematic,
 };
 
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Schema {
-    title: String,
+    pub title: String,
 
-    #[serde(rename = "type")]
-    ty: String, // object
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
 
-    properties: Properties,
-
-    required: Vec<String>,
-
-    additional_properties: bool,
+    #[serde(flatten)]
+    pub ty: PropType,
 }
 
 impl Schema {
     pub fn new<T: Schematic>(title: &str) -> Self {
         Schema {
             title: title.into(),
-            ty: "object".into(),
-            properties: T::properties(),
-            required: T::required(),
-            additional_properties: T::additional_properties(),
+            description: None,
+            ty: T::__type_no_attr(), // もしかしたらContainer Attributesで指定するかも
         }
     }
 
-    pub fn to_string(&self) -> Result<String, String> {
-        match serde_json::to_string(self) {
-             Ok(v) => Ok(v),
-            Err(e) => Err(format!("{:?}", e)),
-        }
+    pub fn description(
+        &mut self,
+        description: impl Into<String>,
+    ) -> &mut Self {
+        self.description = Some(description.into());
+        self
     }
 
-    pub fn to_string_pretty(&self) -> Result<String, String> {
-        match serde_json::to_string_pretty(self) {
-             Ok(v) => Ok(v),
-            Err(e) => Err(format!("{:?}", e)),
-        }
+    pub fn to_string(&self) -> Result<String> {
+        let schema_str = serde_json::to_string(self)?;
+        Ok(schema_str)
     }
 
-    pub fn write(&self, path: impl AsRef<Path>) -> io::Result<()> {
-        let self_str = self.to_string().unwrap();
-        fs::write(path, self_str)
+    pub fn to_string_pretty(&self) -> Result<String> {
+        let schema_str = serde_json::to_string_pretty(self)?;
+        Ok(schema_str)
     }
 
-    pub fn write_pretty(&self, path: impl AsRef<Path>) -> io::Result<()> {
-        let self_str = self.to_string_pretty().unwrap();
-        fs::write(path, self_str)
+    pub fn write(
+        &self,
+        path: impl AsRef<std::path::Path>,
+    ) -> Result<()> {
+        let schema_str = self.to_string()?;
+        std::fs::write(path, schema_str)?;
+
+        Ok(())
+    }
+
+    pub fn write_pretty(
+        &self,
+        path: impl AsRef<std::path::Path>,
+    ) -> Result<()> {
+        let schema_str = self.to_string_pretty()?;
+        std::fs::write(path, schema_str)?;
+
+        Ok(())
     }
 }
