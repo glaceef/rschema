@@ -108,7 +108,7 @@ struct Data {
             min_length = 1,
             max_length = 15,
             pattern = r"^\w+$",
-            // format
+            format = "my format",
         ),
         required
     )]
