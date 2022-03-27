@@ -86,6 +86,34 @@ fn quote_option_bool(val: &Option<impl ToTokens>) -> TokenStream2 {
     }
 }
 
+fn quote_required(fields: &[Field]) -> TokenStream2 {
+    let required: Vec<&syn::Ident> = fields
+        .iter()
+        .filter_map(|field| {
+            let Field { attr, ident, .. } = field;
+
+            // Named field は必ずアトリビュートを持っている
+            let attr = attr.as_ref().unwrap();
+            // Named field は必ずidentがある
+            let ident = ident.as_ref().unwrap();
+
+            if attr.required {
+                Some(ident)
+            } else {
+                None
+            }
+        })
+        .collect();
+
+    quote! {
+        vec![
+            #(
+                stringify!(#required).into(),
+            )*
+        ]
+    }
+}
+
 fn fn_ty_enum(
     container: &Container,
     variants: &[Variant],
@@ -184,6 +212,7 @@ fn fn_ty_enum(
                         })
                         .collect();
 
+                    let required = quote_required(fields);
                     let additional_properties = variant.attr.additional_properties;
                     quote! {
                         rschema::PropType::Object(rschema::ObjectProp {
@@ -194,7 +223,7 @@ fn fn_ty_enum(
                                 )*
                                 properties
                             },
-                            required: vec![],
+                            required: #required,
                             additional_properties: #additional_properties,
                         })
                     }
@@ -304,6 +333,7 @@ fn fn_ty_struct(
         })
         .collect();
 
+    let required = quote_required(fields);
     let additional_properties = container.attr.additional_properties;
     let fn_block = quote! {
         fn __type(
@@ -326,7 +356,7 @@ fn fn_ty_struct(
                     )*
                     properties
                 },
-                required: vec![],
+                required: #required,
                 additional_properties: #additional_properties,
             })
         }
