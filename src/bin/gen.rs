@@ -1,8 +1,6 @@
 #![allow(dead_code)]
 #![allow(unused_imports)]
 
-use serde::Serialize;
-
 use rschema::{
     Schema,
     Schematic,
@@ -246,10 +244,12 @@ struct Data {
     prop_empty_struct: EmptyStruct,
 }
 
-fn main(){
+fn main() -> rschema::Result<()> {
     let schema = Schema::new::<Data, _>("データ");
     // println!("{:#?}", schema);
 
-    let schema_str = serde_json::to_string_pretty(&schema).unwrap();
+    let schema_str = schema.to_string_pretty()?;
     println!("{}", schema_str);
+
+    Ok(())
 }

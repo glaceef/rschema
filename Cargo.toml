@@ -8,8 +8,6 @@ edition = "2021"
 [dependencies]
 rschema-core = { path = "rschema-core" }
 rschema-derive = { path = "rschema-derive" }
-serde = { version = "*", features = ["derive"] }
-serde_json = "*"
 
 [dev-dependencies]
 # serde = { version = "*", features = ["derive"] }
