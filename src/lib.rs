@@ -1,7 +1,14 @@
 pub use rschema_core::{
+    ArrayProp,
+    EnumProp,
+    Items,
+    ObjectProp,
+    PropType,
     Properties,
+    Property,
     Schema,
     Schematic,
+    TupleProp,
 };
 
 #[allow(unused_imports)]
