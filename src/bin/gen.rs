@@ -54,10 +54,13 @@ enum Enum {
 
     #[rschema(additional_properties)]
     Struct {
-        #[rschema(field(
-            title = "aaa",
-            description = "bbb",
-        ))]
+        #[rschema(
+            field(
+                title = "aaa",
+                description = "bbb",
+            ),
+            required
+        )]
         value: i32,
     },
     NewType(String),
