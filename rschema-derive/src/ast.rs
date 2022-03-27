@@ -29,36 +29,6 @@ impl<'a> Container<'a> {
     pub fn from_ast(
         input: &'a syn::DeriveInput,
     ) -> darling::Result<Self> {
-        /*
-        enumは、
-        {
-            // typeなし
-            "anyOf": [
-                {
-                    // バリアント1
-                },
-                {
-                    // バリアント2
-                },
-                ...
-            ]
-        }
-        か、Vec<EnumType>の場合は、
-        {
-            "type": "array",
-            "items": {
-                "anyOf": [
-                    {
-                        // バリアント1
-                    },
-                    {
-                        // バリアント2
-                    },
-                    ...
-                ]
-            }
-        }
-        */
         let data = match input.data {
             syn::Data::Enum(ref data) => Data::enum_from_ast(&data.variants)?,
             syn::Data::Struct(ref data) => Data::struct_from_ast(&data.fields)?,

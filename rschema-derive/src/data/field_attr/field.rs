@@ -23,6 +23,9 @@ pub struct Field {
     #[darling(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pattern: Option<String>,
+    #[darling(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub format: Option<String>,
 
     /* type: number */
     #[darling(default)]
@@ -48,9 +51,4 @@ pub struct Field {
     #[darling(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_items: Option<u64>,
-
-    /* type: object */
-    // #[darling(default)]
-    // #[serde(skip_serializing_if = "Option::is_none")]
-    // pub additional_properties: Option<bool>,
 }

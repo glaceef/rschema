@@ -98,6 +98,7 @@ fn quote_properties(fields: &[Field]) -> TokenStream2 {
 
             let min_length = quote_option_num(&attr.field.min_length);
             let max_length = quote_option_num(&attr.field.max_length);
+            let format = quote_option_str(&attr.field.format);
             let pattern = quote_option_str(&attr.field.pattern);
             let minimum = quote_option_num(&attr.field.minimum);
             let maximum = quote_option_num(&attr.field.maximum);
@@ -120,6 +121,7 @@ fn quote_properties(fields: &[Field]) -> TokenStream2 {
                             #min_length,
                             #max_length,
                             #pattern,
+                            #format,
                             #minimum,
                             #maximum,
                             #multiple_of,
@@ -179,6 +181,7 @@ fn quote_impl_fn_type(body: TokenStream2) -> TokenStream2 {
             min_length: Option<u64>,
             max_length: Option<u64>,
             pattern: Option<String>,
+            format: Option<String>,
             minimum: Option<i64>,
             maximum: Option<i64>,
             multiple_of: Option<u64>,

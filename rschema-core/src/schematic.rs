@@ -14,6 +14,7 @@ pub trait Schematic {
         min_length: Option<u64>,
         max_length: Option<u64>,
         pattern: Option<String>,
+        format: Option<String>,
         minimum: Option<i64>,
         maximum: Option<i64>,
         multiple_of: Option<u64>,
@@ -35,6 +36,7 @@ pub trait Schematic {
             None,
             None,
             None,
+            None,
         )
     }
 }
@@ -44,6 +46,7 @@ impl Schematic for String {
         min_length: Option<u64>,
         max_length: Option<u64>,
         pattern: Option<String>,
+        format: Option<String>,
         minimum: Option<i64>,
         maximum: Option<i64>,
         multiple_of: Option<u64>,
@@ -56,7 +59,7 @@ impl Schematic for String {
             min_length,
             max_length,
             pattern,
-            format: None,
+            format,
             enm: vec![],
         })
     }
@@ -67,6 +70,7 @@ impl Schematic for i32 {
         min_length: Option<u64>,
         max_length: Option<u64>,
         pattern: Option<String>,
+        format: Option<String>,
         minimum: Option<i64>,
         maximum: Option<i64>,
         multiple_of: Option<u64>,
@@ -90,6 +94,7 @@ impl Schematic for usize {
         min_length: Option<u64>,
         max_length: Option<u64>,
         pattern: Option<String>,
+        format: Option<String>,
         minimum: Option<i64>,
         maximum: Option<i64>,
         multiple_of: Option<u64>,
@@ -113,6 +118,7 @@ impl Schematic for bool {
         min_length: Option<u64>,
         max_length: Option<u64>,
         pattern: Option<String>,
+        format: Option<String>,
         minimum: Option<i64>,
         maximum: Option<i64>,
         multiple_of: Option<u64>,
@@ -130,6 +136,7 @@ impl<T: Schematic> Schematic for Option<T> {
         min_length: Option<u64>,
         max_length: Option<u64>,
         pattern: Option<String>,
+        format: Option<String>,
         minimum: Option<i64>,
         maximum: Option<i64>,
         multiple_of: Option<u64>,
@@ -152,6 +159,7 @@ impl<T: Schematic> Schematic for Vec<T> {
         min_length: Option<u64>,
         max_length: Option<u64>,
         pattern: Option<String>,
+        format: Option<String>,
         minimum: Option<i64>,
         maximum: Option<i64>,
         multiple_of: Option<u64>,
