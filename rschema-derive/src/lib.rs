@@ -8,9 +8,9 @@ use syn::{
 };
 
 mod ast;
+mod container_attr;
 mod data;
-mod field_attr;
-mod struct_attr;
+mod variant_attr;
 
 use ast::Container;
 use data::{
@@ -184,6 +184,7 @@ fn fn_ty_enum(
                         })
                         .collect();
 
+                    let additional_properties = variant.attr.additional_properties;
                     quote! {
                         rschema::PropType::Object(rschema::ObjectProp {
                             properties: {
@@ -194,7 +195,7 @@ fn fn_ty_enum(
                                 properties
                             },
                             required: vec![],
-                            additional_properties: false,
+                            additional_properties: #additional_properties,
                         })
                     }
                 },
@@ -303,6 +304,7 @@ fn fn_ty_struct(
         })
         .collect();
 
+    let additional_properties = container.attr.additional_properties;
     let fn_block = quote! {
         fn __type(
             min_length: Option<u64>,
@@ -325,7 +327,7 @@ fn fn_ty_struct(
                     properties
                 },
                 required: vec![],
-                additional_properties: false,
+                additional_properties: #additional_properties,
             })
         }
     };
