@@ -1,0 +1,272 @@
+{
+  "title": "ExampleConfig",
+  "type": "object",
+  "properties": {
+    "prop_string": {
+      "title": "String",
+      "description": "This is string.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 15,
+      "pattern": "^\\w+$",
+      "format": "my format"
+    },
+    "prop_number_i8": {
+      "title": "Number (i8)",
+      "description": "This is number.",
+      "type": "number",
+      "minimum": 0,
+      "maximum": 256,
+      "exclusiveMinimum": false,
+      "exclusiveMaximum": true
+    },
+    "prop_number_i16": {
+      "title": "Number (i16)",
+      "description": "This is number.",
+      "type": "number"
+    },
+    "prop_number_i32": {
+      "title": "Number (i32)",
+      "description": "This is number.",
+      "type": "number",
+      "multipleOf": 5
+    },
+    "prop_number_i64": {
+      "title": "Number (i64)",
+      "description": "This is number.",
+      "type": "number"
+    },
+    "prop_number_isize": {
+      "title": "Number (isize)",
+      "description": "This is number.",
+      "type": "number"
+    },
+    "prop_number_u8": {
+      "title": "Number (u8)",
+      "description": "This is number.",
+      "type": "number"
+    },
+    "prop_number_u16": {
+      "title": "Number (u16)",
+      "description": "This is number.",
+      "type": "number"
+    },
+    "prop_number_u32": {
+      "title": "Number (u32)",
+      "description": "This is number.",
+      "type": "number"
+    },
+    "prop_number_u64": {
+      "title": "Number (u64)",
+      "description": "This is number.",
+      "type": "number"
+    },
+    "prop_number_usize": {
+      "title": "Number (usize)",
+      "description": "This is number.",
+      "type": "number"
+    },
+    "prop_boolean": {
+      "title": "Boolean",
+      "description": "This is boolean.",
+      "type": "boolean"
+    },
+    "prop_optional": {
+      "title": "Optional",
+      "description": "This is optional value.",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "prop_single_type_array": {
+      "title": "Single-type array",
+      "description": "This is single-type array.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "maxItems": 10
+    },
+    "prop_composite_type_array": {
+      "title": "Composite-type array",
+      "description": "This is composite-type array.",
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": []
+          },
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "array",
+            "items": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "field": {
+                "title": "Number",
+                "description": "Number prop in enum's struct variant.",
+                "type": "number"
+              }
+            },
+            "additionalProperties": true
+          },
+          {
+            "type": "string",
+            "enum": [
+              "Unit"
+            ]
+          }
+        ]
+      }
+    },
+    "prop_unit_struct": {
+      "title": "Unit-struct",
+      "description": "This is unit-struct.",
+      "type": "null"
+    },
+    "prop_empty_tuple_struct": {
+      "title": "Empty tuple-struct",
+      "description": "This is empty tuple-struct.",
+      "type": "array",
+      "items": []
+    },
+    "prop_single_tuple_struct": {
+      "title": "Single tuple struct",
+      "description": "This is single tuple struct.",
+      "type": "string"
+    },
+    "prop_tuple_struct": {
+      "title": "Tuple struct",
+      "description": "This is tuple struct.",
+      "type": "array",
+      "items": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "prop_empty_struct": {
+      "title": "Empty struct",
+      "description": "This is empty struct.",
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    },
+    "prop_struct": {
+      "title": "Struct",
+      "description": "This is normal struct.",
+      "type": "object",
+      "properties": {
+        "field_number": {
+          "title": "Number",
+          "description": "This is number prop in struct.",
+          "type": "number"
+        },
+        "nested_struct": {
+          "title": "Number",
+          "description": "This is number prop in struct.",
+          "type": "object",
+          "properties": {
+            "field_number": {
+              "title": "Number",
+              "description": "This is number prop in nested-struct.",
+              "type": "number"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "field_number"
+      ],
+      "additionalProperties": true
+    },
+    "prop_full_enum": {
+      "title": "Full enum",
+      "description": "This is full enum.",
+      "anyOf": [
+        {
+          "type": "array",
+          "items": []
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "array",
+          "items": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "field": {
+              "title": "Number",
+              "description": "Number prop in enum's struct variant.",
+              "type": "number"
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "type": "string",
+          "enum": [
+            "Unit"
+          ]
+        }
+      ]
+    },
+    "prop_unit_variant_only_enum": {
+      "title": "Unit-variant-only enum",
+      "description": "This is unit-variant-only enum.",
+      "type": "string",
+      "enum": [
+        "Unit1",
+        "Unit2",
+        "Unit3"
+      ]
+    },
+    "prop_required_prop": {
+      "title": "Required prop",
+      "description": "This is required prop.",
+      "type": "string"
+    },
+    "prop_required_prop2": {
+      "title": "Required prop 2",
+      "description": "This is another required prop.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "prop_required_prop",
+    "prop_required_prop2"
+  ],
+  "additionalProperties": false
+}
