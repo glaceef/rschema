@@ -5,16 +5,19 @@ use serde::{
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all(serialize = "camelCase"))]
-pub struct StringProp {
+pub struct NumericProp {
     #[serde(skip_serializing_if = "Option::is_none")]
-    min_length: Option<u64>,
+    pub minimum: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    max_length: Option<u64>,
+    pub maximum: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pattern: Option<String>,
+    pub multiple_of: Option<u64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    format: Option<String>,
+    pub exclusive_minimum: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub exclusive_maximum: Option<bool>,
 }

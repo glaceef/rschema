@@ -3,21 +3,22 @@ use serde::{
     Deserialize,
 };
 
-use crate::types::Properties;
+use crate::properties::Properties;
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all(serialize = "camelCase"))]
 pub struct ObjectProp {
     #[serde(default)]
-    properties: Properties,
+    pub properties: Properties,
 
     #[serde(default)]
-    required: Vec<String>,
+    pub required: Vec<String>,
 
     #[serde(default)]
-    additional_properties: bool,
+    pub additional_properties: bool,
 }
 
+/*
 impl ObjectProp {
     pub fn set_properties(&mut self, properties: Properties) {
         self.properties = properties;
@@ -31,3 +32,4 @@ impl ObjectProp {
         self.additional_properties = additional_properties;
     }
 }
+*/

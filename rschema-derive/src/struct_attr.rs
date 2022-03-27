@@ -1,6 +1,6 @@
-use darling::FromAttributes;
+use darling::FromDeriveInput;
 
-#[derive(Debug, FromAttributes)]
+#[derive(Debug, FromDeriveInput)]
 #[darling(attributes(rschema))]
 pub struct StructAttr {
     #[darling(default)]
