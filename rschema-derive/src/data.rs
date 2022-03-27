@@ -3,9 +3,6 @@ use syn::punctuated::Punctuated;
 
 use crate::field_attr::FieldAttr;
 
-mod struct_data;
-use struct_data::StructData;
-
 mod field;
 pub use field::Field;
 
