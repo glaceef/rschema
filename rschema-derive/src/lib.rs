@@ -34,7 +34,7 @@ fn expand_derive_schematic(
     let ident = container.ident;
     let (impl_generics, _, type_generics, where_clause) = container.split_for_impl();
 
-    let fn_ty_block = fn_ty(&container);
+    let fn_ty_block = impl_fn_type(&container);
     let impl_block = quote! {
         impl #impl_generics rschema::Schematic for #ident #type_generics #where_clause {
             #fn_ty_block
@@ -44,8 +44,7 @@ fn expand_derive_schematic(
     Ok(impl_block.into())
 }
 
-// わざわざ別関数にしなくても、トークンをfn_init_blockに差し込んでもよさそう。
-fn fn_ty(container: &Container) -> TokenStream2 {
+fn impl_fn_type(container: &Container) -> TokenStream2 {
     match container.data {
         Data::Enum(ref variants) => {
             fn_ty_enum(&container, &variants)
@@ -86,6 +85,66 @@ fn quote_option_bool(val: &Option<impl ToTokens>) -> TokenStream2 {
     }
 }
 
+fn quote_properties(fields: &[Field]) -> TokenStream2 {
+    let stmts: Vec<TokenStream2> = fields
+        .iter()
+        .map(|field| {
+            let Field { ident, ty, attr } = field;
+            // struct もしくは struct variant の場合、アトリビュートの無いフィールドはスキップしているので必ずSomeになる。
+            let attr = attr.as_ref().unwrap();
+
+            let title = &attr.field.title;
+            let description = quote_option_str(&attr.field.description);
+
+            let min_length = quote_option_num(&attr.field.min_length);
+            let max_length = quote_option_num(&attr.field.max_length);
+            let pattern = quote_option_str(&attr.field.pattern);
+            let minimum = quote_option_num(&attr.field.minimum);
+            let maximum = quote_option_num(&attr.field.maximum);
+            let multiple_of = quote_option_num(&attr.field.multiple_of);
+            let exclusive_minimum = quote_option_bool(&attr.field.exclusive_minimum);
+            let exclusive_maximum = quote_option_bool(&attr.field.exclusive_maximum);
+            let min_items = quote_option_num(&attr.field.min_items);
+            let max_items = quote_option_num(&attr.field.max_items);
+
+            quote! {
+                properties.insert(
+                    stringify!(#ident),
+                    rschema::Property {
+                        // enumの構造体バリアントには、
+                        // アトリビュートをつけるものなのだろうか？
+
+                        title: #title.into(),
+                        description: #description,
+                        ty: <#ty as Schematic>::__type(
+                            #min_length,
+                            #max_length,
+                            #pattern,
+                            #minimum,
+                            #maximum,
+                            #multiple_of,
+                            #exclusive_minimum,
+                            #exclusive_maximum,
+                            #min_items,
+                            #max_items,
+                        ),
+                    },
+                )
+            }
+        })
+        .collect();
+
+    quote! {
+        {
+            let mut properties = rschema::Properties::new();
+            #(
+                #stmts;
+            )*
+            properties
+        }
+    }
+}
+
 fn quote_required(fields: &[Field]) -> TokenStream2 {
     let required: Vec<&syn::Ident> = fields
         .iter()
@@ -114,11 +173,51 @@ fn quote_required(fields: &[Field]) -> TokenStream2 {
     }
 }
 
+fn quote_impl_fn_type(body: TokenStream2) -> TokenStream2 {
+    quote! {
+        fn __type(
+            min_length: Option<u64>,
+            max_length: Option<u64>,
+            pattern: Option<String>,
+            minimum: Option<i64>,
+            maximum: Option<i64>,
+            multiple_of: Option<u64>,
+            exclusive_minimum: Option<bool>,
+            exclusive_maximum: Option<bool>,
+            min_items: Option<u64>,
+            max_items: Option<u64>,
+        ) -> rschema::PropType {
+            #body
+        }
+    }
+}
+
+fn quote_items(fields: &[Field]) -> TokenStream2 {
+    let stmts: Vec<TokenStream2> = fields
+        .iter()
+        .map(|field| {
+            let Field { ty, .. } = field;
+
+            quote! {
+                <#ty as Schematic>::__type_no_attr()
+            }
+        })
+        .collect();
+
+    quote! {
+        Box::new(rschema::Items::Tuple(vec![
+            #(
+                #stmts,
+            )*
+        ]))
+    }
+}
+
 fn fn_ty_enum(
-    container: &Container,
+    _container: &Container,
     variants: &[Variant],
 ) -> TokenStream2 {
-    let stmts: Vec<TokenStream2> = variants
+    let types: Vec<TokenStream2> = variants
         .iter()
         .map(|variant| {
             // 後で共通化を検討
@@ -164,89 +263,23 @@ fn fn_ty_enum(
                     }
                 },
                 Data::Struct(ref fields) => {
-                    let stmts: Vec<TokenStream2> = fields
-                        .iter()
-                        .map(|field| {
-                            let Field { ident, ty, attr } = field;
-                            // structの場合、アトリビュートの無いフィールドはスキップしているので必ずSomeになる。
-                            let attr = attr.as_ref().unwrap();
-
-                            let title = &attr.field.title;
-                            let description = quote_option_str(&attr.field.description);
-
-                            let min_length = quote_option_num(&attr.field.min_length);
-                            let max_length = quote_option_num(&attr.field.max_length);
-                            let pattern = quote_option_str(&attr.field.pattern);
-                            let minimum = quote_option_num(&attr.field.minimum);
-                            let maximum = quote_option_num(&attr.field.maximum);
-                            let multiple_of = quote_option_num(&attr.field.multiple_of);
-                            let exclusive_minimum = quote_option_bool(&attr.field.exclusive_minimum);
-                            let exclusive_maximum = quote_option_bool(&attr.field.exclusive_maximum);
-                            let min_items = quote_option_num(&attr.field.min_items);
-                            let max_items = quote_option_num(&attr.field.max_items);
-
-                            quote! {
-                                properties.insert(
-                                    stringify!(#ident),
-                                    rschema::Property {
-                                        // enumの構造体バリアントには、
-                                        // アトリビュートをつけるものなのだろうか？
-
-                                        title: #title.into(),
-                                        description: #description,
-                                        ty: <#ty as Schematic>::__type(
-                                            #min_length,
-                                            #max_length,
-                                            #pattern,
-                                            #minimum,
-                                            #maximum,
-                                            #multiple_of,
-                                            #exclusive_minimum,
-                                            #exclusive_maximum,
-                                            #min_items,
-                                            #max_items,
-                                        ),
-                                    },
-                                )
-                            }
-                        })
-                        .collect();
-
+                    let properties = quote_properties(fields);
                     let required = quote_required(fields);
                     let additional_properties = variant.attr.additional_properties;
                     quote! {
                         rschema::PropType::Object(rschema::ObjectProp {
-                            properties: {
-                                let mut properties = rschema::Properties::new();
-                                #(
-                                    #stmts;
-                                )*
-                                properties
-                            },
+                            properties: #properties,
                             required: #required,
                             additional_properties: #additional_properties,
                         })
                     }
                 },
                 Data::TupleStruct(ref fields) => {
-                    let stmts: Vec<TokenStream2> = fields
-                        .iter()
-                        .map(|field| {
-                            let Field { ty, .. } = field;
-
-                            quote! {
-                                <#ty as Schematic>::__type_no_attr()
-                            }
-                        })
-                        .collect();
+                    let items = quote_items(fields);
 
                     quote! {
                         rschema::PropType::Array(rschema::ArrayProp {
-                            items: Box::new(rschema::Items::Tuple(vec![
-                                #(
-                                    #stmts,
-                                )*
-                            ])),
+                            items: #items,
                             min_items: None,
                             max_items: None,
                         })
@@ -259,180 +292,66 @@ fn fn_ty_enum(
         })
         .collect();
 
-    let fn_block = quote! {
-        fn __type(
-            min_length: Option<u64>,
-            max_length: Option<u64>,
-            pattern: Option<String>,
-            minimum: Option<i64>,
-            maximum: Option<i64>,
-            multiple_of: Option<u64>,
-            exclusive_minimum: Option<bool>,
-            exclusive_maximum: Option<bool>,
-            min_items: Option<u64>,
-            max_items: Option<u64>,
-        ) -> rschema::PropType {
-            rschema::PropType::Enum(rschema::EnumProp {
-                any_of: vec![
-                    #(
-                        #stmts,
-                    )*
-                ],
-            })
-        }
+    let fn_type_body = quote! {
+        rschema::PropType::Enum(rschema::EnumProp {
+            any_of: vec![
+                #(
+                    #types,
+                )*
+            ],
+        })
     };
-    fn_block.into()
+    quote_impl_fn_type(fn_type_body)
 }
 
 fn fn_ty_struct(
     container: &Container,
     fields: &[Field],
 ) -> TokenStream2 {
-    let stmts: Vec<TokenStream2> = fields
-        .iter()
-        .map(|field| {
-            let Field { ident, ty, attr } = field;
-            // structの場合、アトリビュートの無いフィールドはスキップしているので必ずSomeになる。
-            let attr = attr.as_ref().unwrap();
-
-            let title = &attr.field.title;
-            let description = quote_option_str(&attr.field.description);
-
-            let min_length = quote_option_num(&attr.field.min_length);
-            let max_length = quote_option_num(&attr.field.max_length);
-            let pattern = quote_option_str(&attr.field.pattern);
-            let minimum = quote_option_num(&attr.field.minimum);
-            let maximum = quote_option_num(&attr.field.maximum);
-            let multiple_of = quote_option_num(&attr.field.multiple_of);
-            let exclusive_minimum = quote_option_bool(&attr.field.exclusive_minimum);
-            let exclusive_maximum = quote_option_bool(&attr.field.exclusive_maximum);
-            let min_items = quote_option_num(&attr.field.min_items);
-            let max_items = quote_option_num(&attr.field.max_items);
-
-            quote! {
-                properties.insert(
-                    stringify!(#ident),
-                    rschema::Property {
-                        title: #title.into(),
-                        description: #description,
-                        ty: <#ty as Schematic>::__type(
-                            #min_length,
-                            #max_length,
-                            #pattern,
-                            #minimum,
-                            #maximum,
-                            #multiple_of,
-                            #exclusive_minimum,
-                            #exclusive_maximum,
-                            #min_items,
-                            #max_items,
-                        ),
-                    },
-                )
-            }
-        })
-        .collect();
-
+    let properties = quote_properties(fields);
     let required = quote_required(fields);
     let additional_properties = container.attr.additional_properties;
-    let fn_block = quote! {
-        fn __type(
-            min_length: Option<u64>,
-            max_length: Option<u64>,
-            pattern: Option<String>,
-            minimum: Option<i64>,
-            maximum: Option<i64>,
-            multiple_of: Option<u64>,
-            exclusive_minimum: Option<bool>,
-            exclusive_maximum: Option<bool>,
-            min_items: Option<u64>,
-            max_items: Option<u64>,
-        ) -> rschema::PropType {
-            rschema::PropType::Object(rschema::ObjectProp {
-                properties: {
-                    let mut properties = rschema::Properties::new();
-                    #(
-                        #stmts;
-                    )*
-                    properties
-                },
-                required: #required,
-                additional_properties: #additional_properties,
-            })
-        }
+
+    let fn_type_body = quote! {
+        rschema::PropType::Object(rschema::ObjectProp {
+            properties: #properties,
+            required: #required,
+            additional_properties: #additional_properties,
+        })
     };
-    fn_block.into()
+    quote_impl_fn_type(fn_type_body)
 }
 
 fn fn_ty_unit_struct(
-    container: &Container,
+    _container: &Container,
 ) -> TokenStream2 {
     todo!();
 }
 
 fn fn_ty_newtype_struct(
-    container: &Container,
+    _container: &Container,
     field: &Field,
 ) -> TokenStream2 {
     let Field { ty, .. } = field;
 
-    let fn_block = quote! {
-        fn __type(
-            min_length: Option<u64>,
-            max_length: Option<u64>,
-            pattern: Option<String>,
-            minimum: Option<i64>,
-            maximum: Option<i64>,
-            multiple_of: Option<u64>,
-            exclusive_minimum: Option<bool>,
-            exclusive_maximum: Option<bool>,
-            min_items: Option<u64>,
-            max_items: Option<u64>,
-        ) -> rschema::PropType {
-            <#ty as Schematic>::__type_no_attr()
-        }
+    let fn_type_body = quote! {
+        <#ty as Schematic>::__type_no_attr()
     };
-    fn_block.into()
+    quote_impl_fn_type(fn_type_body)
 }
 
 fn fn_ty_tuple_struct(
-    container: &Container,
+    _container: &Container,
     fields: &[Field],
 ) -> TokenStream2 {
-    let stmts: Vec<TokenStream2> = fields
-        .iter()
-        .map(|field| {
-            let Field { ty, .. } = field;
+    let items = quote_items(fields);
 
-            quote! {
-                <#ty as Schematic>::__type_no_attr()
-            }
+    let fn_type_body = quote! {
+        rschema::PropType::Array(rschema::ArrayProp {
+            items: #items,
+            min_items: None,
+            max_items: None,
         })
-        .collect();
-
-    let fn_block = quote! {
-        fn __type(
-            min_length: Option<u64>,
-            max_length: Option<u64>,
-            pattern: Option<String>,
-            minimum: Option<i64>,
-            maximum: Option<i64>,
-            multiple_of: Option<u64>,
-            exclusive_minimum: Option<bool>,
-            exclusive_maximum: Option<bool>,
-            min_items: Option<u64>,
-            max_items: Option<u64>,
-        ) -> rschema::PropType {
-            rschema::PropType::Array(rschema::ArrayProp {
-                items: Box::new(rschema::Items::Tuple(vec![
-                    #(
-                        #stmts,
-                    )*
-                ])),
-                min_items,
-                max_items,
-            })
-        }
     };
-    fn_block.into()
+    quote_impl_fn_type(fn_type_body)
 }
