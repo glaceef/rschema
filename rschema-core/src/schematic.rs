@@ -1,3 +1,5 @@
+#![allow(unused_variables)]
+
 use crate::{
     ArrayProp,
     EnumProp,
@@ -20,6 +22,7 @@ pub trait Schematic {
         min_items: Option<u64>,
         max_items: Option<u64>,
     ) -> PropType;
+
     fn __type_no_attr() -> PropType {
         Self::__type(
             None,
