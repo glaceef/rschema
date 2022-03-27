@@ -15,8 +15,8 @@ readme = "README.md"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rschema-core = { path = "rschema-core" }
-rschema-derive = { path = "rschema-derive" }
+rschema-core = { version = "0.1.0", path = "rschema-core" }
+rschema-derive = { version = "0.1.0", path = "rschema-derive" }
 
 [dev-dependencies]
 serde = { version = "1.0.136", features = ["derive"] }
