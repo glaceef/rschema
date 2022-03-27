@@ -50,7 +50,8 @@ struct TupleStruct(usize, String);
 #[derive(Debug, Schematic)]
 enum Enum {
     // rename が欲しくなるね
-    Unit,
+    Unit1,
+    Unit2,
 
     #[rschema(additional_properties)]
     Struct {
@@ -65,6 +66,27 @@ enum Enum {
     },
     NewType(String),
     Tuple(usize, String),
+}
+
+#[derive(Debug, Schematic)]
+enum MultiUnitEnum {
+    Unit1,
+    Unit2,
+    Unit3,
+}
+
+// #[derive(Debug, Schematic)]
+// enum NoVariantEnum {
+// }
+
+#[derive(Debug, Schematic)]
+enum SingleVariantEnum {
+    Var(String),
+}
+
+#[derive(Debug, Schematic)]
+enum SingleUnitVariantEnum {
+    Var,
 }
 
 #[derive(Debug, Schematic)]
@@ -171,6 +193,30 @@ struct Data {
         description = "requiredでないフィールドです。",
     ))]
     prop_unrequired: String,
+
+    #[rschema(field(
+        title = "複数のユニットバリアント",
+        description = "複数のユニットバリアントです。",
+    ))]
+    prop_multi_enum: MultiUnitEnum,
+
+    // #[rschema(field(
+    //     title = "バリアントなし",
+    //     description = "バリアントなしです。",
+    // ))]
+    // prop_no_variant_enum: NoVariantEnum,
+
+    #[rschema(field(
+        title = "単一のバリアント",
+        description = "単一のバリアントです。",
+    ))]
+    prop_single_variant_enum: SingleVariantEnum,
+
+    #[rschema(field(
+        title = "単一のユニットバリアント",
+        description = "単一のユニットバリアントです。",
+    ))]
+    prop_single_unit_variant_enum: SingleUnitVariantEnum,
 }
 
 fn main(){

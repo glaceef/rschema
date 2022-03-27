@@ -213,7 +213,7 @@ fn quote_items(fields: &[Field]) -> TokenStream2 {
     }
 }
 
-fn quote_enum_units(variants: &[Variant]) -> Option<TokenStream2> {
+fn quote_enum_units_ty(variants: &[Variant]) -> Option<TokenStream2> {
     /*
     enum に含まれるすべてのユニットバリアントをまとめた、
     下記のようなプロパティを生成する。
@@ -331,16 +331,34 @@ fn fn_ty_enum(
         })
         .collect();
 
-    let enum_units = quote_enum_units(&variants);
-    let fn_type_body = quote! {
-        rschema::PropType::Enum(rschema::EnumProp {
-            any_of: vec![
-                #(
-                    #types,
-                )*
-                #enum_units // 末尾カンマ禁止
-            ],
-        })
+    let enum_units_ty = quote_enum_units_ty(&variants);
+    let fn_type_body = match (types.is_empty(), &enum_units_ty) {
+        ( true, None) => {
+            // Zero-variant enums are prevented in advance.
+            // So this message is never used.
+            unimplemented!("Rschema does not support zero-variant enums.");
+        },
+        ( true, Some(ty)) => {
+            // ユニットバリアントのみ
+            quote! { #ty }
+        },
+        (false, _) if types.len() == 1 => {
+            // 単一の非ユニットバリアント
+            let ty = types.first().unwrap();
+            quote! { #ty }
+        },
+        _ => {
+            quote! {
+                rschema::PropType::Enum(rschema::EnumProp {
+                    any_of: vec![
+                        #(
+                            #types,
+                        )*
+                        #enum_units_ty // 末尾カンマ禁止
+                    ],
+                })
+            }
+        },
     };
     quote_impl_fn_type(fn_type_body)
 }

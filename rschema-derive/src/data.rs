@@ -46,6 +46,10 @@ impl Data {
     pub fn enum_from_ast(
         variants: &Punctuated<syn::Variant, syn::Token![,]>,
     ) -> darling::Result<Self> {
+        if variants.is_empty() {
+            return Err(darling::Error::custom("Rschema does not support zero-variant enums"));
+        }
+
         let variants: darling::Result<Vec<Variant>> = variants
             .iter()
             .map(|variant| {
