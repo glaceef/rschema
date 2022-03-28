@@ -1,7 +1,9 @@
-# Rschema &emsp; [![Latest Version]][crates.io] [![License: Apache]][Apache 2.0] [![License: MIT]][MIT]
+# Rschema &emsp; [![Crates Badge]][crates.io] [![Docs Badge]][docs.rs] [![License: Apache]][Apache 2.0] [![License: MIT]][MIT]
 
-[Latest Version]: https://img.shields.io/crates/v/rschema.svg
+[Crates Badge]: https://img.shields.io/crates/v/rschema.svg
 [crates.io]: https://crates.io/crates/rschema
+[Docs Badge]: https://docs.rs/rschema/badge.svg
+[docs.rs]: https://docs.rs/rschema
 [License: Apache]: https://img.shields.io/badge/License-Apache_2.0-blue.svg
 [Apache 2.0]: https://opensource.org/licenses/Apache-2.0
 [License: MIT]: https://img.shields.io/badge/License-MIT-yellow.svg
