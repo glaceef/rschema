@@ -7,7 +7,7 @@
 [License: MIT]: https://img.shields.io/badge/License-MIT-yellow.svg
 [MIT]: https://opensource.org/licenses/MIT
 
-**Rschema provides a macro for generating JSON schemas from structures.**
+***Rschema* provides a macro for generating JSON schemas from Rust structures.**
 
 ---
 
@@ -34,7 +34,7 @@ struct Custom {
         title = "A flag for debugging",
         description = "Set `true` to display debug logs.",
     ))]
-    debug_flag: bool
+    debug_flag: bool,
 }
 
 #[derive(Debug, Schematic)]
@@ -107,7 +107,7 @@ The above code generates the following file:
         }
       },
       "additionalProperties": true
-    },
+    }
   },
   "required": [
     "app_name",
