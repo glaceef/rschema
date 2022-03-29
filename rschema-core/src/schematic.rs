@@ -226,6 +226,8 @@ macro_rules! impls_tuple_for {
     }
 }
 
+// Implementation for tuples with up to 15 members.
+// See https://qiita.com/9laceef/items/e24f9541ef3924112f6b
 impls_tuple_for!(16);
 
 impl<T: Schematic> Schematic for Option<T> {
