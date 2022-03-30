@@ -246,4 +246,34 @@ pub struct Config {
         required,
     )]
     prop_required_prop2: String,
+
+    #[rschema(field(
+        title = "Empty Tuple",
+        description = "This is empty tuple.",
+    ))]
+    prop_empty_tuple: (),
+
+    #[rschema(field(
+        title = "One Member Tuple",
+        description = "This is tuple with one member.",
+    ))]
+    prop_one_member_tuple: (i8,),
+
+    #[rschema(field(
+        title = "Two Members Tuple",
+        description = "This is tuple with two members.",
+    ))]
+    prop_two_members_tuple: (i8, i16),
+
+    #[rschema(field(
+        title = "Three Members Tuple",
+        description = "This is tuple with three members.",
+    ))]
+    prop_three_members_tuple: (i32, i64, isize),
+
+    #[rschema(field(
+        title = "Twelve Members Tuple",
+        description = "This is tuple with twelve members.",
+    ))]
+    prop_twelve_members_tuple: (u8, u16, u32, u64, usize, f32, f64, bool, char, Option<String>, Vec<String>, Box<String>),
 }

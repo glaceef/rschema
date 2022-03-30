@@ -262,6 +262,105 @@
       "title": "Required prop 2",
       "description": "This is another required prop.",
       "type": "string"
+    },
+    "prop_empty_tuple": {
+      "title": "Empty Tuple",
+      "description": "This is empty tuple.",
+      "type": "null"
+    },
+    "prop_one_member_tuple": {
+      "title": "One Member Tuple",
+      "description": "This is tuple with one member.",
+      "type": "array",
+      "items": [
+        {
+          "type": "number"
+        }
+      ]
+    },
+    "prop_two_members_tuple": {
+      "title": "Two Members Tuple",
+      "description": "This is tuple with two members.",
+      "type": "array",
+      "items": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ]
+    },
+    "prop_three_members_tuple": {
+      "title": "Three Members Tuple",
+      "description": "This is tuple with three members.",
+      "type": "array",
+      "items": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ]
+    },
+    "prop_four_members_tuple": {
+      "title": "Four Members Tuple",
+      "description": "This is tuple with four members.",
+      "type": "array",
+      "items": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1
+        },
+        {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        {
+          "type": "string"
+        }
+      ]
     }
   },
   "required": [
