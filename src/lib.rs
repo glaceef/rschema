@@ -93,7 +93,17 @@
 //! 
 //! # Attributes
 //! 
-//! ## Common attributes
+//! ## Struct attributes
+//! 
+//! This attribute is available only for structs or struct variants.
+//! 
+//! | Attribute | Type | Meaning |
+//! | --- | --- | --- |
+//! | `additional_properties` | `bool` | Whether to allow properties not included in `properties`. |
+//! 
+//! ## Field attributes
+//! 
+//! ### Common
 //! 
 //! All types have the following attributes.
 //! 
@@ -103,7 +113,7 @@
 //! | | `description` | `String` | The more lengthy description about the field. |
 //! | `required` | | `bool` | Whether the property is required or not. |
 //! 
-//! ## Dedicated attributes
+//! ### Dedicated
 //! 
 //! Each types have dedicated attributes.
 //! 

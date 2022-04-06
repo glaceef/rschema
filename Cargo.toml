@@ -1,7 +1,7 @@
 [package]
 name = "rschema"
 description = "A json-schema generator"
-version = "0.1.5"
+version = "0.1.6"
 edition = "2021"
 authors = ["glaceef <ma3ki0708.study@gmail.com>"]
 license = "MIT OR Apache-2.0"
