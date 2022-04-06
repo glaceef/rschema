@@ -307,9 +307,9 @@
         }
       ]
     },
-    "prop_four_members_tuple": {
-      "title": "Four Members Tuple",
-      "description": "This is tuple with four members.",
+    "prop_twelve_members_tuple": {
+      "title": "Twelve Members Tuple",
+      "description": "This is tuple with twelve members.",
       "type": "array",
       "items": [
         {

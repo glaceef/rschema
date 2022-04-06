@@ -19,6 +19,6 @@ pub use prop_type::{
 pub use schema::Schema;
 pub use schematic::Schematic;
 
-/// Alias for a Result with the error type `rschema::Error`.
+/// Alias for a `Result` with the error type `rschema::Error`.
 /// 
 pub type Result<T> = std::result::Result<T, Error>;
