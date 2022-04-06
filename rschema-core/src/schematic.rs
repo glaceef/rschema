@@ -12,6 +12,31 @@ use crate::{
     StringProp,
 };
 
+/// A data structure that can provide any schema informations.
+/// 
+/// It is **deprecated** to implement this manually.
+/// 
+/// Rschema provides `Schematic` implementations for some Rust primitive and standard library types. All of these can be used to generate schema using Rschema.
+/// 
+/// ## Implementations of `Schematic` provided by Rschema
+/// 
+/// - **Primitive types**:
+///   - bool
+///   - i8, i16, i32, i64, isize
+///   - u8, u16, u32, u64, usize
+///   - f32, f64
+///   - char
+///   - str(&str)
+/// - **Compound types**:
+///   - tuples up to size 12
+/// - **Common standard library types**:
+///   - String
+///   - Option\<T\>
+/// - **Wrapper types**:
+///   - Box\<T\>
+/// - **Collection types**:
+///   - Vec\<T\>
+/// 
 pub trait Schematic {
     fn __type(
         min_length: Option<u64>,

@@ -3,6 +3,8 @@ use serde::{
     Deserialize,
 };
 
+/// Attributes for numeric type properties.
+/// 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all(serialize = "camelCase"))]
 pub struct NumericProp {

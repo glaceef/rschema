@@ -4,8 +4,12 @@ use serde::{
     Deserialize,
 };
 
-use crate::property::Property;
+use super::Property;
 
+/// Properties map of an object type property.
+/// 
+/// This is a map with entries of names and properties for each field of the structure and structure variant.
+/// 
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct Properties(IndexMap<String, Property>);
 

@@ -17,24 +17,49 @@ pub use array_prop::{
 };
 pub use enum_prop::EnumProp;
 pub use numeric_prop::NumericProp;
-pub use object_prop::ObjectProp;
+pub use object_prop::{
+    ObjectProp,
+    Properties,
+    Property,
+};
 pub use string_prop::StringProp;
 pub use tuple_prop::TupleProp;
 
+/// Represents some property type.
+/// 
 #[derive(Debug, Deserialize)]
 pub enum PropType {
+    /// For a `string` type property.
+    /// 
     String(StringProp),
+
+    /// For a `number` type property.
+    /// 
     // Integer(NumericProp),
     Number(NumericProp),
+
+    /// For a `boolean` type property.
+    /// 
     Boolean,
+
+    /// For a `null` type property.
+    /// 
     Null,
+
+    /// For an `array` type property.
+    /// 
     Array(ArrayProp),
+
+    /// For an `object` type property.
+    /// 
     Object(ObjectProp),
 
-    // 順序の定まっていない複合型
+    /// For an `array` type property. In particular, it has unordered and composite type items.
+    /// 
     Enum(EnumProp),
 
-    // タプル構造体（順序の決まった複合型）
+    /// For an `array` type property. In particular, it has ordered and composite type items.
+    /// 
     Tuple(TupleProp),
 }
 
