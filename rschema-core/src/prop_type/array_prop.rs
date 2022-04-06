@@ -6,6 +6,8 @@ use serde::{
 mod items;
 pub use items::Items;
 
+/// Attributes for array type properties.
+/// 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all(serialize = "camelCase"))]
 pub struct ArrayProp {

@@ -3,12 +3,49 @@ use serde::{
     Deserialize,
 };
 
+use std::fs;
+
 use crate::{
     PropType,
     Result,
     Schematic,
 };
 
+/// This is a structure representing the JSON schema itself.
+/// 
+/// ## Create Schema
+/// 
+/// See [the documentation top](https://docs.rs/rschema/latest/rschema/) for usage.
+/// 
+/// ## To JSON schema string
+/// 
+/// ```
+/// #[derive(Debug, Schematic)]
+/// struct Example {
+///     #[rschema(field(
+///         title = "Dummy",
+///         description = "Dummy field",
+///     ))]
+///     dummy: String,
+/// }
+/// 
+/// fn main() -> rschema::Result<()> {
+///     let schema_str = Schema::new::<Example>("Example")
+///         .to_string()?;
+/// 
+///     assert_eq!(
+///         schema_str,
+///         r#"{"title":"Example","type":"object","properties":{"dummy":{"title":"Dummy","description":"Dummy field","type":"string"}},"additionalProperties":false}"#
+///     );
+/// 
+///     Ok(())
+/// }
+/// ``` 
+/// 
+/// Use [`to_string_pretty`](fn@Schema::to_string_pretty) to generate as a pretty-prited string.
+/// 
+/// 
+/// 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Schema {
     pub title: String,
@@ -17,10 +54,12 @@ pub struct Schema {
     pub description: Option<String>,
 
     #[serde(flatten)]
-    pub ty: PropType,
+    ty: PropType,
 }
 
 impl Schema {
+    /// Create a schema object from the given type `T`.
+    /// 
     pub fn new<T: Schematic>(title: &str) -> Self {
         Schema {
             title: title.into(),
@@ -29,6 +68,8 @@ impl Schema {
         }
     }
 
+    /// Add a description about this schema.
+    /// 
     pub fn description(
         &mut self,
         description: impl Into<String>,
@@ -37,32 +78,56 @@ impl Schema {
         self
     }
 
+    /// Generate a JSON schema string.
+    /// 
+    /// # Errors
+    /// 
+    /// Internally calls `serde_json::to_string`, so this can fail if it fails. [Read more](https://docs.rs/serde_json/latest/serde_json/fn.to_string.html)
+    /// 
     pub fn to_string(&self) -> Result<String> {
         let schema_str = serde_json::to_string(self)?;
         Ok(schema_str)
     }
 
+    /// Generate a pretty-printed JSON schema string.
+    /// 
+    /// # Errors
+    /// 
+    /// Internally calls `serde_json::to_string_pretty`, so this can fail if it fails. [Read more](https://docs.rs/serde_json/latest/serde_json/fn.to_string_pretty.html)
+    /// 
     pub fn to_string_pretty(&self) -> Result<String> {
         let schema_str = serde_json::to_string_pretty(self)?;
         Ok(schema_str)
     }
 
+    /// Write a JSON schema string to a file.
+    /// 
+    /// # Errors
+    /// 
+    /// This call can fail if its own `to_string` call or writing to a file fails.
+    /// 
     pub fn write(
         &self,
         path: impl AsRef<std::path::Path>,
     ) -> Result<()> {
         let schema_str = self.to_string()?;
-        std::fs::write(path, schema_str)?;
+        fs::write(path, schema_str)?;
 
         Ok(())
     }
 
+    /// Write a pretty-printed JSON schema string to a file.
+    /// 
+    /// # Errors
+    /// 
+    /// This call can fail if its own `to_string_pretty` call or writing to a file fails.
+    /// 
     pub fn write_pretty(
         &self,
         path: impl AsRef<std::path::Path>,
     ) -> Result<()> {
         let schema_str = self.to_string_pretty()?;
-        std::fs::write(path, schema_str)?;
+        fs::write(path, schema_str)?;
 
         Ok(())
     }

@@ -3,6 +3,8 @@ use serde::{
     Deserialize,
 };
 
+/// Attributes for string type properties.
+/// 
 #[derive(Debug, Default, Serialize, Deserialize)]
 #[serde(rename_all(serialize = "camelCase"))]
 pub struct StringProp {

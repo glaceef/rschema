@@ -5,9 +5,14 @@ use serde::{
 
 use crate::prop_type::PropType;
 
+/// Items of an array type or a tuple type property.
+/// 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum Items {
-    Single(PropType), // Vec<String> のような単一の配列
-    Tuple(Vec<PropType>), // Tuple(u32, String) のようなタプル構造体
+    /// For an array type property with a single type items.
+    Single(PropType),
+
+    /// For an array type property with ordered items, like a tuple struct.
+    Tuple(Vec<PropType>),
 }
