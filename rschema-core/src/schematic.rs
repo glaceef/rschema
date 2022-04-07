@@ -356,16 +356,6 @@ impl<T: Schematic> Schematic for Box<T> {
     }
 }
 
-// Collection types:
-// - BTreeMap<K, V>
-// - BTreeSet<T>
-// - BinaryHeap<T>
-// - HashMap<K, V, H>
-// - HashSet<T, H>
-// - LinkedList<T>
-// - VecDeque<T>
-// - Vec<T>
-
 impl<V: Schematic, S> Schematic for std::collections::HashMap<String, V, S> {
     fn __type(
         min_length: Option<u64>,
