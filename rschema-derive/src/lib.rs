@@ -8,7 +8,6 @@ use syn::{
 };
 
 mod ast;
-mod container_attr;
 mod data;
 mod variant_attr;
 

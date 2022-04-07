@@ -1,13 +1,12 @@
 use darling::FromDeriveInput;
 
-use crate::{
-    container_attr::ContainerAttr,
-    data::Data,
-};
+use crate::Data;
 
+mod container_attr;
 mod impl_generics;
 mod type_generics;
 
+use container_attr::ContainerAttr;
 use impl_generics::ImplGenerics;
 use type_generics::TypeGenerics;
 
