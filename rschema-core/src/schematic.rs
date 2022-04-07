@@ -28,6 +28,7 @@ use crate::{
 ///   - char
 ///   - str(&str)
 /// - **Compound types**:
+///   - [T; 0]
 ///   - tuples up to size 12
 /// - **Common standard library types**:
 ///   - String
