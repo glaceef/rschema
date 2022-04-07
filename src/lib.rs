@@ -142,8 +142,8 @@
 //! 
 //! | Attribute | Type | Meaning |
 //! | --- | --- | --- |
-//! | `min_items` | `u64` | Specify the minimum length of the array. |
-//! | `max_items` | `u64` | Specify the maximum length of the array. |
+//! | `min_items` | `usize` | Specify the minimum length of the array. |
+//! | `max_items` | `usize` | Specify the maximum length of the array. |
 
 pub use rschema_core::{
     ArrayProp,

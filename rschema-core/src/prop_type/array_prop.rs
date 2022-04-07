@@ -14,8 +14,8 @@ pub struct ArrayProp {
     pub items: Box<Items>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub min_items: Option<u64>,
+    pub min_items: Option<usize>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub max_items: Option<u64>,
+    pub max_items: Option<usize>,
 }
