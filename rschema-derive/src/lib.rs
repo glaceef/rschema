@@ -187,8 +187,8 @@ fn quote_impl_fn_type(body: TokenStream2) -> TokenStream2 {
             multiple_of: Option<u64>,
             exclusive_minimum: Option<bool>,
             exclusive_maximum: Option<bool>,
-            min_items: Option<u64>,
-            max_items: Option<u64>,
+            min_items: Option<usize>,
+            max_items: Option<usize>,
         ) -> rschema::PropType {
             #body
         }

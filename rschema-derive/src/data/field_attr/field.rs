@@ -36,19 +36,19 @@ pub struct Field {
     pub maximum: Option<i64>,
     #[darling(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub multiple_of: Option<u64>, // 整数？
+    pub multiple_of: Option<u64>,
     #[darling(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub exclusive_minimum: Option<bool>, // minimumを含めるか否か
+    pub exclusive_minimum: Option<bool>,
     #[darling(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub exclusive_maximum: Option<bool>, // maximumを含めるか否か
+    pub exclusive_maximum: Option<bool>,
 
     /* type: array */
     #[darling(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub min_items: Option<u64>,
+    pub min_items: Option<usize>,
     #[darling(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub max_items: Option<u64>,
+    pub max_items: Option<usize>,
 }
