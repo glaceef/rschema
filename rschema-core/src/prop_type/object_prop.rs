@@ -3,9 +3,11 @@ use serde::{
     Deserialize,
 };
 
+mod additional_properties;
 mod properties;
 mod property;
 
+pub use additional_properties::AdditionalProperties;
 pub use properties::Properties;
 pub use property::Property;
 
@@ -21,5 +23,5 @@ pub struct ObjectProp {
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub required: Vec<String>,
 
-    pub additional_properties: bool,
+    pub additional_properties: Box<AdditionalProperties>,
 }

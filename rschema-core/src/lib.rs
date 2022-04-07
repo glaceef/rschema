@@ -5,6 +5,7 @@ mod schematic;
 
 pub use error::Error;
 pub use prop_type::{
+    AdditionalProperties,
     ArrayProp,
     EnumProp,
     Items,

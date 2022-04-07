@@ -16,14 +16,14 @@
       "description": "This is number.",
       "type": "number",
       "minimum": 0,
-      "maximum": 256,
-      "exclusiveMinimum": false,
-      "exclusiveMaximum": true
+      "maximum": 256
     },
     "prop_number_i16": {
       "title": "Number (i16)",
       "description": "This is number.",
-      "type": "number"
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 256
     },
     "prop_number_i32": {
       "title": "Number (i32)",
@@ -361,6 +361,93 @@
           "type": "string"
         }
       ]
+    },
+    "prop_hashmap_simple_values": {
+      "title": "HashMap",
+      "description": "This is map with primitive type values",
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "prop_hashmap_object_values": {
+      "title": "HashMap",
+      "description": "This is map with object type values",
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "field_number": {
+            "title": "Number",
+            "description": "This is number prop in struct.",
+            "type": "number"
+          },
+          "nested_struct": {
+            "title": "Number",
+            "description": "This is number prop in struct.",
+            "type": "object",
+            "properties": {
+              "field_number": {
+                "title": "Number",
+                "description": "This is number prop in nested-struct.",
+                "type": "number"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "field_number"
+        ],
+        "additionalProperties": true
+      }
+    },
+    "prop_hashmap_complex_values": {
+      "title": "HashMap",
+      "description": "This is map with complex type values",
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": []
+          },
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "array",
+            "items": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "field": {
+                "title": "Number",
+                "description": "Number prop in enum's struct variant.",
+                "type": "number"
+              }
+            },
+            "additionalProperties": true
+          },
+          {
+            "type": "string",
+            "enum": [
+              "Unit"
+            ]
+          }
+        ]
+      }
     }
   },
   "required": [

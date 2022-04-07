@@ -78,13 +78,6 @@ fn quote_option_num(val: &Option<impl ToTokens>) -> TokenStream2 {
     }
 }
 
-fn quote_option_bool(val: &Option<impl ToTokens>) -> TokenStream2 {
-    match val {
-        Some(v) => quote! { Some(#v) },
-        None    => quote! { None },
-    }
-}
-
 fn quote_properties(fields: &[Field]) -> TokenStream2 {
     let stmts: Vec<TokenStream2> = fields
         .iter()
@@ -103,8 +96,8 @@ fn quote_properties(fields: &[Field]) -> TokenStream2 {
             let minimum = quote_option_num(&attr.field.minimum);
             let maximum = quote_option_num(&attr.field.maximum);
             let multiple_of = quote_option_num(&attr.field.multiple_of);
-            let exclusive_minimum = quote_option_bool(&attr.field.exclusive_minimum);
-            let exclusive_maximum = quote_option_bool(&attr.field.exclusive_maximum);
+            let exclusive_minimum = quote_option_num(&attr.field.exclusive_minimum);
+            let exclusive_maximum = quote_option_num(&attr.field.exclusive_maximum);
             let min_items = quote_option_num(&attr.field.min_items);
             let max_items = quote_option_num(&attr.field.max_items);
 
@@ -184,9 +177,9 @@ fn quote_impl_fn_type(body: TokenStream2) -> TokenStream2 {
             format: Option<String>,
             minimum: Option<i64>,
             maximum: Option<i64>,
-            multiple_of: Option<u64>,
-            exclusive_minimum: Option<bool>,
-            exclusive_maximum: Option<bool>,
+            multiple_of: Option<i64>,
+            exclusive_minimum: Option<i64>,
+            exclusive_maximum: Option<i64>,
             min_items: Option<usize>,
             max_items: Option<usize>,
         ) -> rschema::PropType {
@@ -313,7 +306,9 @@ fn fn_ty_enum(
                         rschema::PropType::Object(rschema::ObjectProp {
                             properties: #properties,
                             required: #required,
-                            additional_properties: #additional_properties,
+                            additional_properties: Box::new(
+                                rschema::AdditionalProperties::Boolean(#additional_properties),
+                            ),
                         })
                     })
                 },
@@ -378,7 +373,9 @@ fn fn_ty_struct(
         rschema::PropType::Object(rschema::ObjectProp {
             properties: #properties,
             required: #required,
-            additional_properties: #additional_properties,
+            additional_properties: Box::new(
+                rschema::AdditionalProperties::Boolean(#additional_properties),
+            ),
         })
     };
     quote_impl_fn_type(fn_type_body)

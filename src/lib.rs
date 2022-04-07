@@ -132,11 +132,11 @@
 //! 
 //! | Attribute | Type | Meaning |
 //! | --- | --- | --- |
-//! | `minimum` | `u64` | Specify the minimum. |
-//! | `maximum` | `u64` | Specify the maximum. |
-//! | `multiple_of` | `u64` | Numbers can be restricted to a multiple of a given number. |
-//! | `exclusive_minimum` | `bool` | Specify the minimum of ranges. |
-//! | `exclusive_maximum` | `bool` | Specify the maximum of ranges. |
+//! | `minimum` | `i64` | Specify the minimum of the range. |
+//! | `maximum` | `i64` | Specify the maximum of the range. |
+//! | `multiple_of` | `i64` | Numbers can be restricted to a multiple of a given number. |
+//! | `exclusive_minimum` | `i64` | Specify the **exclusive** minimum of the range. |
+//! | `exclusive_maximum` | `i64` | Specify the **exclusive** maximum of the range. |
 //! 
 //! #### `Array`
 //! 
@@ -146,6 +146,7 @@
 //! | `max_items` | `usize` | Specify the maximum length of the array. |
 
 pub use rschema_core::{
+    AdditionalProperties,
     ArrayProp,
     EnumProp,
     Error,

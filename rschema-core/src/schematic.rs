@@ -4,10 +4,13 @@ use seq_macro::seq;
 use paste::paste;
 
 use crate::{
+    AdditionalProperties,
     ArrayProp,
     EnumProp,
     Items,
     NumericProp,
+    ObjectProp,
+    Properties,
     PropType,
     StringProp,
 };
@@ -46,9 +49,9 @@ pub trait Schematic {
         format: Option<String>,
         minimum: Option<i64>,
         maximum: Option<i64>,
-        multiple_of: Option<u64>,
-        exclusive_minimum: Option<bool>,
-        exclusive_maximum: Option<bool>,
+        multiple_of: Option<i64>,
+        exclusive_minimum: Option<i64>,
+        exclusive_maximum: Option<i64>,
         min_items: Option<usize>,
         max_items: Option<usize>,
     ) -> PropType;
@@ -80,9 +83,9 @@ macro_rules! impl_for_str {
                 format: Option<String>,
                 minimum: Option<i64>,
                 maximum: Option<i64>,
-                multiple_of: Option<u64>,
-                exclusive_minimum: Option<bool>,
-                exclusive_maximum: Option<bool>,
+                multiple_of: Option<i64>,
+                exclusive_minimum: Option<i64>,
+                exclusive_maximum: Option<i64>,
                 min_items: Option<usize>,
                 max_items: Option<usize>,
             ) -> PropType {
@@ -111,9 +114,9 @@ macro_rules! impl_for_num {
                 format: Option<String>,
                 minimum: Option<i64>,
                 maximum: Option<i64>,
-                multiple_of: Option<u64>,
-                exclusive_minimum: Option<bool>,
-                exclusive_maximum: Option<bool>,
+                multiple_of: Option<i64>,
+                exclusive_minimum: Option<i64>,
+                exclusive_maximum: Option<i64>,
                 min_items: Option<usize>,
                 max_items: Option<usize>,
             ) -> PropType {
@@ -150,9 +153,9 @@ impl Schematic for char {
         format: Option<String>,
         minimum: Option<i64>,
         maximum: Option<i64>,
-        multiple_of: Option<u64>,
-        exclusive_minimum: Option<bool>,
-        exclusive_maximum: Option<bool>,
+        multiple_of: Option<i64>,
+        exclusive_minimum: Option<i64>,
+        exclusive_maximum: Option<i64>,
         min_items: Option<usize>,
         max_items: Option<usize>,
     ) -> PropType {
@@ -174,9 +177,9 @@ impl Schematic for bool {
         format: Option<String>,
         minimum: Option<i64>,
         maximum: Option<i64>,
-        multiple_of: Option<u64>,
-        exclusive_minimum: Option<bool>,
-        exclusive_maximum: Option<bool>,
+        multiple_of: Option<i64>,
+        exclusive_minimum: Option<i64>,
+        exclusive_maximum: Option<i64>,
         min_items: Option<usize>,
         max_items: Option<usize>,
     ) -> PropType {
@@ -192,9 +195,9 @@ impl Schematic for () {
         format: Option<String>,
         minimum: Option<i64>,
         maximum: Option<i64>,
-        multiple_of: Option<u64>,
-        exclusive_minimum: Option<bool>,
-        exclusive_maximum: Option<bool>,
+        multiple_of: Option<i64>,
+        exclusive_minimum: Option<i64>,
+        exclusive_maximum: Option<i64>,
         min_items: Option<usize>,
         max_items: Option<usize>,
     ) -> PropType {
@@ -214,9 +217,9 @@ macro_rules! impls {
                 format: Option<String>,
                 minimum: Option<i64>,
                 maximum: Option<i64>,
-                multiple_of: Option<u64>,
-                exclusive_minimum: Option<bool>,
-                exclusive_maximum: Option<bool>,
+                multiple_of: Option<i64>,
+                exclusive_minimum: Option<i64>,
+                exclusive_maximum: Option<i64>,
                 min_items: Option<usize>,
                 max_items: Option<usize>,
             ) -> PropType {
@@ -264,9 +267,9 @@ impl<T: Schematic> Schematic for Option<T> {
         format: Option<String>,
         minimum: Option<i64>,
         maximum: Option<i64>,
-        multiple_of: Option<u64>,
-        exclusive_minimum: Option<bool>,
-        exclusive_maximum: Option<bool>,
+        multiple_of: Option<i64>,
+        exclusive_minimum: Option<i64>,
+        exclusive_maximum: Option<i64>,
         min_items: Option<usize>,
         max_items: Option<usize>,
     ) -> PropType {
@@ -287,9 +290,9 @@ impl<T: Schematic, const N: usize> Schematic for [T; N] {
         format: Option<String>,
         minimum: Option<i64>,
         maximum: Option<i64>,
-        multiple_of: Option<u64>,
-        exclusive_minimum: Option<bool>,
-        exclusive_maximum: Option<bool>,
+        multiple_of: Option<i64>,
+        exclusive_minimum: Option<i64>,
+        exclusive_maximum: Option<i64>,
         min_items: Option<usize>,
         max_items: Option<usize>,
     ) -> PropType {
@@ -309,9 +312,9 @@ impl<T: Schematic> Schematic for Vec<T> {
         format: Option<String>,
         minimum: Option<i64>,
         maximum: Option<i64>,
-        multiple_of: Option<u64>,
-        exclusive_minimum: Option<bool>,
-        exclusive_maximum: Option<bool>,
+        multiple_of: Option<i64>,
+        exclusive_minimum: Option<i64>,
+        exclusive_maximum: Option<i64>,
         min_items: Option<usize>,
         max_items: Option<usize>,
     ) -> PropType {
@@ -331,9 +334,9 @@ impl<T: Schematic> Schematic for Box<T> {
         format: Option<String>,
         minimum: Option<i64>,
         maximum: Option<i64>,
-        multiple_of: Option<u64>,
-        exclusive_minimum: Option<bool>,
-        exclusive_maximum: Option<bool>,
+        multiple_of: Option<i64>,
+        exclusive_minimum: Option<i64>,
+        exclusive_maximum: Option<i64>,
         min_items: Option<usize>,
         max_items: Option<usize>,
     ) -> PropType {
@@ -350,5 +353,39 @@ impl<T: Schematic> Schematic for Box<T> {
             min_items,
             max_items,
         )
+    }
+}
+
+// Collection types:
+// - BTreeMap<K, V>
+// - BTreeSet<T>
+// - BinaryHeap<T>
+// - HashMap<K, V, H>
+// - HashSet<T, H>
+// - LinkedList<T>
+// - VecDeque<T>
+// - Vec<T>
+
+impl<V: Schematic, S> Schematic for std::collections::HashMap<String, V, S> {
+    fn __type(
+        min_length: Option<u64>,
+        max_length: Option<u64>,
+        pattern: Option<String>,
+        format: Option<String>,
+        minimum: Option<i64>,
+        maximum: Option<i64>,
+        multiple_of: Option<i64>,
+        exclusive_minimum: Option<i64>,
+        exclusive_maximum: Option<i64>,
+        min_items: Option<usize>,
+        max_items: Option<usize>,
+    ) -> PropType {
+        PropType::Object(ObjectProp {
+            properties: Properties::new(),
+            required: vec![],
+            additional_properties: Box::new(
+                AdditionalProperties::Complex(V::__type_no_attr())
+            ),
+        })
     }
 }

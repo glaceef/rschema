@@ -15,11 +15,11 @@ pub struct NumericProp {
     pub maximum: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub multiple_of: Option<u64>,
+    pub multiple_of: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub exclusive_minimum: Option<bool>,
+    pub exclusive_minimum: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub exclusive_maximum: Option<bool>,
+    pub exclusive_maximum: Option<i64>,
 }
