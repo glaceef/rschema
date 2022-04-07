@@ -10,6 +10,7 @@ use serde::Deserialize;
 use std::collections::HashMap;
 
 #[derive(Debug, Schematic, Deserialize)]
+#[rschema(additional_properties)]
 #[serde(untagged)]
 enum FullEnum {
     Unit,
@@ -20,13 +21,16 @@ enum FullEnum {
 
     MultiFieldTuple(usize, String),
 
-    #[rschema(additional_properties)]
+    #[rschema(
+        additional_properties,
+        rename_all = "kebab-case",
+    )]
     Struct {
         #[rschema(field(
             title = "Number",
             description = "Number prop in enum's struct variant.",
         ))]
-        field: i32,
+        struct_variant_field: i32,
     },
 }
 
@@ -56,6 +60,7 @@ struct NestedStruct {
 
 #[derive(Debug, Schematic, Deserialize)]
 #[rschema(additional_properties)]
+#[rschema(rename_all = "camelCase")]
 struct Struct {
     #[rschema(
         field(
@@ -74,13 +79,15 @@ struct Struct {
 }
 
 #[derive(Debug, Schematic, Deserialize)]
+#[rschema(rename_all = "snake_case")]
 enum UnitVariantOnlyEnum {
-    Unit1,
-    Unit2,
-    Unit3,
+    UnitHoge,
+    UnitFuga,
+    UnitPiyo,
 }
 
 #[derive(Debug, Schematic, Deserialize)]
+#[rschema(rename_all = "UPPERFLATCASE")]
 pub struct Config {
     #[rschema(field(
         title = "String",

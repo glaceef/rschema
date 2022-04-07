@@ -2,7 +2,7 @@
   "title": "ExampleConfig",
   "type": "object",
   "properties": {
-    "prop_string": {
+    "PROPSTRING": {
       "title": "String",
       "description": "This is string.",
       "type": "string",
@@ -11,67 +11,67 @@
       "pattern": "^\\w+$",
       "format": "my format"
     },
-    "prop_number_i8": {
+    "PROPNUMBERI8": {
       "title": "Number (i8)",
       "description": "This is number.",
       "type": "number",
       "minimum": 0,
       "maximum": 256
     },
-    "prop_number_i16": {
+    "PROPNUMBERI16": {
       "title": "Number (i16)",
       "description": "This is number.",
       "type": "number",
       "exclusiveMinimum": 0,
       "exclusiveMaximum": 256
     },
-    "prop_number_i32": {
+    "PROPNUMBERI32": {
       "title": "Number (i32)",
       "description": "This is number.",
       "type": "number",
       "multipleOf": 5
     },
-    "prop_number_i64": {
+    "PROPNUMBERI64": {
       "title": "Number (i64)",
       "description": "This is number.",
       "type": "number"
     },
-    "prop_number_isize": {
+    "PROPNUMBERISIZE": {
       "title": "Number (isize)",
       "description": "This is number.",
       "type": "number"
     },
-    "prop_number_u8": {
+    "PROPNUMBERU8": {
       "title": "Number (u8)",
       "description": "This is number.",
       "type": "number"
     },
-    "prop_number_u16": {
+    "PROPNUMBERU16": {
       "title": "Number (u16)",
       "description": "This is number.",
       "type": "number"
     },
-    "prop_number_u32": {
+    "PROPNUMBERU32": {
       "title": "Number (u32)",
       "description": "This is number.",
       "type": "number"
     },
-    "prop_number_u64": {
+    "PROPNUMBERU64": {
       "title": "Number (u64)",
       "description": "This is number.",
       "type": "number"
     },
-    "prop_number_usize": {
+    "PROPNUMBERUSIZE": {
       "title": "Number (usize)",
       "description": "This is number.",
       "type": "number"
     },
-    "prop_boolean": {
+    "PROPBOOLEAN": {
       "title": "Boolean",
       "description": "This is boolean.",
       "type": "boolean"
     },
-    "prop_optional": {
+    "PROPOPTIONAL": {
       "title": "Optional",
       "description": "This is optional value.",
       "anyOf": [
@@ -83,7 +83,7 @@
         }
       ]
     },
-    "prop_single_type_array": {
+    "PROPSINGLETYPEARRAY": {
       "title": "Single-type array",
       "description": "This is single-type array.",
       "type": "array",
@@ -93,7 +93,7 @@
       "minItems": 1,
       "maxItems": 10
     },
-    "prop_composite_type_array": {
+    "PROPCOMPOSITETYPEARRAY": {
       "title": "Composite-type array",
       "description": "This is composite-type array.",
       "type": "array",
@@ -120,7 +120,7 @@
           {
             "type": "object",
             "properties": {
-              "field": {
+              "struct-variant-field": {
                 "title": "Number",
                 "description": "Number prop in enum's struct variant.",
                 "type": "number"
@@ -137,23 +137,23 @@
         ]
       }
     },
-    "prop_unit_struct": {
+    "PROPUNITSTRUCT": {
       "title": "Unit-struct",
       "description": "This is unit-struct.",
       "type": "null"
     },
-    "prop_empty_tuple_struct": {
+    "PROPEMPTYTUPLESTRUCT": {
       "title": "Empty tuple-struct",
       "description": "This is empty tuple-struct.",
       "type": "array",
       "items": []
     },
-    "prop_single_tuple_struct": {
+    "PROPSINGLETUPLESTRUCT": {
       "title": "Single tuple struct",
       "description": "This is single tuple struct.",
       "type": "string"
     },
-    "prop_tuple_struct": {
+    "PROPTUPLESTRUCT": {
       "title": "Tuple struct",
       "description": "This is tuple struct.",
       "type": "array",
@@ -166,24 +166,24 @@
         }
       ]
     },
-    "prop_empty_struct": {
+    "PROPEMPTYSTRUCT": {
       "title": "Empty struct",
       "description": "This is empty struct.",
       "type": "object",
       "properties": {},
       "additionalProperties": false
     },
-    "prop_struct": {
+    "PROPSTRUCT": {
       "title": "Struct",
       "description": "This is normal struct.",
       "type": "object",
       "properties": {
-        "field_number": {
+        "fieldNumber": {
           "title": "Number",
           "description": "This is number prop in struct.",
           "type": "number"
         },
-        "nested_struct": {
+        "nestedStruct": {
           "title": "Number",
           "description": "This is number prop in struct.",
           "type": "object",
@@ -202,7 +202,7 @@
       ],
       "additionalProperties": true
     },
-    "prop_full_enum": {
+    "PROPFULLENUM": {
       "title": "Full enum",
       "description": "This is full enum.",
       "anyOf": [
@@ -227,7 +227,7 @@
         {
           "type": "object",
           "properties": {
-            "field": {
+            "struct-variant-field": {
               "title": "Number",
               "description": "Number prop in enum's struct variant.",
               "type": "number"
@@ -243,32 +243,32 @@
         }
       ]
     },
-    "prop_unit_variant_only_enum": {
+    "PROPUNITVARIANTONLYENUM": {
       "title": "Unit-variant-only enum",
       "description": "This is unit-variant-only enum.",
       "type": "string",
       "enum": [
-        "Unit1",
-        "Unit2",
-        "Unit3"
+        "unit_hoge",
+        "unit_fuga",
+        "unit_piyo"
       ]
     },
-    "prop_required_prop": {
+    "PROPREQUIREDPROP": {
       "title": "Required prop",
       "description": "This is required prop.",
       "type": "string"
     },
-    "prop_required_prop2": {
+    "PROPREQUIREDPROP2": {
       "title": "Required prop 2",
       "description": "This is another required prop.",
       "type": "string"
     },
-    "prop_empty_tuple": {
+    "PROPEMPTYTUPLE": {
       "title": "Empty Tuple",
       "description": "This is empty tuple.",
       "type": "null"
     },
-    "prop_one_member_tuple": {
+    "PROPONEMEMBERTUPLE": {
       "title": "One Member Tuple",
       "description": "This is tuple with one member.",
       "type": "array",
@@ -278,7 +278,7 @@
         }
       ]
     },
-    "prop_two_members_tuple": {
+    "PROPTWOMEMBERSTUPLE": {
       "title": "Two Members Tuple",
       "description": "This is tuple with two members.",
       "type": "array",
@@ -291,7 +291,7 @@
         }
       ]
     },
-    "prop_three_members_tuple": {
+    "PROPTHREEMEMBERSTUPLE": {
       "title": "Three Members Tuple",
       "description": "This is tuple with three members.",
       "type": "array",
@@ -307,7 +307,7 @@
         }
       ]
     },
-    "prop_twelve_members_tuple": {
+    "PROPTWELVEMEMBERSTUPLE": {
       "title": "Twelve Members Tuple",
       "description": "This is tuple with twelve members.",
       "type": "array",
@@ -362,7 +362,7 @@
         }
       ]
     },
-    "prop_hashmap_simple_values": {
+    "PROPHASHMAPSIMPLEVALUES": {
       "title": "HashMap",
       "description": "This is map with primitive type values",
       "type": "object",
@@ -371,7 +371,7 @@
         "type": "number"
       }
     },
-    "prop_hashmap_object_values": {
+    "PROPHASHMAPOBJECTVALUES": {
       "title": "HashMap",
       "description": "This is map with object type values",
       "type": "object",
@@ -379,12 +379,12 @@
       "additionalProperties": {
         "type": "object",
         "properties": {
-          "field_number": {
+          "fieldNumber": {
             "title": "Number",
             "description": "This is number prop in struct.",
             "type": "number"
           },
-          "nested_struct": {
+          "nestedStruct": {
             "title": "Number",
             "description": "This is number prop in struct.",
             "type": "object",
@@ -404,7 +404,7 @@
         "additionalProperties": true
       }
     },
-    "prop_hashmap_complex_values": {
+    "PROPHASHMAPCOMPLEXVALUES": {
       "title": "HashMap",
       "description": "This is map with complex type values",
       "type": "object",
@@ -432,7 +432,7 @@
           {
             "type": "object",
             "properties": {
-              "field": {
+              "struct-variant-field": {
                 "title": "Number",
                 "description": "Number prop in enum's struct variant.",
                 "type": "number"
