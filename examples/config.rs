@@ -7,6 +7,8 @@ use rschema::{
 };
 use serde::Deserialize;
 
+use std::collections::HashMap;
+
 #[derive(Debug, Schematic, Deserialize)]
 #[serde(untagged)]
 enum FullEnum {
@@ -95,14 +97,14 @@ pub struct Config {
         description = "This is number.",
         minimum = 0,
         maximum = 256,
-        exclusive_minimum = false,
-        exclusive_maximum = true,
     ))]
     prop_number_i8: i8,
     
     #[rschema(field(
         title = "Number (i16)",
         description = "This is number.",
+        exclusive_minimum = 0,
+        exclusive_maximum = 256,
     ))]
     prop_number_i16: i16,
     
@@ -276,4 +278,22 @@ pub struct Config {
         description = "This is tuple with twelve members.",
     ))]
     prop_twelve_members_tuple: (u8, u16, u32, u64, usize, f32, f64, bool, char, Option<String>, Vec<String>, Box<String>),
+
+    #[rschema(field(
+        title = "HashMap",
+        description = "This is map with primitive type values",
+    ))]
+    prop_hashmap_simple_values: HashMap<String, i32>,
+
+    #[rschema(field(
+        title = "HashMap",
+        description = "This is map with object type values",
+    ))]
+    prop_hashmap_object_values: HashMap<String, Struct>,
+
+    #[rschema(field(
+        title = "HashMap",
+        description = "This is map with complex type values",
+    ))]
+    prop_hashmap_complex_values: HashMap<String, FullEnum>,
 }

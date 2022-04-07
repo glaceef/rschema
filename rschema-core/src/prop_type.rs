@@ -18,6 +18,7 @@ pub use array_prop::{
 pub use enum_prop::EnumProp;
 pub use numeric_prop::NumericProp;
 pub use object_prop::{
+    AdditionalProperties,
     ObjectProp,
     Properties,
     Property,
