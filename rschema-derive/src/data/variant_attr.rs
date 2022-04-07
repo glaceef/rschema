@@ -1,3 +1,5 @@
+use crate::Case;
+
 mod struct_variant_attr;
 mod unit_variant_attr;
 
@@ -7,12 +9,14 @@ pub use unit_variant_attr::UnitVariantAttr;
 #[derive(Debug, Default)]
 pub struct VariantAttr {
     pub additional_properties: bool,
+    pub rename_all: Option<Case>,
 }
 
 impl From<StructVariantAttr> for VariantAttr {
     fn from(attr: StructVariantAttr) -> Self {
         VariantAttr {
             additional_properties: attr.additional_properties,
+            rename_all: attr.rename_all,
         }
     }
 }

@@ -1,6 +1,7 @@
-use crate::variant_attr::VariantAttr;
-
-use super::Data;
+use super::{
+    Data,
+    variant_attr::VariantAttr
+};
 
 #[derive(Debug)]
 pub struct Variant {
