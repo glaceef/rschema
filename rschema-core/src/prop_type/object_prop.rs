@@ -1,7 +1,4 @@
-use serde::{
-    Serialize,
-    Deserialize,
-};
+use serde::Serialize;
 
 mod additional_properties;
 mod properties;
@@ -15,7 +12,7 @@ pub use property::Property;
 /// 
 /// Structs and struct-type variants of enums are correspond to `ObjectProp`.
 /// 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 #[serde(rename_all(serialize = "camelCase"))]
 pub struct ObjectProp {
     pub properties: Properties,

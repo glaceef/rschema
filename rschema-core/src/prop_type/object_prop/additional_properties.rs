@@ -1,11 +1,8 @@
-use serde::{
-    Serialize,
-    Deserialize,
-};
+use serde::Serialize;
 
 use crate::PropType;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 #[serde(untagged)]
 pub enum AdditionalProperties {
     /// For objects with fixed properties, such as struct.

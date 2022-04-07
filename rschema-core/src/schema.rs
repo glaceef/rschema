@@ -1,7 +1,4 @@
-use serde::{
-    Serialize,
-    Deserialize,
-};
+use serde::Serialize;
 
 use std::fs;
 
@@ -46,7 +43,7 @@ use crate::{
 /// 
 /// 
 /// 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 pub struct Schema {
     pub title: String,
 

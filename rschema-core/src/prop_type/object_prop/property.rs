@@ -1,13 +1,10 @@
-use serde::{
-    Serialize,
-    Deserialize,
-};
+use serde::Serialize;
 
 use crate::PropType;
 
 /// One of the properties of an object type property.
 /// 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 pub struct Property {
     pub title: String,
 

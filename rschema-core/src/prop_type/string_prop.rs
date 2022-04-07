@@ -1,11 +1,8 @@
-use serde::{
-    Serialize,
-    Deserialize,
-};
+use serde::Serialize;
 
 /// Attributes for string type properties.
 /// 
-#[derive(Debug, Default, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize)]
 #[serde(rename_all(serialize = "camelCase"))]
 pub struct StringProp {
     #[serde(skip_serializing_if = "Option::is_none")]

@@ -1,14 +1,11 @@
-use serde::{
-    Serialize,
-    Deserialize,
-};
+use serde::Serialize;
 
 mod items;
 pub use items::Items;
 
 /// Attributes for array type properties.
 /// 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 #[serde(rename_all(serialize = "camelCase"))]
 pub struct ArrayProp {
     pub items: Box<Items>,

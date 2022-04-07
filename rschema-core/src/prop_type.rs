@@ -1,7 +1,6 @@
 use serde::{
     Serialize,
     Serializer,
-    Deserialize,
 };
 
 mod array_prop;
@@ -28,7 +27,7 @@ pub use tuple_prop::TupleProp;
 
 /// Represents some property type.
 /// 
-#[derive(Debug, Deserialize)]
+#[derive(Debug)]
 pub enum PropType {
     /// For a `string` type property.
     /// 

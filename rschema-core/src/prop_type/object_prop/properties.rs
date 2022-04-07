@@ -1,8 +1,5 @@
 use indexmap::IndexMap;
-use serde::{
-    Serialize,
-    Deserialize,
-};
+use serde::Serialize;
 
 use super::Property;
 
@@ -10,7 +7,7 @@ use super::Property;
 /// 
 /// This is a map with entries of names and properties for each field of the structure and structure variant.
 /// 
-#[derive(Debug, Default, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct Properties(IndexMap<String, Property>);
 
 // Deref, DerefMut にするかは要検討

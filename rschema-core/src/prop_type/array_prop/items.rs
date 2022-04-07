@@ -1,13 +1,10 @@
-use serde::{
-    Serialize,
-    Deserialize,
-};
+use serde::Serialize;
 
 use crate::prop_type::PropType;
 
 /// Items of an array type or a tuple type property.
 /// 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 #[serde(untagged)]
 pub enum Items {
     /// For an array type property with a single type items.

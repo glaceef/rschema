@@ -1,7 +1,4 @@
-use serde::{
-    Serialize,
-    Deserialize,
-};
+use serde::Serialize;
 
 use super::PropType;
 
@@ -9,7 +6,7 @@ use super::PropType;
 /// 
 /// Only an array of enum struct corresponds to `EnumProp`.
 /// 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 #[serde(rename_all(serialize = "camelCase"))]
 pub struct EnumProp {
     pub any_of: Vec<PropType>,

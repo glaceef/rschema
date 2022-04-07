@@ -1,11 +1,8 @@
-use serde::{
-    Serialize,
-    Deserialize,
-};
+use serde::Serialize;
 
 /// Attributes for numeric type properties.
 /// 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize)]
 #[serde(rename_all(serialize = "camelCase"))]
 pub struct NumericProp {
     #[serde(skip_serializing_if = "Option::is_none")]
