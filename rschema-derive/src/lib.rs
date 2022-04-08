@@ -193,7 +193,7 @@ fn quote_impl_fn_type(body: TokenStream2) -> TokenStream2 {
             exclusive_maximum: Option<i64>,
             min_items: Option<usize>,
             max_items: Option<usize>,
-        ) -> rschema::PropType {
+        ) -> rschema::Type {
             #body
         }
     }
@@ -247,7 +247,7 @@ fn quote_enum_units_ty(
     }
 
     Some(quote! {
-        rschema::PropType::String(rschema::StringProp {
+        rschema::Type::String(rschema::StringKeys {
             enm: vec![
                 #(
                     #idents.into(),
@@ -309,7 +309,7 @@ fn fn_ty_enum(
                     let required = quote_required(fields);
                     let additional_properties = variant.attr.additional_properties;
                     Some(quote! {
-                        rschema::PropType::Object(rschema::ObjectProp {
+                        rschema::Type::Object(rschema::ObjectKeys {
                             properties: #properties,
                             required: #required,
                             additional_properties: Box::new(
@@ -321,7 +321,7 @@ fn fn_ty_enum(
                 Data::TupleStruct(ref fields) => {
                     let items = quote_items(fields);
                     Some(quote! {
-                        rschema::PropType::Array(rschema::ArrayProp {
+                        rschema::Type::Array(rschema::ArrayKeys {
                             items: #items,
                             min_items: None,
                             max_items: None,
@@ -353,7 +353,7 @@ fn fn_ty_enum(
         },
         _ => {
             quote! {
-                rschema::PropType::Enum(rschema::EnumProp {
+                rschema::Type::Enum(rschema::EnumKeys {
                     any_of: vec![
                         #(
                             #types,
@@ -376,7 +376,7 @@ fn fn_ty_struct(
     let additional_properties = container.attr.additional_properties;
 
     let fn_type_body = quote! {
-        rschema::PropType::Object(rschema::ObjectProp {
+        rschema::Type::Object(rschema::ObjectKeys {
             properties: #properties,
             required: #required,
             additional_properties: Box::new(
@@ -391,7 +391,7 @@ fn fn_ty_unit_struct(
     _container: &Container,
 ) -> TokenStream2 {
     let fn_type_body = quote! {
-        rschema::PropType::Null
+        rschema::Type::Null
     };
     quote_impl_fn_type(fn_type_body)
 }
@@ -415,7 +415,7 @@ fn fn_ty_tuple_struct(
     let items = quote_items(fields);
 
     let fn_type_body = quote! {
-        rschema::PropType::Array(rschema::ArrayProp {
+        rschema::Type::Array(rschema::ArrayKeys {
             items: #items,
             min_items: None,
             max_items: None,

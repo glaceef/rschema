@@ -4,7 +4,7 @@ use serde::Serialize;
 /// 
 #[derive(Debug, Serialize)]
 #[serde(rename_all(serialize = "camelCase"))]
-pub struct NumericProp {
+pub struct NumericKeys {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub minimum: Option<i64>,
 

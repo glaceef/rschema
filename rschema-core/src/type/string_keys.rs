@@ -4,7 +4,7 @@ use serde::Serialize;
 /// 
 #[derive(Debug, Default, Serialize)]
 #[serde(rename_all(serialize = "camelCase"))]
-pub struct StringProp {
+pub struct StringKeys {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub min_length: Option<u64>,
 

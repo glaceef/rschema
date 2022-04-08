@@ -1,6 +1,6 @@
 use serde::Serialize;
 
-use crate::PropType;
+use crate::Type;
 
 /// One of the properties of an object type property.
 /// 
@@ -12,5 +12,5 @@ pub struct Property {
     pub description: Option<String>,
 
     #[serde(flatten)]
-    pub ty: PropType,
+    pub ty: Type,
 }

@@ -147,19 +147,19 @@
 
 pub use rschema_core::{
     AdditionalProperties,
-    ArrayProp,
-    EnumProp,
+    ArrayKeys,
+    EnumKeys,
     Error,
     Items,
-    ObjectProp,
+    ObjectKeys,
     Properties,
     Property,
-    PropType,
+    Type,
     Result,
     Schema,
     Schematic,
-    StringProp,
-    TupleProp,
+    StringKeys,
+    TupleKeys,
 };
 
 #[allow(unused_imports)]
