@@ -3,6 +3,11 @@
 use seq_macro::seq;
 use paste::paste;
 
+use std::collections::{
+    HashMap,
+    HashSet,
+};
+
 use crate::{
     AdditionalProperties,
     ArrayKeys,
@@ -372,7 +377,7 @@ impl<T: Schematic> Schematic for Box<T> {
     }
 }
 
-impl<V: Schematic, S> Schematic for std::collections::HashMap<String, V, S> {
+impl<V: Schematic, S> Schematic for HashMap<String, V, S> {
     fn __type(
         min_length: Option<u64>,
         max_length: Option<u64>,
@@ -393,6 +398,30 @@ impl<V: Schematic, S> Schematic for std::collections::HashMap<String, V, S> {
             additional_properties: Box::new(
                 AdditionalProperties::Complex(V::__type_no_attr())
             ),
+        })
+    }
+}
+
+impl<T: Schematic, S> Schematic for HashSet<T, S> {
+    fn __type(
+        min_length: Option<u64>,
+        max_length: Option<u64>,
+        pattern: Option<String>,
+        format: Option<String>,
+        minimum: Option<i64>,
+        maximum: Option<i64>,
+        multiple_of: Option<i64>,
+        exclusive_minimum: Option<i64>,
+        exclusive_maximum: Option<i64>,
+        min_items: Option<usize>,
+        max_items: Option<usize>,
+        unique_items: Option<bool>,
+    ) -> Type {
+        Type::Array(ArrayKeys {
+            items: Box::new(Items::Single(T::__type_no_attr())),
+            min_items: min_items,
+            max_items: max_items,
+            unique_items: Some(true),
         })
     }
 }
