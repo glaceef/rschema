@@ -228,18 +228,19 @@
 pub use rschema_core::{
     AdditionalProperties,
     ArrayKeys,
+    Draft,
     EnumKeys,
     Error,
     Items,
     ObjectKeys,
     Properties,
     Property,
-    Type,
     Result,
     Schema,
     Schematic,
     StringKeys,
     TupleKeys,
+    Type,
 };
 
 #[allow(unused_imports)]
