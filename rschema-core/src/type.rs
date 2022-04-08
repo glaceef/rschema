@@ -3,40 +3,40 @@ use serde::{
     Serializer,
 };
 
-mod array_prop;
-mod enum_prop;
-mod numeric_prop;
-mod object_prop;
-mod string_prop;
-mod tuple_prop;
+mod array_keys;
+mod enum_keys;
+mod numeric_keys;
+mod object_keys;
+mod string_keys;
+mod tuple_keys;
 
-pub use array_prop::{
-    ArrayProp,
+pub use array_keys::{
+    ArrayKeys,
     Items,
 };
-pub use enum_prop::EnumProp;
-pub use numeric_prop::NumericProp;
-pub use object_prop::{
+pub use enum_keys::EnumKeys;
+pub use numeric_keys::NumericKeys;
+pub use object_keys::{
     AdditionalProperties,
-    ObjectProp,
+    ObjectKeys,
     Properties,
     Property,
 };
-pub use string_prop::StringProp;
-pub use tuple_prop::TupleProp;
+pub use string_keys::StringKeys;
+pub use tuple_keys::TupleKeys;
 
 /// Represents some property type.
 /// 
 #[derive(Debug)]
-pub enum PropType {
+pub enum Type {
     /// For a `string` type property.
     /// 
-    String(StringProp),
+    String(StringKeys),
 
     /// For a `number` type property.
     /// 
-    // Integer(NumericProp),
-    Number(NumericProp),
+    // Integer(NumericKeys),
+    Number(NumericKeys),
 
     /// For a `boolean` type property.
     /// 
@@ -48,22 +48,22 @@ pub enum PropType {
 
     /// For an `array` type property.
     /// 
-    Array(ArrayProp),
+    Array(ArrayKeys),
 
     /// For an `object` type property.
     /// 
-    Object(ObjectProp),
+    Object(ObjectKeys),
 
     /// For an `array` type property. In particular, it has unordered and composite type items.
     /// 
-    Enum(EnumProp),
+    Enum(EnumKeys),
 
     /// For an `array` type property. In particular, it has ordered and composite type items.
     /// 
-    Tuple(TupleProp),
+    Tuple(TupleKeys),
 }
 
-macro_rules! prop_match_block {
+macro_rules! keys_match_block {
     ($variant:ident, $inner:expr, $serializer:expr) => {
         {
             let wrapper = Wrapper {
@@ -96,21 +96,20 @@ struct Wrapper<'a, T> {
     inner: &'a T,
 }
 
-impl Serialize for PropType {
+impl Serialize for Type {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
         match self {
-            PropType::String( ref prop) => prop_match_block!( string, prop, serializer),
-            // PropType::Integer(ref prop) => match_block!(integer, prop, serializer),
-            PropType::Number( ref prop) => prop_match_block!( number, prop, serializer),
-            PropType::Boolean           => unit_match_block!(boolean, serializer),
-            PropType::Null              => unit_match_block!(   null, serializer),
-            PropType::Array(  ref prop) => prop_match_block!(  array, prop, serializer),
-            PropType::Object( ref prop) => prop_match_block!( object, prop, serializer),
-            PropType::Enum(   ref prop) => prop.serialize(serializer),
-            PropType::Tuple(  ref prop) => prop_match_block!(  tuple, prop, serializer),
+            Type::String( ref keys) => keys_match_block!( string, keys, serializer),
+            Type::Number( ref keys) => keys_match_block!( number, keys, serializer),
+            Type::Boolean           => unit_match_block!(boolean, serializer),
+            Type::Null              => unit_match_block!(   null, serializer),
+            Type::Array(  ref keys) => keys_match_block!(  array, keys, serializer),
+            Type::Object( ref keys) => keys_match_block!( object, keys, serializer),
+            Type::Enum(   ref keys) => keys.serialize(serializer),
+            Type::Tuple(  ref keys) => keys_match_block!(  tuple, keys, serializer),
         }
     }
 }

@@ -1,6 +1,6 @@
 use serde::Serialize;
 
-use crate::PropType;
+use crate::Type;
 
 #[derive(Debug, Serialize)]
 #[serde(untagged)]
@@ -9,5 +9,5 @@ pub enum AdditionalProperties {
     Boolean(bool),
 
     /// For objects with undefined properties, such as HashMap.
-    Complex(PropType),
+    Complex(Type),
 }

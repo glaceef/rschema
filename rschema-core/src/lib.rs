@@ -1,23 +1,23 @@
 mod draft;
 mod error;
-mod prop_type;
+mod r#type;
 mod schema;
 mod schematic;
 
 pub use draft::Draft;
 pub use error::Error;
-pub use prop_type::{
+pub use r#type::{
     AdditionalProperties,
-    ArrayProp,
-    EnumProp,
+    ArrayKeys,
+    EnumKeys,
     Items,
-    NumericProp,
-    ObjectProp,
+    NumericKeys,
+    ObjectKeys,
     Properties,
     Property,
-    PropType,
-    StringProp,
-    TupleProp,
+    Type,
+    StringKeys,
+    TupleKeys,
 };
 pub use schema::Schema;
 pub use schematic::Schematic;

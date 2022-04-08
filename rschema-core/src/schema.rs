@@ -4,7 +4,7 @@ use std::fs;
 
 use crate::{
     Draft,
-    PropType,
+    Type,
     Result,
     Schematic,
 };
@@ -59,7 +59,7 @@ pub struct Schema {
     pub description: Option<String>,
 
     #[serde(flatten)]
-    ty: PropType,
+    ty: Type,
 }
 
 impl Schema {
