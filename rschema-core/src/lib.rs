@@ -1,8 +1,10 @@
+mod draft;
 mod error;
 mod prop_type;
 mod schema;
 mod schematic;
 
+pub use draft::Draft;
 pub use error::Error;
 pub use prop_type::{
     AdditionalProperties,
