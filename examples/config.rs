@@ -102,16 +102,15 @@ pub struct Config {
     #[rschema(field(
         title = "Number (i8)",
         description = "This is number.",
-        minimum = 0,
-        maximum = 256,
+        comment = "-128 .. 127",
+        minimum = -128,
+        maximum = 127,
     ))]
     prop_number_i8: i8,
     
     #[rschema(field(
         title = "Number (i16)",
         description = "This is number.",
-        exclusive_minimum = 0,
-        exclusive_maximum = 256,
     ))]
     prop_number_i16: i16,
     
@@ -137,6 +136,8 @@ pub struct Config {
     #[rschema(field(
         title = "Number (u8)",
         description = "This is number.",
+        exclusive_minimum = 0,
+        exclusive_maximum = 100,
     ))]
     prop_number_u8: u8,
     
@@ -181,6 +182,7 @@ pub struct Config {
         description = "This is single-type array.",
         min_items = 1,
         max_items = 10,
+        unique_items,
     ))]
     prop_single_type_array: Vec<String>,
     
@@ -259,6 +261,7 @@ pub struct Config {
     #[rschema(field(
         title = "Empty Tuple",
         description = "This is empty tuple.",
+        deprecated,
     ))]
     prop_empty_tuple: (),
 

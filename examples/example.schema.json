@@ -14,16 +14,15 @@
     "PROPNUMBERI8": {
       "title": "Number (i8)",
       "description": "This is number.",
+      "comment": "-128 .. 127",
       "type": "number",
-      "minimum": 0,
-      "maximum": 256
+      "minimum": -128,
+      "maximum": 127
     },
     "PROPNUMBERI16": {
       "title": "Number (i16)",
       "description": "This is number.",
-      "type": "number",
-      "exclusiveMinimum": 0,
-      "exclusiveMaximum": 256
+      "type": "number"
     },
     "PROPNUMBERI32": {
       "title": "Number (i32)",
@@ -44,7 +43,9 @@
     "PROPNUMBERU8": {
       "title": "Number (u8)",
       "description": "This is number.",
-      "type": "number"
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 100
     },
     "PROPNUMBERU16": {
       "title": "Number (u16)",
@@ -91,7 +92,8 @@
         "type": "string"
       },
       "minItems": 1,
-      "maxItems": 10
+      "maxItems": 10,
+      "uniqueItems": true
     },
     "PROPCOMPOSITETYPEARRAY": {
       "title": "Composite-type array",
@@ -266,6 +268,7 @@
     "PROPEMPTYTUPLE": {
       "title": "Empty Tuple",
       "description": "This is empty tuple.",
+      "deprecated": true,
       "type": "null"
     },
     "PROPONEMEMBERTUPLE": {

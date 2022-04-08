@@ -15,4 +15,11 @@ pub struct ArrayKeys {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_items: Option<usize>,
+
+    #[serde(skip_serializing_if = "is_falsy")]
+    pub unique_items: Option<bool>,
+}
+
+fn is_falsy(b: &Option<bool>) -> bool {
+    *b != Some(true)
 }

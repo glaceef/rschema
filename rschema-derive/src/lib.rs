@@ -79,6 +79,13 @@ fn quote_option_num(val: &Option<impl ToTokens>) -> TokenStream2 {
     }
 }
 
+fn quote_option_bool(val: &Option<impl ToTokens>) -> TokenStream2 {
+    match val {
+        Some(v) => quote! { Some(#v) },
+        None    => quote! { None },
+    }
+}
+
 fn quote_properties(
     fields: &[Field],
     rename_all: Option<Case>,
@@ -99,6 +106,8 @@ fn quote_properties(
 
             let title = &attr.field.title;
             let description = quote_option_str(&attr.field.description);
+            let comment = quote_option_str(&attr.field.comment);
+            let deprecated = quote_option_bool(&attr.field.deprecated);
 
             let min_length = quote_option_num(&attr.field.min_length);
             let max_length = quote_option_num(&attr.field.max_length);
@@ -111,6 +120,7 @@ fn quote_properties(
             let exclusive_maximum = quote_option_num(&attr.field.exclusive_maximum);
             let min_items = quote_option_num(&attr.field.min_items);
             let max_items = quote_option_num(&attr.field.max_items);
+            let unique_items = quote_option_num(&attr.field.unique_items);
 
             quote! {
                 properties.insert(
@@ -121,6 +131,8 @@ fn quote_properties(
 
                         title: #title.into(),
                         description: #description,
+                        comment: #comment,
+                        deprecated: #deprecated,
                         ty: <#ty as Schematic>::__type(
                             #min_length,
                             #max_length,
@@ -133,6 +145,7 @@ fn quote_properties(
                             #exclusive_maximum,
                             #min_items,
                             #max_items,
+                            #unique_items,
                         ),
                     },
                 )
@@ -155,17 +168,14 @@ fn quote_required(fields: &[Field]) -> TokenStream2 {
     let required: Vec<&syn::Ident> = fields
         .iter()
         .filter_map(|field| {
-            let Field { attr, ident, .. } = field;
-
-            // Named field は必ずアトリビュートを持っている
-            let attr = attr.as_ref().unwrap();
-            // Named field は必ずidentがある
-            let ident = ident.as_ref().unwrap();
-
-            if attr.required {
-                Some(ident)
+            if let Field {
+                attr: Some(attr),
+                ident: Some(ident),
+                ..
+            } = field {
+                attr.required.then(|| ident)
             } else {
-                None
+                unreachable!();
             }
         })
         .collect();
@@ -193,6 +203,7 @@ fn quote_impl_fn_type(body: TokenStream2) -> TokenStream2 {
             exclusive_maximum: Option<i64>,
             min_items: Option<usize>,
             max_items: Option<usize>,
+            unique_items: Option<bool>,
         ) -> rschema::Type {
             #body
         }
@@ -269,36 +280,6 @@ fn fn_ty_enum(
                 // ユニットバリアントは後で処理する。
                 Data::UnitStruct => None,
                 Data::NewTypeStruct(ref field) => {
-                    /*
-                    現在はserdeのuntaggedと同じ扱いをしている。
-                    ```
-                    enum Enum {
-                        Var(String),
-                    }
-                    struct Data {
-                        field: Enum,
-                    }
-                    ```
-                    は、
-                    ```
-                    {
-                        "field": "some string"
-                    }
-                    ```
-                    として扱う。
-
-                    untaggedでない場合、
-                    ```
-                    {
-                        "field": {
-                            "Var": "some string"
-                        }
-                    }
-                    ```
-                    となる。
-                    こちらをカバーすることを考える必要がありそう？
-                    */
-
                     let Field { ty, .. } = field;
                     Some(quote! {
                         <#ty as Schematic>::__type_no_attr()
@@ -325,6 +306,7 @@ fn fn_ty_enum(
                             items: #items,
                             min_items: None,
                             max_items: None,
+                            unique_items: None,
                         })
                     })
                 },
@@ -419,6 +401,7 @@ fn fn_ty_tuple_struct(
             items: #items,
             min_items: None,
             max_items: None,
+            unique_items: None,
         })
     };
     quote_impl_fn_type(fn_type_body)

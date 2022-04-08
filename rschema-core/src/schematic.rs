@@ -54,10 +54,12 @@ pub trait Schematic {
         exclusive_maximum: Option<i64>,
         min_items: Option<usize>,
         max_items: Option<usize>,
+        unique_items: Option<bool>,
     ) -> Type;
 
     fn __type_no_attr() -> Type {
         Self::__type(
+            None,
             None,
             None,
             None,
@@ -88,6 +90,7 @@ macro_rules! impl_for_str {
                 exclusive_maximum: Option<i64>,
                 min_items: Option<usize>,
                 max_items: Option<usize>,
+                unique_items: Option<bool>,
             ) -> Type {
                 Type::String(StringKeys {
                     min_length,
@@ -119,6 +122,7 @@ macro_rules! impl_for_num {
                 exclusive_maximum: Option<i64>,
                 min_items: Option<usize>,
                 max_items: Option<usize>,
+                unique_items: Option<bool>,
             ) -> Type {
                 Type::Number(NumericKeys {
                     minimum,
@@ -158,6 +162,7 @@ impl Schematic for char {
         exclusive_maximum: Option<i64>,
         min_items: Option<usize>,
         max_items: Option<usize>,
+        unique_items: Option<bool>,
     ) -> Type {
         Type::String(StringKeys {
             min_length: Some(1),
@@ -182,6 +187,7 @@ impl Schematic for bool {
         exclusive_maximum: Option<i64>,
         min_items: Option<usize>,
         max_items: Option<usize>,
+        unique_items: Option<bool>,
     ) -> Type {
         Type::Boolean
     }
@@ -200,6 +206,7 @@ impl Schematic for () {
         exclusive_maximum: Option<i64>,
         min_items: Option<usize>,
         max_items: Option<usize>,
+        unique_items: Option<bool>,
     ) -> Type {
         Type::Null
     }
@@ -222,6 +229,7 @@ macro_rules! impls {
                 exclusive_maximum: Option<i64>,
                 min_items: Option<usize>,
                 max_items: Option<usize>,
+                unique_items: Option<bool>,
             ) -> Type {
                 Type::Array(ArrayKeys {
                     items: Box::new(Items::Tuple(vec![
@@ -231,6 +239,7 @@ macro_rules! impls {
                     ])),
                     min_items,
                     max_items,
+                    unique_items,
                 })
             }
         }
@@ -272,6 +281,7 @@ impl<T: Schematic> Schematic for Option<T> {
         exclusive_maximum: Option<i64>,
         min_items: Option<usize>,
         max_items: Option<usize>,
+        unique_items: Option<bool>,
     ) -> Type {
         Type::Enum(EnumKeys {
             any_of: vec![
@@ -295,11 +305,13 @@ impl<T: Schematic, const N: usize> Schematic for [T; N] {
         exclusive_maximum: Option<i64>,
         min_items: Option<usize>,
         max_items: Option<usize>,
+        unique_items: Option<bool>,
     ) -> Type {
         Type::Array(ArrayKeys {
             items: Box::new(Items::Single(T::__type_no_attr())),
             min_items: Some(N),
             max_items: Some(N),
+            unique_items: unique_items,
         })
     }
 }
@@ -317,11 +329,13 @@ impl<T: Schematic> Schematic for Vec<T> {
         exclusive_maximum: Option<i64>,
         min_items: Option<usize>,
         max_items: Option<usize>,
+        unique_items: Option<bool>,
     ) -> Type {
         Type::Array(ArrayKeys {
             items: Box::new(Items::Single(T::__type_no_attr())),
             min_items,
             max_items,
+            unique_items,
         })
     }
 }
@@ -339,6 +353,7 @@ impl<T: Schematic> Schematic for Box<T> {
         exclusive_maximum: Option<i64>,
         min_items: Option<usize>,
         max_items: Option<usize>,
+        unique_items: Option<bool>,
     ) -> Type {
         T::__type(
             min_length,
@@ -352,6 +367,7 @@ impl<T: Schematic> Schematic for Box<T> {
             exclusive_maximum,
             min_items,
             max_items,
+            unique_items,
         )
     }
 }
@@ -369,6 +385,7 @@ impl<V: Schematic, S> Schematic for std::collections::HashMap<String, V, S> {
         exclusive_maximum: Option<i64>,
         min_items: Option<usize>,
         max_items: Option<usize>,
+        unique_items: Option<bool>,
     ) -> Type {
         Type::Object(ObjectKeys {
             properties: Properties::new(),
