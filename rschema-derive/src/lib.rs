@@ -1,3 +1,4 @@
+use convert_case::Casing;
 use darling::ToTokens;
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
@@ -8,10 +9,11 @@ use syn::{
 };
 
 mod ast;
+mod case;
 mod data;
-mod variant_attr;
 
 use ast::Container;
+use case::Case;
 use data::{
     Data,
     Field,
@@ -77,13 +79,23 @@ fn quote_option_num(val: &Option<impl ToTokens>) -> TokenStream2 {
     }
 }
 
-fn quote_properties(fields: &[Field]) -> TokenStream2 {
+fn quote_properties(
+    fields: &[Field],
+    rename_all: Option<Case>,
+) -> TokenStream2 {
     let stmts: Vec<TokenStream2> = fields
         .iter()
         .map(|field| {
             let Field { ident, ty, attr } = field;
             // struct もしくは struct variant の場合、アトリビュートの無いフィールドはスキップしているので必ずSomeになる。
             let attr = attr.as_ref().unwrap();
+
+            // NamedField に対してのみこのメソッドは呼ばれるため、unwrap は必ず成功する。
+            let ident_str = ident.as_ref().unwrap().to_string();
+            let converted_ident = match rename_all {
+                Some(case) => ident_str.to_case(case.into()),
+                None => ident_str,
+            };
 
             let title = &attr.field.title;
             let description = quote_option_str(&attr.field.description);
@@ -102,7 +114,7 @@ fn quote_properties(fields: &[Field]) -> TokenStream2 {
 
             quote! {
                 properties.insert(
-                    stringify!(#ident),
+                    #converted_ident,
                     rschema::Property {
                         // enumの構造体バリアントには、
                         // アトリビュートをつけるものなのだろうか？
@@ -208,27 +220,22 @@ fn quote_items(fields: &[Field]) -> TokenStream2 {
     }
 }
 
-fn quote_enum_units_ty(variants: &[Variant]) -> Option<TokenStream2> {
-    /*
-    enum に含まれるすべてのユニットバリアントをまとめた、
-    下記のようなプロパティを生成する。
-    ```
-    {
-        "type": "string",
-        "enum": [
-            "name1",
-            "name2",
-            ...
-        ]
-    }
-    ```
-    */
-
-    let idents: Vec<syn::Ident> = variants
+fn quote_enum_units_ty(
+    variants: &[Variant],
+    rename_all: Option<Case>,
+) -> Option<TokenStream2> {
+    let idents: Vec<String> = variants
         .iter()
         .filter_map(|variant| {
             match variant.data {
-                Data::UnitStruct => Some(variant.ident.clone()),
+                Data::UnitStruct => {
+                    let ident_str = variant.ident.to_string();
+                    let converted_ident = match rename_all {
+                        Some(case) => ident_str.to_case(case.into()),
+                        None => ident_str,
+                    };
+                    Some(converted_ident)
+                },
                 _ => None,
             }
         })
@@ -243,7 +250,7 @@ fn quote_enum_units_ty(variants: &[Variant]) -> Option<TokenStream2> {
         rschema::PropType::String(rschema::StringProp {
             enm: vec![
                 #(
-                    stringify!(#idents).into(),
+                    #idents.into(),
                 )*
             ],
             ..Default::default()
@@ -252,7 +259,7 @@ fn quote_enum_units_ty(variants: &[Variant]) -> Option<TokenStream2> {
 }
 
 fn fn_ty_enum(
-    _container: &Container,
+    container: &Container,
     variants: &[Variant],
 ) -> TokenStream2 {
     let types: Vec<TokenStream2> = variants
@@ -298,7 +305,7 @@ fn fn_ty_enum(
                     })
                 },
                 Data::Struct(ref fields) => {
-                    let properties = quote_properties(fields);
+                    let properties = quote_properties(fields, variant.attr.rename_all);
                     let required = quote_required(fields);
                     let additional_properties = variant.attr.additional_properties;
                     Some(quote! {
@@ -328,7 +335,7 @@ fn fn_ty_enum(
         })
         .collect();
 
-    let enum_units_ty = quote_enum_units_ty(&variants);
+    let enum_units_ty = quote_enum_units_ty(&variants, container.attr.rename_all);
     let fn_type_body = match (types.is_empty(), &enum_units_ty) {
         ( true, None) => {
             // Zero-variant enums are prevented in advance.
@@ -364,7 +371,7 @@ fn fn_ty_struct(
     container: &Container,
     fields: &[Field],
 ) -> TokenStream2 {
-    let properties = quote_properties(fields);
+    let properties = quote_properties(fields, container.attr.rename_all);
     let required = quote_required(fields);
     let additional_properties = container.attr.additional_properties;
 

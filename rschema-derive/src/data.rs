@@ -4,21 +4,18 @@ use darling::{
 };
 use syn::punctuated::Punctuated;
 
-use crate::{
-    // container_attr::ContainerAttr,
-    variant_attr::{
-        StructVariantAttr,
-        UnitVariantAttr,
-    },
-};
-
 mod field;
 mod field_attr;
 mod variant;
+mod variant_attr;
 
 pub use field::Field;
 pub use field_attr::FieldAttr;
 pub use variant::Variant;
+pub use variant_attr::{
+    StructVariantAttr,
+    UnitVariantAttr,
+};
 
 #[derive(Debug)]
 pub enum Data {
