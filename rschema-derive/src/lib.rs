@@ -104,23 +104,23 @@ fn quote_properties(
                 None => ident_str,
             };
 
-            let title = &attr.field.title;
-            let description = quote_option_str(&attr.field.description);
-            let comment = quote_option_str(&attr.field.comment);
-            let deprecated = quote_option_bool(&attr.field.deprecated);
+            let title = &attr.title;
+            let description = quote_option_str(&attr.description);
+            let comment = quote_option_str(&attr.comment);
+            let deprecated = quote_option_bool(&attr.deprecated);
 
-            let min_length = quote_option_num(&attr.field.min_length);
-            let max_length = quote_option_num(&attr.field.max_length);
-            let format = quote_option_str(&attr.field.format);
-            let pattern = quote_option_str(&attr.field.pattern);
-            let minimum = quote_option_num(&attr.field.minimum);
-            let maximum = quote_option_num(&attr.field.maximum);
-            let multiple_of = quote_option_num(&attr.field.multiple_of);
-            let exclusive_minimum = quote_option_num(&attr.field.exclusive_minimum);
-            let exclusive_maximum = quote_option_num(&attr.field.exclusive_maximum);
-            let min_items = quote_option_num(&attr.field.min_items);
-            let max_items = quote_option_num(&attr.field.max_items);
-            let unique_items = quote_option_num(&attr.field.unique_items);
+            let min_length = quote_option_num(&attr.min_length);
+            let max_length = quote_option_num(&attr.max_length);
+            let format = quote_option_str(&attr.format);
+            let pattern = quote_option_str(&attr.pattern);
+            let minimum = quote_option_num(&attr.minimum);
+            let maximum = quote_option_num(&attr.maximum);
+            let multiple_of = quote_option_num(&attr.multiple_of);
+            let exclusive_minimum = quote_option_num(&attr.exclusive_minimum);
+            let exclusive_maximum = quote_option_num(&attr.exclusive_maximum);
+            let min_items = quote_option_num(&attr.min_items);
+            let max_items = quote_option_num(&attr.max_items);
+            let unique_items = quote_option_num(&attr.unique_items);
 
             quote! {
                 properties.insert(
