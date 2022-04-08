@@ -13,36 +13,32 @@
 //! #[derive(Debug, Schematic)]
 //! #[rschema(additional_properties)]
 //! struct Data {
-//!     #[rschema(field(
+//!     #[rschema(
 //!         title = "Test flag",
 //!         description = "The flag whether for test.",
-//!     ))]
+//!     )]
 //!     test_flag: bool,
 //! }
 //! 
 //! #[derive(Debug, Schematic)]
 //! struct AppConfig {
 //!     #[rschema(
-//!         field(
-//!             title = "Application name",
-//!         ),
+//!         title = "Application name",
 //!         required,
 //!     )]
 //!     name: String,
 //! 
 //!     #[rschema(
-//!         field(
-//!             title = "Application version",
-//!             pattern = r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$",
-//!         ),
+//!         title = "Application version",
+//!         pattern = r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$",
 //!         required,
 //!     )]
 //!     version: String,
 //! 
-//!     #[rschema(field(
+//!     #[rschema(
 //!         title = "Application data",
 //!         description = "This property is optional.",
-//!     ))]
+//!     )]
 //!     other_data: Data,
 //! }
 //! 
@@ -91,59 +87,143 @@
 //! }
 //! ```
 //! 
-//! # Attributes
+//! # Attributes provided
 //! 
-//! ## Struct attributes
+//! - [**Container attributes**](#container-attributes) — apply to a struct or enum declaration.
+//! - [**Variant attributes**](#variant-attributes) — apply to a variant of an enum.
+//! - [**Field attributes**](#field-attributes) — apply to one field in a struct or in an enum variant.
 //! 
-//! This attribute is available only for structs or struct variants.
+//! See [Understanding JSON Schema](https://json-schema.org/understanding-json-schema/) for more information on each keywords.
 //! 
-//! | Attribute | Type | Meaning |
-//! | --- | --- | --- |
-//! | `additional_properties` | `bool` | Whether to allow properties not included in `properties`. |
+//! 
+//! ## Container attributes
+//! 
+//! - `#[rschema(additional_properties)]`
+//! 
+//!   Whether to allow properties not included in `properties`.
+//! 
+//! - `#[rschema(rename_all = "...")]`
+//! 
+//!   Rename all the fields of structs or **unit**-variants of enums according to the given case convention.
+//! 
+//!   The possible values:
+//! 
+//!   - `"lowercase"`
+//!   - `"UPPERCASE"`
+//!   - `"camelCase"`
+//!   - `"PascalCase"`
+//!   - `"kebab-case"`
+//!   - `"Train-Case"`
+//!   - `"COBOL-CASE"`
+//!   - `"snake_case"`
+//!   - `"UPPER_SNAKE_CASE"`
+//!   - `"flatcase"`
+//!   - `"UPPERFLATCASE"`
+//! 
+//!   **Note**: For enums, the `rename_all` attribute is only effective for unit variants. Because the other variants always behave as if the `flatten` attribute of *serde* is applied.
+//! 
+//! 
+//! ## Variant attributes
+//! 
+//! Only for structural variants, you can apply [container attributes](#container-attributes) just like a normal structs.
+//! 
 //! 
 //! ## Field attributes
 //! 
-//! ### Common
+//! Only the `title` keyword is required, the others are optional.
 //! 
-//! All types have the following attributes.
+//! For keywords other than in [`Common`](#common), while it raises no errors to use attributes of another types, it doesn’t really make sense to do so.
 //! 
-//! | Top-level attribute | Sub attribute | Type | Meaning |
-//! | --- | --- | --- | --- |
-//! | `field` | `title` | `String` | **Required**. The short description about the field. |
-//! | | `description` | `String` | The more lengthy description about the field. |
-//! | `required` | | `bool` | Whether the property is required or not. |
+//! If you want to skip, do not use attributes.
 //! 
-//! ### Dedicated
+//! #### Common
 //! 
-//! Each types have dedicated attributes.
+//! - `#[rschema(title = "title")]`
 //! 
-//! Using another type's attributes does not raise errors, but no meaning.
+//!   **Required**. The short description for the field.
 //! 
-//! #### `String`
+//! - `#[rschema(description = "description")]`
 //! 
-//! | Attribute | Type | Meaning |
-//! | --- | --- | --- |
-//! | `min_length` | `u64` | The minimum length. |
-//! | `max_length` | `u64` | The maximum length. |
-//! | `pattern` | `String` | The regular expression to restrict value. |
-//! | `format` | `String` | The basic semantic identification of certain kinds of string values that are commonly used. |
+//!   The more lengthy description for the field.
 //! 
-//! #### `Number`
+//! - `#[rschema(comment)]`
 //! 
-//! | Attribute | Type | Meaning |
-//! | --- | --- | --- |
-//! | `minimum` | `i64` | Specify the minimum of the range. |
-//! | `maximum` | `i64` | Specify the maximum of the range. |
-//! | `multiple_of` | `i64` | Numbers can be restricted to a multiple of a given number. |
-//! | `exclusive_minimum` | `i64` | Specify the **exclusive** minimum of the range. |
-//! | `exclusive_maximum` | `i64` | Specify the **exclusive** maximum of the range. |
+//!   The comment for this schema.
 //! 
-//! #### `Array`
+//! - `#[rschema(deprecated)]`
 //! 
-//! | Attribute | Type | Meaning |
-//! | --- | --- | --- |
-//! | `min_items` | `usize` | Specify the minimum length of the array. |
-//! | `max_items` | `usize` | Specify the maximum length of the array. |
+//!   Indicate that the property this keyword applies to should not be used and may be removed in the future.
+//! 
+//! - `#[rschema(required)]`
+//! 
+//!   Indicate that the property this keyword applies to is required.
+//! 
+//! 
+//! #### `string`
+//! 
+//! - `#[rschema(min_length = 1)]`
+//! 
+//!   Specify the minimum length. Give an integer greater than or equal to 0.
+//! 
+//! - `#[rschema(max_length = 1)]`
+//! 
+//!   Specify the maximum length. Give an integer greater than or equal to 0.
+//! 
+//! - `#[rschema(pattern = "regular expressions")]`
+//! 
+//!   The regular expression to restrict a string. You should use a raw strings if necessary to avoid unnecessary escaping.
+//! 
+//! - `#[rschema(format = "format")]`
+//! 
+//!   The basic semantic identification of certain kinds of string values that are commonly used.
+//! 
+//! 
+//! #### `number`
+//! 
+//! - `#[rschema(minimum = 1)]`
+//! 
+//!   Specify the minimum of the range.
+//! 
+//! - `#[rschema(maximum = 1)]`
+//! 
+//!   Specify the maximum of the range.
+//! 
+//! - `#[rschema(multiple_of = 1)]`
+//! 
+//!   Restrict the number to a multiple of a given number.
+//! 
+//! - `#[rschema(exclusive_minimum = 1)]`
+//! 
+//!   Specify the **exclusive** minimum of the range.
+//! 
+//! - `#[rschema(exclusive_maximum = 1)]`
+//! 
+//!   Specify the **exclusive** maximum of the range.
+//! 
+//! 
+//! #### `array`
+//! 
+//! - `#[rschema(min_items = 1)]`
+//! 
+//!   Specify the minimum length of the array. Give an integer greater than or equal to 0.
+//! 
+//! - `#[rschema(max_items = 1)]`
+//! 
+//!   Specify the maximum length of the array. Give an integer greater than or equal to 0.
+//! 
+//! - `#[rschema(unique_items)]`
+//! 
+//!   Indicates that the array has unique values.
+//! 
+//! 
+//! # Combination with Serde
+//! 
+//! *Rschema* is strongly intended to be used in combination with [*Serde*](https://serde.rs/).
+//! 
+//! For example, generate a JSON schema from structs and enums you define.
+//! Data files validated by the JSON schema are always deserializable to the original structures!
+//! 
+//! 
 
 pub use rschema_core::{
     AdditionalProperties,
