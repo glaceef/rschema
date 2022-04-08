@@ -4,7 +4,7 @@
 //! 
 //! # Example
 //! 
-//! ```rust
+//! ```no_run
 //! use rschema::{
 //!     Schema,
 //!     Schematic,
