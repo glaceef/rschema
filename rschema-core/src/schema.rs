@@ -3,6 +3,7 @@ use serde::Serialize;
 use std::fs;
 
 use crate::{
+    Draft,
     PropType,
     Result,
     Schematic,
@@ -42,9 +43,16 @@ use crate::{
 /// Use [`to_string_pretty`](fn@Schema::to_string_pretty) to generate as a pretty-prited string.
 /// 
 /// 
-/// 
 #[derive(Debug, Serialize)]
 pub struct Schema {
+    #[serde(rename = "$schema")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub schema: Option<Draft>,
+
+    #[serde(rename = "$id")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub id: Option<String>,
+
     pub title: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -59,9 +67,11 @@ impl Schema {
     /// 
     pub fn new<T: Schematic>(title: &str) -> Self {
         Schema {
+            schema: None,
+            id: None,
             title: title.into(),
             description: None,
-            ty: T::__type_no_attr(), // もしかしたらContainer Attributesで指定するかも
+            ty: T::__type_no_attr(),
         }
     }
 
@@ -72,6 +82,26 @@ impl Schema {
         description: impl Into<String>,
     ) -> &mut Self {
         self.description = Some(description.into());
+        self
+    }
+
+    /// Specify `$schema`.
+    /// 
+    pub fn schema(
+        &mut self,
+        schema: Draft,
+    ) -> &mut Self {
+        self.schema = Some(schema);
+        self
+    }
+
+    /// Specify `$id`.
+    /// 
+    pub fn id(
+        &mut self,
+        id: impl Into<String>,
+    ) -> &mut Self {
+        self.id = Some(id.into());
         self
     }
 
