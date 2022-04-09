@@ -218,9 +218,10 @@ impl Schematic for () {
 }
 
 macro_rules! impls {
+    // $n: Member length
     // $t: Type parameter
     // $c: Comma
-    ( $( $t:tt $c:tt )* ) => {
+    ( $n:expr, $( $t:tt $c:tt )* ) => {
         impl<$($t:Schematic $c)*> Schematic for ($($t $c)*) {
             fn __type(
                 min_length: Option<u64>,
@@ -242,8 +243,8 @@ macro_rules! impls {
                             <$t as Schematic>::__type_no_attr(),
                         )*
                     ])),
-                    min_items,
-                    max_items,
+                    min_items: Some($n),
+                    max_items: Some($n),
                     unique_items,
                 })
             }
@@ -253,9 +254,9 @@ macro_rules! impls {
 
 macro_rules! impls_tuple {
     ($n:expr) => {
-        seq!(N in 0..$n {
+        seq!(N in 1..=$n {
             paste! {
-                impls!( #( [<T~N>], )* );
+                impls!( $n, #( [<T~N>], )* );
             }
         });
     };
@@ -316,7 +317,7 @@ impl<T: Schematic, const N: usize> Schematic for [T; N] {
             items: Box::new(Items::Single(T::__type_no_attr())),
             min_items: Some(N),
             max_items: Some(N),
-            unique_items: unique_items,
+            unique_items,
         })
     }
 }
@@ -419,8 +420,8 @@ impl<T: Schematic, S> Schematic for HashSet<T, S> {
     ) -> Type {
         Type::Array(ArrayKeys {
             items: Box::new(Items::Single(T::__type_no_attr())),
-            min_items: min_items,
-            max_items: max_items,
+            min_items,
+            max_items,
             unique_items: Some(true),
         })
     }

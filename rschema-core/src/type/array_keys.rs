@@ -1,12 +1,14 @@
 use serde::Serialize;
 
+use crate::is_falsy;
+
 mod items;
 pub use items::Items;
 
-/// Attributes for array type properties.
+/// Keywords for an array type property.
 /// 
 #[derive(Debug, Serialize)]
-#[serde(rename_all(serialize = "camelCase"))]
+#[serde(rename_all = "camelCase")]
 pub struct ArrayKeys {
     pub items: Box<Items>,
 
@@ -18,8 +20,4 @@ pub struct ArrayKeys {
 
     #[serde(skip_serializing_if = "is_falsy")]
     pub unique_items: Option<bool>,
-}
-
-fn is_falsy(b: &Option<bool>) -> bool {
-    *b != Some(true)
 }

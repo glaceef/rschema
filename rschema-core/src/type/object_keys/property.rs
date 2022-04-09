@@ -1,6 +1,9 @@
 use serde::Serialize;
 
-use crate::Type;
+use crate::{
+    Type,
+    is_falsy,
+};
 
 /// One of the properties of an object type property.
 /// 
@@ -19,8 +22,4 @@ pub struct Property {
 
     #[serde(flatten)]
     pub ty: Type,
-}
-
-fn is_falsy(b: &Option<bool>) -> bool {
-    *b != Some(true)
 }

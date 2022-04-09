@@ -1,4 +1,8 @@
-use crate::Case;
+use crate::{
+    Attribute,
+    Case,
+    is_falsy,
+};
 
 mod struct_variant_attr;
 mod unit_variant_attr;
@@ -8,7 +12,7 @@ pub use unit_variant_attr::UnitVariantAttr;
 
 #[derive(Debug, Default)]
 pub struct VariantAttr {
-    pub additional_properties: bool,
+    pub additional_properties: Option<bool>,
     pub rename_all: Option<Case>,
 }
 
@@ -26,5 +30,15 @@ impl From<UnitVariantAttr> for VariantAttr {
         VariantAttr {
             ..Default::default()
         }
+    }
+}
+
+impl Attribute for VariantAttr {
+    fn additional_properties(&self) -> bool {
+        !is_falsy(&self.additional_properties)
+    }
+
+    fn rename_all(&self) -> Option<Case> {
+        self.rename_all
     }
 }

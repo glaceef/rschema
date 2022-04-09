@@ -6,7 +6,7 @@ use crate::Case;
 #[darling(attributes(rschema))]
 pub struct StructVariantAttr {
     #[darling(default)]
-    pub additional_properties: bool,
+    pub additional_properties: Option<bool>,
 
     #[darling(default)]
     pub rename_all: Option<Case>,

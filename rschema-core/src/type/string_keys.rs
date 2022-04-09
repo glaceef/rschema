@@ -1,9 +1,9 @@
 use serde::Serialize;
 
-/// Attributes for string type properties.
+/// Keywords for a string type property.
 /// 
 #[derive(Debug, Default, Serialize)]
-#[serde(rename_all(serialize = "camelCase"))]
+#[serde(rename_all = "camelCase")]
 pub struct StringKeys {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub min_length: Option<u64>,
