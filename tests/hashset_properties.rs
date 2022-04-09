@@ -53,7 +53,9 @@ fn it_generates_hashset_schema() -> rschema::Result<()> {
         "anyOf": [
           {
             "type": "array",
-            "items": []
+            "items": [],
+            "minItems": 0,
+            "maxItems": 0
           },
           {
             "type": "array",
@@ -64,7 +66,9 @@ fn it_generates_hashset_schema() -> rschema::Result<()> {
               {
                 "type": "string"
               }
-            ]
+            ],
+            "minItems": 2,
+            "maxItems": 2
           },
           {
             "type": "object",

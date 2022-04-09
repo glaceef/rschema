@@ -82,7 +82,9 @@ fn it_generates_array_schema() -> rschema::Result<()> {
         {
           "type": "boolean"
         }
-      ]
+      ],
+      "minItems": 3,
+      "maxItems": 3
     },
     "prop_vec_enum": {
       "title": "Vec<Enum>",
@@ -91,7 +93,9 @@ fn it_generates_array_schema() -> rschema::Result<()> {
         "anyOf": [
           {
             "type": "array",
-            "items": []
+            "items": [],
+            "minItems": 0,
+            "maxItems": 0
           },
           {
             "type": "array",
@@ -102,7 +106,9 @@ fn it_generates_array_schema() -> rschema::Result<()> {
               {
                 "type": "string"
               }
-            ]
+            ],
+            "minItems": 2,
+            "maxItems": 2
           },
           {
             "type": "object",

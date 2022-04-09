@@ -102,14 +102,14 @@ impl Serialize for Type {
         S: Serializer,
     {
         match self {
-            Type::String( ref keys) => keys_match_block!( string, keys, serializer),
-            Type::Number( ref keys) => keys_match_block!( number, keys, serializer),
-            Type::Boolean           => unit_match_block!(boolean, serializer),
-            Type::Null              => unit_match_block!(   null, serializer),
-            Type::Array(  ref keys) => keys_match_block!(  array, keys, serializer),
-            Type::Object( ref keys) => keys_match_block!( object, keys, serializer),
-            Type::Enum(   ref keys) => keys.serialize(serializer),
-            Type::Tuple(  ref keys) => keys_match_block!(  tuple, keys, serializer),
+            Self::String(ref keys) => keys_match_block!( string, keys, serializer),
+            Self::Number(ref keys) => keys_match_block!( number, keys, serializer),
+            Self::Boolean          => unit_match_block!(boolean, serializer),
+            Self::Null             => unit_match_block!(   null, serializer),
+            Self::Array( ref keys) => keys_match_block!(  array, keys, serializer),
+            Self::Object(ref keys) => keys_match_block!( object, keys, serializer),
+            Self::Enum(  ref keys) => keys.serialize(serializer),
+            Self::Tuple( ref keys) => keys_match_block!(  tuple, keys, serializer),
         }
     }
 }

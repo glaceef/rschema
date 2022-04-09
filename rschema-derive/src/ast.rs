@@ -50,8 +50,8 @@ impl<'a> Container<'a> {
     pub fn split_for_impl(
         &self,
     ) -> (
-        ImplGenerics, // <T: xxx, U: yyy>
-        TypeGenerics, // <T, U>
+        ImplGenerics,
+        TypeGenerics,
         syn::TypeGenerics,
         Option<&syn::WhereClause>,
     ) {

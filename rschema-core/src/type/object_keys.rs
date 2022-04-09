@@ -8,12 +8,12 @@ pub use additional_properties::AdditionalProperties;
 pub use properties::Properties;
 pub use property::Property;
 
-/// Attributes for object type properties.
+/// Keywords for an object type property.
 /// 
-/// Structs and struct-type variants of enums are correspond to `ObjectKeys`.
+/// Structs and struct-type variants are correspond to `ObjectKeys`.
 /// 
 #[derive(Debug, Serialize)]
-#[serde(rename_all(serialize = "camelCase"))]
+#[serde(rename_all = "camelCase")]
 pub struct ObjectKeys {
     pub properties: Properties,
 

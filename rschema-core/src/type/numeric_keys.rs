@@ -1,9 +1,9 @@
 use serde::Serialize;
 
-/// Attributes for numeric type properties.
+/// Keywords for a numeric type property.
 /// 
 #[derive(Debug, Serialize)]
-#[serde(rename_all(serialize = "camelCase"))]
+#[serde(rename_all = "camelCase")]
 pub struct NumericKeys {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub minimum: Option<i64>,

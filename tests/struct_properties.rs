@@ -63,7 +63,9 @@ fn it_generates_struct_schema() -> rschema::Result<()> {
     "prop_empty_tuple_struct": {
       "title": "EmptyTupleStruct",
       "type": "array",
-      "items": []
+      "items": [],
+      "minItems": 0,
+      "maxItems": 0
     },
     "prop_tuple_struct": {
       "title": "TupleStruct",
@@ -75,7 +77,9 @@ fn it_generates_struct_schema() -> rschema::Result<()> {
         {
           "type": "string"
         }
-      ]
+      ],
+      "minItems": 2,
+      "maxItems": 2
     },
     "prop_nested_struct": {
       "title": "NestedStruct",

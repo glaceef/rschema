@@ -6,6 +6,8 @@ mod schematic;
 
 pub use draft::Draft;
 pub use error::Error;
+pub use schema::Schema;
+pub use schematic::Schematic;
 pub use r#type::{
     AdditionalProperties,
     ArrayKeys,
@@ -15,13 +17,15 @@ pub use r#type::{
     ObjectKeys,
     Properties,
     Property,
-    Type,
     StringKeys,
     TupleKeys,
+    Type,
 };
-pub use schema::Schema;
-pub use schematic::Schematic;
 
 /// Alias for a `Result` with the error type `rschema::Error`.
 /// 
 pub type Result<T> = std::result::Result<T, Error>;
+
+pub(crate) fn is_falsy(b: &Option<bool>) -> bool {
+    *b != Some(true)
+}
