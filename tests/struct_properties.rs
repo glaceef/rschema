@@ -12,7 +12,15 @@ struct UnitStruct;
 struct EmptyTupleStruct();
 
 #[derive(Debug, Schematic)]
-struct TupleStruct(i32, String);
+struct TupleStruct(
+    #[rschema(
+        minimum = 0,
+        maximum = 100,
+    )]
+    i32,
+
+    String,
+);
 
 #[derive(Debug, Schematic)]
 struct NestedStruct {
@@ -72,7 +80,9 @@ fn it_generates_struct_schema() -> rschema::Result<()> {
       "type": "array",
       "items": [
         {
-          "type": "number"
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
         },
         {
           "type": "string"
