@@ -47,5 +47,7 @@ pub struct FieldAttr {
 
     /* control */
     #[darling(default)]
+    pub rename: Option<String>,
+    #[darling(default)]
     pub skip: Option<bool>, // Named fields or variants only
 }

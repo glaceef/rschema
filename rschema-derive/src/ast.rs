@@ -6,7 +6,7 @@ mod container_attr;
 mod impl_generics;
 mod type_generics;
 
-use container_attr::ContainerAttr;
+pub use container_attr::ContainerAttr;
 use impl_generics::ImplGenerics;
 use type_generics::TypeGenerics;
 
