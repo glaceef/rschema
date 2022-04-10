@@ -8,8 +8,10 @@ mod type_generics;
 
 pub use container_attr::{
     ContainerAttr,
+    EmptyStructAttr,
     EnumAttr,
     StructAttr,
+    TupleStructAttr,
 };
 use impl_generics::ImplGenerics;
 use type_generics::TypeGenerics;
@@ -21,7 +23,7 @@ pub struct Container<'a> {
     // The struct or enum name (without generics).
     pub ident: &'a syn::Ident,
     // The data within the struct or enum.
-    pub data: Data,
+    pub data: Data<'a>,
     // Any generics on the struct or enum.
     pub generics: &'a syn::Generics,
     // Source input
@@ -41,7 +43,27 @@ impl<'a> Container<'a> {
             },
             syn::Data::Struct(ref data) => {
                 (
-                    StructAttr::from_derive_input(&input)?.into(),
+                    match data.fields {
+                        // struct
+                        syn::Fields::Named(_) => {
+                            StructAttr::from_derive_input(&input)?.into()
+                        },
+
+                        // unit struct
+                        syn::Fields::Unit => {
+                            EmptyStructAttr::from_derive_input(&input)?.into()
+                        },
+
+                        // newtype struct
+                        syn::Fields::Unnamed(ref fields) if fields.unnamed.len() == 1 => {
+                            EmptyStructAttr::from_derive_input(&input)?.into()
+                        },
+
+                        // tuple struct
+                        syn::Fields::Unnamed(_) => {
+                            TupleStructAttr::from_derive_input(&input)?.into()
+                        },
+                    },
                     Data::struct_from_ast(&data.fields)?,
                 )
             },

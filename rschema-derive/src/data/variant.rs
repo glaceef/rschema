@@ -3,9 +3,9 @@ use super::{
     variant_attr::VariantAttr
 };
 
-#[derive(Debug)]
-pub struct Variant {
+#[derive(Debug, PartialEq)]
+pub struct Variant<'a> {
     pub attr: VariantAttr,
-    pub ident: syn::Ident,
-    pub data: Data,
+    pub ident: &'a syn::Ident,
+    pub data: Data<'a>,
 }

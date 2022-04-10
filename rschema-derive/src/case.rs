@@ -1,6 +1,6 @@
 use darling::FromMeta;
 
-#[derive(Clone, Copy, Debug, FromMeta)]
+#[derive(Clone, Copy, Debug, PartialEq, FromMeta)]
 pub enum Case {
     #[darling(rename = "lowercase")]
     Lower,

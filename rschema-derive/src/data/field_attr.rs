@@ -1,6 +1,6 @@
 use darling::FromField;
 
-#[derive(Debug, FromField)]
+#[derive(Debug, FromField, PartialEq)]
 #[darling(attributes(rschema))]
 pub struct FieldAttr {
     /* common */

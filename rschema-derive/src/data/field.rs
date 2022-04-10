@@ -1,8 +1,16 @@
+use crate::is_falsy;
+
 use super::FieldAttr;
 
-#[derive(Debug)]
-pub struct Field {
+#[derive(Debug, PartialEq)]
+pub struct Field<'a> {
     pub attr: FieldAttr,
-    pub ident: Option<syn::Ident>,
-    pub ty: syn::Type,
+    pub ident: Option<&'a syn::Ident>,
+    pub ty: &'a syn::Type,
+}
+
+impl<'a> Field<'a> {
+    pub fn required(&self) -> bool {
+        !is_falsy(&self.attr.required)
+    }
 }
