@@ -17,7 +17,7 @@ pub use struct_variant_attr::StructVariantAttr;
 pub use tuple_struct_variant_attr::TupleStructVariantAttr;
 pub use unit_variant_attr::UnitVariantAttr;
 
-#[derive(Debug, Default, FromAttributes)]
+#[derive(Debug, Default, PartialEq, FromAttributes)]
 #[darling(attributes(rschema))]
 pub struct VariantAttr {
     #[darling(default)]

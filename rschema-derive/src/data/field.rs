@@ -2,7 +2,7 @@ use crate::is_falsy;
 
 use super::FieldAttr;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Field {
     pub attr: FieldAttr,
     pub ident: Option<syn::Ident>,

@@ -144,6 +144,22 @@ fn quote_ty(Field{ attr, ty, .. }: &Field) -> TokenStream2 {
     }
 }
 
+fn rename_ident(
+    ident: &proc_macro2::Ident,
+    rename: Option<&String>,
+    rename_all: Option<Case>,
+) -> String {
+    if let Some(rename) = rename {
+        rename.clone()
+    } else {
+        let ident_str = ident.to_string();
+        match rename_all {
+            Some(case) => ident_str.to_case(case.into()),
+            None => ident_str,
+        }
+    }
+}
+
 fn quote_properties(
     struct_attr: &impl StructAttribute,
     fields: &[Field],
@@ -162,16 +178,11 @@ fn quote_properties(
                 unreachable!("Oh, that's a bug. Trying to generate properties from unnamed fields.");
             };
 
-            // property name
-            let fixed_ident = if let Some(ref rename) = attr.rename {
-                rename.clone()
-            } else {
-                let ident_str = ident.to_string();
-                match struct_attr.rename_all() {
-                    Some(case) => ident_str.to_case(case.into()),
-                    None => ident_str,
-                }
-            };
+            let fixed_ident = rename_ident(
+                ident,
+                attr.rename.as_ref(),
+                struct_attr.rename_all(),
+            );
 
             // common params
             let title = quote_option_str(&attr.title);
@@ -333,21 +344,13 @@ fn quote_enum_units_ty(
     let idents: Vec<String> = variants
         .iter()
         .filter_map(|variant| {
-            match variant.data {
-                Data::UnitStruct => {
-                    let fixed_ident = if let Some(ref rename) = variant.attr.rename {
-                        rename.clone()
-                    } else {
-                        let ident_str = variant.ident.to_string();
-                        match attr.rename_all() {
-                            Some(case) => ident_str.to_case(case.into()),
-                            None => ident_str,
-                        }
-                    };
-                    Some(fixed_ident)
-                },
-                _ => None,
-            }
+            (variant.data == Data::UnitStruct).then(|| {
+                rename_ident(
+                    &variant.ident,
+                    variant.attr.rename.as_ref(),
+                    attr.rename_all(),
+                )
+            })
         })
         .collect();
 

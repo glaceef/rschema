@@ -3,7 +3,7 @@ use super::{
     variant_attr::VariantAttr
 };
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Variant {
     pub attr: VariantAttr,
     pub ident: syn::Ident,

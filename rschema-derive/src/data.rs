@@ -22,7 +22,7 @@ pub use variant_attr::{
     VariantAttr,
 };
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Data {
     // Simple structure.
     // e.x.) struct Data { ... }
