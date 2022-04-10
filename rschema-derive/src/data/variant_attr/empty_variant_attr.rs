@@ -2,5 +2,5 @@ use darling::FromAttributes;
 
 #[derive(Debug, FromAttributes)]
 #[darling(attributes(rschema))]
-pub struct UnitVariantAttr {
+pub struct EmptyVariantAttr {
 }

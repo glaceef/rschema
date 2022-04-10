@@ -32,7 +32,7 @@ impl<'a> Container<'a> {
             syn::Data::Enum(ref data) => Data::enum_from_ast(&data.variants)?,
             syn::Data::Struct(ref data) => Data::struct_from_ast(&data.fields)?,
             syn::Data::Union(_) => {
-                panic!("Rschema does not support derive for unions");
+                return Err(darling::Error::custom("Rschema does not support derive for unions"));
             },
         };
 

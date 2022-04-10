@@ -5,10 +5,10 @@ use crate::{
 };
 
 mod struct_variant_attr;
-mod unit_variant_attr;
+mod empty_variant_attr;
 
 pub use struct_variant_attr::StructVariantAttr;
-pub use unit_variant_attr::UnitVariantAttr;
+pub use empty_variant_attr::EmptyVariantAttr;
 
 #[derive(Debug, Default)]
 pub struct VariantAttr {
@@ -25,11 +25,9 @@ impl From<StructVariantAttr> for VariantAttr {
     }
 }
 
-impl From<UnitVariantAttr> for VariantAttr {
-    fn from(_attr: UnitVariantAttr) -> Self {
-        VariantAttr {
-            ..Default::default()
-        }
+impl From<EmptyVariantAttr> for VariantAttr {
+    fn from(_attr: EmptyVariantAttr) -> Self {
+        Self::default()
     }
 }
 

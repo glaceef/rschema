@@ -4,7 +4,8 @@ use darling::FromField;
 #[darling(attributes(rschema))]
 pub struct FieldAttr {
     /* common */
-    pub title: String,
+    #[darling(default)]
+    pub title: Option<String>,
     #[darling(default)]
     pub description: Option<String>,
     #[darling(default)]
@@ -12,7 +13,7 @@ pub struct FieldAttr {
     #[darling(default)]
     pub deprecated: Option<bool>,
     #[darling(default)]
-    pub required: bool,
+    pub required: Option<bool>,
 
     /* type: string */
     #[darling(default)]
