@@ -16,6 +16,7 @@ use crate::{
     NumericKeys,
     ObjectKeys,
     Properties,
+    Property,
     Type,
     StringKeys,
 };
@@ -240,7 +241,13 @@ macro_rules! impls {
                 Type::Array(ArrayKeys {
                     items: Box::new(Items::Tuple(vec![
                         $(
-                            <$t as Schematic>::__type_no_attr(),
+                            Property {
+                                title: None,
+                                description: None,
+                                comment: None,
+                                deprecated: None,
+                                ty: <$t as Schematic>::__type_no_attr(),
+                            },
                         )*
                     ])),
                     min_items: Some($n),

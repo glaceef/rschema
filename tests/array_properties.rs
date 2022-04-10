@@ -11,7 +11,16 @@ enum Enum {
 
     EmptyTupleVariant(),
 
-    TupleVariant(i32, String),
+    TupleVariant(
+        #[rschema(
+            title = "i32",
+            minimum = 0,
+            maximum = 100,
+        )]
+        i32,
+
+        String,
+    ),
 
     StructVariant {
         #[rschema(title = "i32")]
@@ -101,7 +110,10 @@ fn it_generates_array_schema() -> rschema::Result<()> {
             "type": "array",
             "items": [
               {
-                "type": "number"
+                "title": "i32",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
               },
               {
                 "type": "string"

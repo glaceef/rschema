@@ -1,6 +1,9 @@
 use serde::Serialize;
 
-use crate::Type;
+use crate::{
+    Property,
+    Type,
+};
 
 /// Items of an array type or a tuple type property.
 /// 
@@ -11,5 +14,5 @@ pub enum Items {
     Single(Type),
 
     /// For an array type property with ordered items, like a tuple struct.
-    Tuple(Vec<Type>),
+    Tuple(Vec<Property>),
 }

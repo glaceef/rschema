@@ -1,16 +1,13 @@
-use darling::FromAttributes;
+use darling::FromDeriveInput;
 
 use crate::Case;
 
-#[derive(Debug, FromAttributes)]
+#[derive(Debug, FromDeriveInput)]
 #[darling(attributes(rschema))]
-pub struct StructVariantAttr {
+pub struct StructAttr {
     #[darling(default)]
     pub additional_properties: Option<bool>,
 
     #[darling(default)]
     pub rename_all: Option<Case>,
-
-    #[darling(default)]
-    pub skip: Option<bool>,
 }

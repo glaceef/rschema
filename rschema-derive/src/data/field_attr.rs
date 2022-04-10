@@ -1,10 +1,11 @@
 use darling::FromField;
 
-#[derive(Debug, FromField)]
+#[derive(Debug, FromField, PartialEq)]
 #[darling(attributes(rschema))]
 pub struct FieldAttr {
     /* common */
-    pub title: String,
+    #[darling(default)]
+    pub title: Option<String>,
     #[darling(default)]
     pub description: Option<String>,
     #[darling(default)]
@@ -12,7 +13,7 @@ pub struct FieldAttr {
     #[darling(default)]
     pub deprecated: Option<bool>,
     #[darling(default)]
-    pub required: bool,
+    pub required: Option<bool>,
 
     /* type: string */
     #[darling(default)]
@@ -43,4 +44,10 @@ pub struct FieldAttr {
     pub max_items: Option<usize>,
     #[darling(default)]
     pub unique_items: Option<bool>,
+
+    /* control */
+    #[darling(default)]
+    pub rename: Option<String>,
+    #[darling(default)]
+    pub skip: Option<bool>, // Named fields or variants only
 }

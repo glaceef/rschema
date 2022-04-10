@@ -100,11 +100,11 @@
 //! 
 //! - `#[rschema(additional_properties)]`
 //! 
-//!   Whether to allow properties not included in `properties`.
+//!   Indicates whether to allow properties not included in `properties`.
 //! 
 //! - `#[rschema(rename_all = "...")]`
 //! 
-//!   Rename all the fields of structs or **unit**-variants of enums according to the given case convention.
+//!   Rename all the fields of structs or **unit** variants of enums according to the given case convention.
 //! 
 //!   The possible values:
 //! 
@@ -120,27 +120,50 @@
 //!   - `"flatcase"`
 //!   - `"UPPERFLATCASE"`
 //! 
-//!   **Note**: For enums, the `rename_all` attribute is only effective for unit variants. Because the other variants always behave as if the `flatten` attribute of *serde* is applied.
+//!   **Note**: For enums, the `rename_all` attribute is only effective for unit variants. 
+//!   Because the other variants always behave as if the `flatten` attribute of *serde* is applied.
+//! 
+//! - `#[rschema(unique_items)]`
+//! 
+//!   Indicates that the tuple struct has unique values.
 //! 
 //! 
 //! ## Variant attributes
 //! 
-//! Only for structural variants, you can apply [container attributes](#container-attributes) just like a normal structs.
+//! - `#[rschema(additional_properties)]`
+//! 
+//!   Indicates whether to allow properties not included in `properties`.
+//! 
+//! - `#[rschema(rename = "...")]`
+//! 
+//!   Rename a unit variant. This takes precedence over the `rename_all` attribute.
+//! 
+//! - `#[rschema(rename_all = "...")]`
+//! 
+//!   Rename all the fields of struct variants according to the given case convention.
+//! 
+//!   The possible values are the same as of `Container attributes`' one.
+//! 
+//! - `#[rschema(skip)]`
+//! 
+//!   Skip not to include in schema.
+//! 
+//! - `#[rschema(unique_items)]`
+//! 
+//!   Indicates that the tuple struct has unique values.
 //! 
 //! 
 //! ## Field attributes
 //! 
-//! Only the `title` keyword is required, the others are optional.
+//!   None of these keywords are required, but they are encouraged for good practice.
 //! 
-//! For keywords other than in [`Common`](#common), while it raises no errors to use attributes of another types, it doesn’t really make sense to do so.
-//! 
-//! If you want to skip, do not use attributes.
+//!   For keywords other than in [`Common`](#common), while it raises no errors to use attributes of another types, it doesn’t really make sense to do so.
 //! 
 //! #### Common
 //! 
 //! - `#[rschema(title = "title")]`
 //! 
-//!   **Required**. The short description for the field.
+//!   The short description for the field.
 //! 
 //! - `#[rschema(description = "description")]`
 //! 
@@ -157,6 +180,14 @@
 //! - `#[rschema(required)]`
 //! 
 //!   Indicate that the property this keyword applies to is required.
+//! 
+//! - `#[rschema(rename = "name")]`
+//! 
+//!   Renames the field name with the given name.
+//! 
+//! - `#[rschema(skip)]`
+//! 
+//!   Skip not to include in schema.
 //! 
 //! 
 //! #### `string`
