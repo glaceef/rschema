@@ -19,6 +19,13 @@ struct TupleStruct(
 );
 
 #[derive(Debug, Schematic)]
+#[rschema(unique_items)]
+struct TupleStruct2(
+    i32,
+    String,
+);
+
+#[derive(Debug, Schematic)]
 enum Enum {
     Variant1(i32, String),
     #[rschema(skip)]
@@ -64,6 +71,8 @@ struct Attributes {
     prop_skip_enum: Enum,
 
     prop_skip_unit_variants: UnitVariantsEnum,
+
+    prop_tuple_struct2: TupleStruct2,
 }
 
 #[test]
@@ -125,6 +134,20 @@ fn it_tests_attributes() -> rschema::Result<()> {
         "UnitVariant3",
         "UnitVariantX"
       ]
+    },
+    "prop_tuple_struct2": {
+      "type": "array",
+      "items": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "minItems": 2,
+      "maxItems": 2,
+      "uniqueItems": true
     }
   },
   "additionalProperties": true

@@ -17,6 +17,7 @@ pub use variant::Variant;
 pub use variant_attr::{
     OtherVariantAttr,
     StructVariantAttr,
+    TupleStructVariantAttr,
     UnitVariantAttr,
     VariantAttr,
 };
@@ -44,7 +45,9 @@ pub enum Data {
 }    
 
 impl Data {
-    pub fn struct_from_ast(fields: &syn::Fields) -> darling::Result<Self> {
+    pub fn struct_from_ast(
+        fields: &syn::Fields,
+    ) -> darling::Result<Self> {
         Ok(match fields {
             // 通常の構造体
             syn::Fields::Named(ref fields) => {
@@ -121,12 +124,21 @@ fn parse_variant(
 ) -> darling::Result<Option<Variant>> {
     let attr: VariantAttr = match variant.fields {
         // struct variant
-        syn::Fields::Named(_) => StructVariantAttr::from_attributes(&variant.attrs)?.into(),
+        syn::Fields::Named(_) => {
+            StructVariantAttr::from_attributes(&variant.attrs)?.into()
+        },
 
         // unit variant
-        syn::Fields::Unit => UnitVariantAttr::from_attributes(&variant.attrs)?.into(),
+        syn::Fields::Unit => {
+            UnitVariantAttr::from_attributes(&variant.attrs)?.into()
+        }
 
-        // else
+        // tuple struct variant
+        syn::Fields::Unnamed(ref fields) if fields.unnamed.len() > 1 => {
+            TupleStructVariantAttr::from_attributes(&variant.attrs)?.into()
+        },
+
+        // empty tuple struct variant / newtype variant
         _ => OtherVariantAttr::from_attributes(&variant.attrs)?.into(),
     };
 

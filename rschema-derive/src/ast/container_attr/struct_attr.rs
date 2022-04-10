@@ -1,11 +1,8 @@
-use darling::{
-    FromAttributes,
-    FromDeriveInput,
-};
+use darling::FromDeriveInput;
 
 use crate::Case;
 
-#[derive(Debug, FromAttributes, FromDeriveInput)]
+#[derive(Debug, FromDeriveInput)]
 #[darling(attributes(rschema))]
 pub struct StructAttr {
     #[darling(default)]
