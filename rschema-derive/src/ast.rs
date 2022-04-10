@@ -23,7 +23,7 @@ pub struct Container<'a> {
     // The struct or enum name (without generics).
     pub ident: &'a syn::Ident,
     // The data within the struct or enum.
-    pub data: Data,
+    pub data: Data<'a>,
     // Any generics on the struct or enum.
     pub generics: &'a syn::Generics,
     // Source input

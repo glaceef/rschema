@@ -4,8 +4,8 @@ use super::{
 };
 
 #[derive(Debug, PartialEq)]
-pub struct Variant {
+pub struct Variant<'a> {
     pub attr: VariantAttr,
-    pub ident: syn::Ident,
-    pub data: Data,
+    pub ident: &'a syn::Ident,
+    pub data: Data<'a>,
 }

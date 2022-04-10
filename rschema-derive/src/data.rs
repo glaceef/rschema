@@ -23,10 +23,10 @@ pub use variant_attr::{
 };
 
 #[derive(Debug, PartialEq)]
-pub enum Data {
+pub enum Data<'a> {
     // Simple structure.
     // e.x.) struct Data { ... }
-    Struct(Vec<Field>),
+    Struct(Vec<Field<'a>>),
     
     // Unit structure.
     // e.x.) struct Unit;
@@ -34,19 +34,19 @@ pub enum Data {
     
     // The tuple structure that has just one field.
     // e.x.) struct Tuple(Ty);
-    NewTypeStruct(Field),
+    NewTypeStruct(Field<'a>),
     
     // The tuple structure that has multiple fields.
     // e.x.) struct Tuple(Ty1, Ty2, ...);
-    TupleStruct(Vec<Field>),
+    TupleStruct(Vec<Field<'a>>),
 
     // enum
-    Enum(Vec<Variant>),
+    Enum(Vec<Variant<'a>>),
 }    
 
-impl Data {
+impl<'a> Data<'a> {
     pub fn struct_from_ast(
-        fields: &syn::Fields,
+        fields: &'a syn::Fields,
     ) -> darling::Result<Self> {
         Ok(match fields {
             // 通常の構造体
@@ -80,7 +80,7 @@ impl Data {
     }
 
     pub fn enum_from_ast(
-        variants: &Punctuated<syn::Variant, syn::Token![,]>,
+        variants: &'a Punctuated<syn::Variant, syn::Token![,]>,
     ) -> darling::Result<Self> {
         if variants.is_empty() {
             return Err(darling::Error::custom("Rschema does not support zero-variant enums"));
@@ -104,8 +104,8 @@ fn parse_field(
     // However, Rschema does not check it. Because there might be a reason.
     let field = is_falsy(&attr.skip).then(|| Field {
         attr,
-        ident: field.ident.clone(), // 参照はできるか？
-        ty: field.ty.clone(),
+        ident: field.ident.as_ref(),
+        ty: &field.ty,
     });
     Ok(field)
 }
@@ -119,9 +119,9 @@ fn fields_from_ast(
         .collect()
 }
 
-fn parse_variant(
-    variant: &syn::Variant,
-) -> darling::Result<Option<Variant>> {
+fn parse_variant<'a>(
+    variant: &'a syn::Variant,
+) -> darling::Result<Option<Variant<'a>>> {
     let attr: VariantAttr = match variant.fields {
         // struct variant
         syn::Fields::Named(_) => {
@@ -149,7 +149,7 @@ fn parse_variant(
     Data::struct_from_ast(&variant.fields)
         .map(|data| Some(Variant {
             attr,
-            ident: variant.ident.clone(),
+            ident: &variant.ident,
             data,
         }))
 }
