@@ -15,6 +15,7 @@ pub use field::Field;
 pub use field_attr::FieldAttr;
 pub use variant::Variant;
 pub use variant_attr::{
+    OtherVariantAttr,
     StructVariantAttr,
     UnitVariantAttr,
     VariantAttr,
@@ -126,7 +127,7 @@ fn parse_variant(
         syn::Fields::Unit => UnitVariantAttr::from_attributes(&variant.attrs)?.into(),
 
         // else
-        _ => VariantAttr::from_attributes(&variant.attrs)?.into(),
+        _ => OtherVariantAttr::from_attributes(&variant.attrs)?.into(),
     };
 
     if !is_falsy(&attr.skip) {
