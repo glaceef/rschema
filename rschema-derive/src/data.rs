@@ -4,6 +4,8 @@ use darling::{
 };
 use syn::punctuated::Punctuated;
 
+use crate::is_falsy;
+
 mod field;
 mod field_attr;
 mod variant;
@@ -13,8 +15,9 @@ pub use field::Field;
 pub use field_attr::FieldAttr;
 pub use variant::Variant;
 pub use variant_attr::{
+    OtherVariantAttr,
     StructVariantAttr,
-    EmptyVariantAttr,
+    VariantAttr,
 };
 
 #[derive(Debug)]
@@ -55,8 +58,13 @@ impl Data {
             // フィールド１つのタプル構造体
             // 中のデータ型として扱う。
             syn::Fields::Unnamed(ref fields) if fields.unnamed.len() == 1 => {
-                let field = fields_from_ast(&fields.unnamed)?.pop().unwrap();
-                Data::NewTypeStruct(field)
+                match fields_from_ast(&fields.unnamed)?.pop() {
+                    Some(field) => Data::NewTypeStruct(field),
+                    None => {
+                        // This is no longer a NewTypeStruct, but an empty TupleStruct.
+                        Data::TupleStruct(vec![])
+                    },
+                }
             },
 
             // そのほかのタプル構造体
@@ -74,43 +82,28 @@ impl Data {
             return Err(darling::Error::custom("Rschema does not support zero-variant enums"));
         }
 
-        let variants: darling::Result<Vec<Variant>> = variants
-            .iter()
-            .map(Self::parse_variant)
-            .collect();
+        let variants = variants_from_ast(variants)?;
+        if variants.is_empty() {
+            return Err(darling::Error::custom("Don't skip all variants."));
+        }
 
-        Ok(Data::Enum(variants?))
-    }
-
-    fn parse_variant(variant: &syn::Variant) -> darling::Result<Variant> {
-        let attr = match variant.fields {
-            // struct variant
-            syn::Fields::Named(_) => {
-                StructVariantAttr::from_attributes(&variant.attrs)?.into()
-            },
-
-            // other variant
-            _ => {
-                EmptyVariantAttr::from_attributes(&variant.attrs)?.into()
-            },
-        };
-
-        Self::struct_from_ast(&variant.fields)
-            .map(|data| Variant {
-                attr,
-                ident: variant.ident.clone(),
-                data,
-            })
+        Ok(Data::Enum(variants))
     }
 }
 
-fn parse_field(field: &syn::Field) -> darling::Result<Field> {
-    FieldAttr::from_field(field)
-        .map(|attr| Field {
-            attr,
-            ident: field.ident.clone(), // 参照はできるか？
-            ty: field.ty.clone(),
-        })
+fn parse_field(
+    field: &syn::Field,
+) -> darling::Result<Option<Field>> {
+    let attr = FieldAttr::from_field(field)?;
+
+    // In most cases, It is not recommended to skip unnamed fields.
+    // However, Rschema does not check it. Because there might be a reason.
+    let field = is_falsy(&attr.skip).then(|| Field {
+        attr,
+        ident: field.ident.clone(), // 参照はできるか？
+        ty: field.ty.clone(),
+    });
+    Ok(field)
 }
 
 fn fields_from_ast(
@@ -118,6 +111,37 @@ fn fields_from_ast(
 ) -> darling::Result<Vec<Field>> {
     fields
         .iter()
-        .map(parse_field)
+        .filter_map(|field| parse_field(field).transpose())
+        .collect()
+}
+
+fn parse_variant(
+    variant: &syn::Variant,
+) -> darling::Result<Option<Variant>> {
+    let attr: VariantAttr = match variant.fields {
+        // struct variant
+        syn::Fields::Named(_) => StructVariantAttr::from_attributes(&variant.attrs)?.into(),
+        // other variant
+        _ => OtherVariantAttr::from_attributes(&variant.attrs)?.into(),
+    };
+
+    if !is_falsy(&attr.skip) {
+        return Ok(None);
+    }
+
+    Data::struct_from_ast(&variant.fields)
+        .map(|data| Some(Variant {
+            attr,
+            ident: variant.ident.clone(),
+            data,
+        }))
+}
+
+fn variants_from_ast(
+    variants: &Punctuated<syn::Variant, syn::Token![,]>,
+) -> darling::Result<Vec<Variant>> {
+    variants
+        .iter()
+        .filter_map(|variant| parse_variant(variant).transpose())
         .collect()
 }

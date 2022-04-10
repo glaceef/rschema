@@ -44,4 +44,8 @@ pub struct FieldAttr {
     pub max_items: Option<usize>,
     #[darling(default)]
     pub unique_items: Option<bool>,
+
+    /* control */
+    #[darling(default)]
+    pub skip: Option<bool>, // Named fields or variants only
 }
