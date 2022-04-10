@@ -1,19 +1,30 @@
+use darling::FromAttributes;
+
 use crate::{
     Attribute,
     Case,
     is_falsy,
 };
 
-mod other_variant_attr;
 mod struct_variant_attr;
+mod unit_variant_attr;
 
-pub use other_variant_attr::OtherVariantAttr;
 pub use struct_variant_attr::StructVariantAttr;
+pub use unit_variant_attr::UnitVariantAttr;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, FromAttributes)]
+#[darling(attributes(rschema))]
 pub struct VariantAttr {
+    #[darling(default)]
     pub additional_properties: Option<bool>,
+
+    #[darling(default)]
+    pub rename: Option<String>,
+
+    #[darling(default)]
     pub rename_all: Option<Case>,
+
+    #[darling(default)]
     pub skip: Option<bool>,
 }
 
@@ -23,13 +34,15 @@ impl From<StructVariantAttr> for VariantAttr {
             additional_properties: attr.additional_properties,
             rename_all: attr.rename_all,
             skip: attr.skip,
+            ..Default::default()
         }
     }
 }
 
-impl From<OtherVariantAttr> for VariantAttr {
-    fn from(attr: OtherVariantAttr) -> Self {
+impl From<UnitVariantAttr> for VariantAttr {
+    fn from(attr: UnitVariantAttr) -> Self {
         VariantAttr {
+            rename: attr.rename,
             skip: attr.skip,
             ..Default::default()
         }

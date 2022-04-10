@@ -30,9 +30,14 @@ enum Enum {
 #[derive(Debug, Schematic)]
 enum UnitVariantsEnum {
     UnitVariant1,
+
     #[rschema(skip)]
     UnitVariant2,
+
     UnitVariant3,
+
+    #[rschema(rename = "UnitVariantX")]
+    UnitVariant0,
 }
 
 #[derive(Debug, Schematic)]
@@ -45,6 +50,9 @@ struct Attributes {
     prop_no_title: i32,
 
     prop_no_attr: i32,
+
+    #[rschema(rename = "prop_renamed")]
+    prop_have_to_rename: i32,
 
     #[rschema(skip)]
     prop_skip: i32,
@@ -72,6 +80,9 @@ fn it_tests_attributes() -> rschema::Result<()> {
       "maximum": 100
     },
     "prop_no_attr": {
+      "type": "number"
+    },
+    "prop_renamed": {
       "type": "number"
     },
     "prop_skip_new_type_struct": {
@@ -111,7 +122,8 @@ fn it_tests_attributes() -> rschema::Result<()> {
       "type": "string",
       "enum": [
         "UnitVariant1",
-        "UnitVariant3"
+        "UnitVariant3",
+        "UnitVariantX"
       ]
     }
   },

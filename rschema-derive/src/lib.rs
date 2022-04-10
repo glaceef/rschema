@@ -13,7 +13,10 @@ mod attribute;
 mod case;
 mod data;
 
-use ast::Container;
+use ast::{
+    Container,
+    ContainerAttr,
+};
 use attribute::Attribute;
 use case::Case;
 use data::{
@@ -108,7 +111,7 @@ fn quote_option(val: &Option<impl ToTokens>) -> TokenStream2 {
 }
 
 fn quote_properties(
-    attr0: &impl Attribute,
+    container_attr: &ContainerAttr,
     fields: &[Field],
 ) -> TokenStream2 {
     let stmts: Vec<TokenStream2> = fields
@@ -125,10 +128,14 @@ fn quote_properties(
                 unreachable!("Oh, that's a bug. Trying to generate properties from unnamed fields.");
             };
 
-            let ident_str = ident.to_string();
-            let fixed_ident = match attr0.rename_all() {
-                Some(case) => ident_str.to_case(case.into()),
-                None => ident_str,
+            let fixed_ident = if let Some(ref rename) = attr.rename {
+                rename.clone()
+            } else {
+                let ident_str = ident.to_string();
+                match container_attr.rename_all() {
+                    Some(case) => ident_str.to_case(case.into()),
+                    None => ident_str,
+                }
             };
 
             // common params
@@ -385,11 +392,16 @@ fn quote_enum_units_ty(
         .filter_map(|variant| {
             match variant.data {
                 Data::UnitStruct => {
-                    let ident_str = variant.ident.to_string();
-                    let fixed_ident = match attr.rename_all() {
-                        Some(case) => ident_str.to_case(case.into()),
-                        None => ident_str,
+                    let fixed_ident = if let Some(ref rename) = variant.attr.rename {
+                        rename.clone()
+                    } else {
+                        let ident_str = variant.ident.to_string();
+                        match attr.rename_all() {
+                            Some(case) => ident_str.to_case(case.into()),
+                            None => ident_str,
+                        }
                     };
+
                     Some(fixed_ident)
                 },
                 _ => None,
@@ -429,6 +441,10 @@ fn fn_type_body_for_enum(
                 },
                 Data::Struct(ref fields) => {
                     Some(fn_type_body_for_struct(&container, &fields))
+
+                    // StructAttributeへの変換が必要か
+                    // Some(fn_type_body_for_struct(&variant.attr, &fields))
+                    // quote_additional_propertiesにenumのContainerAttrが渡されるのはおかしい
                 },
                 Data::TupleStruct(ref fields) => {
                     Some(fn_type_body_for_tuple_struct(&container, &fields))
