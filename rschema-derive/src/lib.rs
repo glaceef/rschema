@@ -269,14 +269,6 @@ fn fn_type_body_for_newtype_struct(
 ) -> TokenStream2 {
     let Field { attr, ty, .. } = field;
 
-    /*
-    // common params
-    let title = quote_option_str(&attr.title);
-    let description = quote_option_str(&attr.description);
-    let comment = quote_option_str(&attr.comment);
-    let deprecated = quote_option(&attr.deprecated);
-    */
-
     // params for each types
     let min_length = quote_option(&attr.min_length);
     let max_length = quote_option(&attr.max_length);
@@ -310,18 +302,16 @@ fn fn_type_body_for_newtype_struct(
 }
 
 fn quote_items(fields: &[Field]) -> TokenStream2 {
-    let types: Vec<TokenStream2> = fields
+    let properties: Vec<TokenStream2> = fields
         .iter()
         .map(|field| {
             let Field { attr, ty, .. } = field;
 
-            /*
             // common params
             let title = quote_option_str(&attr.title);
             let description = quote_option_str(&attr.description);
             let comment = quote_option_str(&attr.comment);
             let deprecated = quote_option(&attr.deprecated);
-            */
 
             // params for each types
             let min_length = quote_option(&attr.min_length);
@@ -338,20 +328,26 @@ fn quote_items(fields: &[Field]) -> TokenStream2 {
             let unique_items = quote_option(&attr.unique_items);
 
             quote! {
-                <#ty as Schematic>::__type(
-                    #min_length,
-                    #max_length,
-                    #pattern,
-                    #format,
-                    #minimum,
-                    #maximum,
-                    #multiple_of,
-                    #exclusive_minimum,
-                    #exclusive_maximum,
-                    #min_items,
-                    #max_items,
-                    #unique_items,
-                )
+                rschema::Property {
+                    title: #title,
+                    description: #description,
+                    comment: #comment,
+                    deprecated: #deprecated,
+                    ty: <#ty as Schematic>::__type(
+                        #min_length,
+                        #max_length,
+                        #pattern,
+                        #format,
+                        #minimum,
+                        #maximum,
+                        #multiple_of,
+                        #exclusive_minimum,
+                        #exclusive_maximum,
+                        #min_items,
+                        #max_items,
+                        #unique_items,
+                    ),
+                }
             }
         })
         .collect();
@@ -359,7 +355,7 @@ fn quote_items(fields: &[Field]) -> TokenStream2 {
     quote! {
         Box::new(rschema::Items::Tuple(vec![
             #(
-                #types,
+                #properties,
             )*
         ]))
     }

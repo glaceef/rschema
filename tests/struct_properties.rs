@@ -12,8 +12,21 @@ struct UnitStruct;
 struct EmptyTupleStruct();
 
 #[derive(Debug, Schematic)]
+struct NewTypeStruct(i32);
+
+#[derive(Debug, Schematic)]
+struct NewTypeStructWithAttr(
+    #[rschema(
+        minimum = 0,
+        maximum = 100,
+    )]
+    i32,
+);
+
+#[derive(Debug, Schematic)]
 struct TupleStruct(
     #[rschema(
+        title = "i32",
         minimum = 0,
         maximum = 100,
     )]
@@ -46,6 +59,12 @@ struct StructProperties {
     #[rschema(title = "EmptyTupleStruct")]
     prop_empty_tuple_struct: EmptyTupleStruct,
 
+    #[rschema(title = "NewTypeStruct")]
+    prop_new_type_struct: NewTypeStruct,
+
+    #[rschema(title = "NewTypeStructWithAttr")]
+    prop_new_type_struct_with_attr: NewTypeStructWithAttr,
+
     #[rschema(title = "TupleStruct")]
     prop_tuple_struct: TupleStruct,
 
@@ -75,11 +94,22 @@ fn it_generates_struct_schema() -> rschema::Result<()> {
       "minItems": 0,
       "maxItems": 0
     },
+    "prop_new_type_struct": {
+      "title": "NewTypeStruct",
+      "type": "number"
+    },
+    "prop_new_type_struct_with_attr": {
+      "title": "NewTypeStructWithAttr",
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
     "prop_tuple_struct": {
       "title": "TupleStruct",
       "type": "array",
       "items": [
         {
+          "title": "i32",
           "type": "number",
           "minimum": 0,
           "maximum": 100
