@@ -13,11 +13,11 @@ mod attribute;
 mod case;
 mod data;
 
-use ast::{
-    Container,
-    ContainerAttr,
+use ast::Container;
+use attribute::{
+    EnumAttribute,
+    StructAttribute,
 };
-use attribute::Attribute;
 use case::Case;
 use data::{
     Data,
@@ -57,16 +57,16 @@ fn expand_derive_schematic(
 fn fn_type(container: &Container) -> TokenStream2 {
     let fn_type_body = match container.data {
         Data::Struct(ref fields) => {
-            fn_type_body_for_struct(container, fields)
+            fn_type_body_for_struct(&container.attr, fields)
         },
         Data::UnitStruct => {
-            fn_type_body_for_unit_struct(container)
+            fn_type_body_for_unit_struct()
         },
         Data::NewTypeStruct(ref field) => {
-            fn_type_body_for_newtype_struct(container, field)
+            fn_type_body_for_newtype_struct(field)
         },
         Data::TupleStruct(ref fields) => {
-            fn_type_body_for_tuple_struct(container, fields)
+            fn_type_body_for_tuple_struct(fields)
         },
         Data::Enum(ref variants) => {
             fn_type_body_for_enum(container, variants)
@@ -111,7 +111,7 @@ fn quote_option(val: &Option<impl ToTokens>) -> TokenStream2 {
 }
 
 fn quote_properties(
-    container_attr: &ContainerAttr,
+    struct_attr: &impl StructAttribute,
     fields: &[Field],
 ) -> TokenStream2 {
     let stmts: Vec<TokenStream2> = fields
@@ -132,7 +132,7 @@ fn quote_properties(
                 rename.clone()
             } else {
                 let ident_str = ident.to_string();
-                match container_attr.rename_all() {
+                match struct_attr.rename_all() {
                     Some(case) => ident_str.to_case(case.into()),
                     None => ident_str,
                 }
@@ -233,7 +233,7 @@ fn quote_required(
 }
 
 fn quote_additional_properties(
-    attr: &impl Attribute,
+    attr: &impl StructAttribute,
 ) -> TokenStream2 {
     let additional_properties = attr.additional_properties();
     quote! {
@@ -244,12 +244,12 @@ fn quote_additional_properties(
 }
 
 fn fn_type_body_for_struct(
-    container: &Container,
+    attr: &impl StructAttribute,
     fields: &[Field],
 ) -> TokenStream2 {
-    let properties = quote_properties(&container.attr, fields);
+    let properties = quote_properties(attr, fields);
     let required = quote_required(fields);
-    let additional_properties = quote_additional_properties(&container.attr);
+    let additional_properties = quote_additional_properties(attr);
 
     quote! {
         rschema::Type::Object(rschema::ObjectKeys {
@@ -260,16 +260,13 @@ fn fn_type_body_for_struct(
     }
 }
 
-fn fn_type_body_for_unit_struct(
-    _container: &Container,
-) -> TokenStream2 {
+fn fn_type_body_for_unit_struct() -> TokenStream2 {
     quote! {
         rschema::Type::Null
     }
 }
 
 fn fn_type_body_for_newtype_struct(
-    _container: &Container,
     field: &Field,
 ) -> TokenStream2 {
     let Field { attr, ty, .. } = field;
@@ -306,7 +303,9 @@ fn fn_type_body_for_newtype_struct(
     }
 }
 
-fn quote_items(fields: &[Field]) -> TokenStream2 {
+fn quote_items(
+    fields: &[Field],
+) -> TokenStream2 {
     let properties: Vec<TokenStream2> = fields
         .iter()
         .map(|field| {
@@ -367,7 +366,6 @@ fn quote_items(fields: &[Field]) -> TokenStream2 {
 }
 
 fn fn_type_body_for_tuple_struct(
-    _container: &Container,
     fields: &[Field],
 ) -> TokenStream2 {
     let items = quote_items(fields);
@@ -384,7 +382,7 @@ fn fn_type_body_for_tuple_struct(
 }
 
 fn quote_enum_units_ty(
-    attr: &impl Attribute,
+    attr: &impl EnumAttribute,
     variants: &[Variant],
 ) -> Option<TokenStream2> {
     let idents: Vec<String> = variants
@@ -434,20 +432,15 @@ fn fn_type_body_for_enum(
         .iter()
         .filter_map(|variant| {
             match variant.data {
-                // ユニットバリアントは後で処理する。
-                Data::UnitStruct => None,
-                Data::NewTypeStruct(ref field) => {
-                    Some(fn_type_body_for_newtype_struct(&container, field))
-                },
                 Data::Struct(ref fields) => {
-                    Some(fn_type_body_for_struct(&container, &fields))
-
-                    // StructAttributeへの変換が必要か
-                    // Some(fn_type_body_for_struct(&variant.attr, &fields))
-                    // quote_additional_propertiesにenumのContainerAttrが渡されるのはおかしい
+                    Some(fn_type_body_for_struct(&variant.attr, &fields))
+                },
+                Data::UnitStruct => None, // ユニットバリアントは後で処理する。
+                Data::NewTypeStruct(ref field) => {
+                    Some(fn_type_body_for_newtype_struct(field))
                 },
                 Data::TupleStruct(ref fields) => {
-                    Some(fn_type_body_for_tuple_struct(&container, &fields))
+                    Some(fn_type_body_for_tuple_struct(&fields))
                 },
                 Data::Enum(_) => {
                     unreachable!("There is no enum-type variants.");

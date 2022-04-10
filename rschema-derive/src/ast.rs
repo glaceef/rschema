@@ -6,7 +6,11 @@ mod container_attr;
 mod impl_generics;
 mod type_generics;
 
-pub use container_attr::ContainerAttr;
+pub use container_attr::{
+    ContainerAttr,
+    EnumAttr,
+    StructAttr,
+};
 use impl_generics::ImplGenerics;
 use type_generics::TypeGenerics;
 
@@ -28,15 +32,23 @@ impl<'a> Container<'a> {
     pub fn from_ast(
         input: &'a syn::DeriveInput,
     ) -> darling::Result<Self> {
-        let data = match input.data {
-            syn::Data::Enum(ref data) => Data::enum_from_ast(&data.variants)?,
-            syn::Data::Struct(ref data) => Data::struct_from_ast(&data.fields)?,
+        let (attr, data) = match input.data {
+            syn::Data::Enum(ref data) => {
+                (
+                    EnumAttr::from_derive_input(&input)?.into(),
+                    Data::enum_from_ast(&data.variants)?,
+                )
+            },
+            syn::Data::Struct(ref data) => {
+                (
+                    StructAttr::from_derive_input(&input)?.into(),
+                    Data::struct_from_ast(&data.fields)?,
+                )
+            },
             syn::Data::Union(_) => {
                 return Err(darling::Error::custom("Rschema does not support derive for unions"));
             },
         };
-
-        let attr = ContainerAttr::from_derive_input(&input).unwrap();
 
         Ok(Container {
             attr,

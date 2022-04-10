@@ -1,14 +1,16 @@
 use darling::FromAttributes;
 
 use crate::{
-    Attribute,
     Case,
+    StructAttribute,
     is_falsy,
 };
 
+mod other_variant_attr;
 mod struct_variant_attr;
 mod unit_variant_attr;
 
+pub use other_variant_attr::OtherVariantAttr;
 pub use struct_variant_attr::StructVariantAttr;
 pub use unit_variant_attr::UnitVariantAttr;
 
@@ -26,6 +28,15 @@ pub struct VariantAttr {
 
     #[darling(default)]
     pub skip: Option<bool>,
+}
+
+impl From<OtherVariantAttr> for VariantAttr {
+    fn from(attr: OtherVariantAttr) -> Self {
+        VariantAttr {
+            skip: attr.skip,
+            ..Default::default()
+        }
+    }
 }
 
 impl From<StructVariantAttr> for VariantAttr {
@@ -49,7 +60,7 @@ impl From<UnitVariantAttr> for VariantAttr {
     }
 }
 
-impl Attribute for VariantAttr {
+impl StructAttribute for VariantAttr {
     fn additional_properties(&self) -> bool {
         !is_falsy(&self.additional_properties)
     }

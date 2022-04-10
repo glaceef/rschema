@@ -10,7 +10,6 @@ use serde::Deserialize;
 use std::collections::HashMap;
 
 #[derive(Debug, Schematic, Deserialize)]
-#[rschema(additional_properties)]
 #[serde(untagged)]
 enum FullEnum {
     Unit,
