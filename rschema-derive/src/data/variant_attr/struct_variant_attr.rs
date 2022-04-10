@@ -10,4 +10,7 @@ pub struct StructVariantAttr {
 
     #[darling(default)]
     pub rename_all: Option<Case>,
+
+    #[darling(default)]
+    pub skip: Option<bool>,
 }

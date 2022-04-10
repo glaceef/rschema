@@ -107,7 +107,6 @@ fn quote_option(val: &Option<impl ToTokens>) -> TokenStream2 {
     }
 }
 
-// Do not call this method for structs or variants with no named fields.
 fn quote_properties(
     attr0: &impl Attribute,
     fields: &[Field],
@@ -122,8 +121,8 @@ fn quote_properties(
             } = field {
                 (attr, ident, ty)
             } else {
-                // Named field always have ident.
-                unreachable!("in the function `quote_properties`");
+                // Do not call this for unnamed fields.
+                unreachable!("Oh, that's a bug. Trying to generate properties from unnamed fields.");
             };
 
             let ident_str = ident.to_string();
@@ -191,7 +190,6 @@ fn quote_properties(
     }
 }
 
-// Do not call this method for structs or variants with no named fields.
 fn quote_required(
     fields: &[Field],
 ) -> TokenStream2 {
@@ -212,8 +210,8 @@ fn quote_required(
                     _ => None,
                 }
             } else {
-                // Named field always have ident.
-                unreachable!("in the function `quote_required`");
+                // Do not call this for unnamed fields.
+                unreachable!("Oh, that's a bug. Trying to create a list of required properties from unnamed fields.");
             }
         })
         .collect();
@@ -450,12 +448,7 @@ fn fn_type_body_for_enum(
             unreachable!("Rschema does not support zero-variant enums.");
         },
         ( true, Some(ty)) => {
-            // ユニットバリアントのみ
-            quote! { #ty }
-        },
-        (false, _) if types.len() == 1 => {
-            // 単一の非ユニットバリアント
-            let ty = types.first().unwrap();
+            // Only unit variants
             quote! { #ty }
         },
         _ => {
@@ -465,7 +458,7 @@ fn fn_type_body_for_enum(
                         #(
                             #types,
                         )*
-                        #enum_units_ty // 末尾カンマ禁止
+                        #enum_units_ty // Don't put a comma at the end.
                     ],
                 })
             }

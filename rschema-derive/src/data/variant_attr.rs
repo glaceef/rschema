@@ -4,16 +4,17 @@ use crate::{
     is_falsy,
 };
 
+mod other_variant_attr;
 mod struct_variant_attr;
-mod empty_variant_attr;
 
+pub use other_variant_attr::OtherVariantAttr;
 pub use struct_variant_attr::StructVariantAttr;
-pub use empty_variant_attr::EmptyVariantAttr;
 
 #[derive(Debug, Default)]
 pub struct VariantAttr {
     pub additional_properties: Option<bool>,
     pub rename_all: Option<Case>,
+    pub skip: Option<bool>,
 }
 
 impl From<StructVariantAttr> for VariantAttr {
@@ -21,13 +22,17 @@ impl From<StructVariantAttr> for VariantAttr {
         VariantAttr {
             additional_properties: attr.additional_properties,
             rename_all: attr.rename_all,
+            skip: attr.skip,
         }
     }
 }
 
-impl From<EmptyVariantAttr> for VariantAttr {
-    fn from(_attr: EmptyVariantAttr) -> Self {
-        Self::default()
+impl From<OtherVariantAttr> for VariantAttr {
+    fn from(attr: OtherVariantAttr) -> Self {
+        VariantAttr {
+            skip: attr.skip,
+            ..Default::default()
+        }
     }
 }
 
