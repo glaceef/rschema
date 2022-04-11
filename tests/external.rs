@@ -1,6 +1,5 @@
 #![allow(dead_code)]
 
-use chrono::prelude::*;
 use rschema::{
     Schema,
     Schematic,
@@ -46,12 +45,6 @@ struct External {
         title = "AlternativeStruct",
     )]
     prop_external2: ExternalStruct,
-
-    #[rschema(
-        alt = "String",
-        format = "date",
-    )]
-    prop_date: DateTime<Utc>,
 }
 
 #[test]
@@ -86,10 +79,6 @@ fn it_tests_external() -> rschema::Result<()> {
         }
       },
       "additionalProperties": false
-    },
-    "prop_date": {
-      "type": "string",
-      "format": "date"
     }
   },
   "additionalProperties": false

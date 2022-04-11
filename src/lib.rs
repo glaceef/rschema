@@ -185,6 +185,14 @@
 //! 
 //!   Renames the field name with the given name.
 //! 
+//! - `#[rschema(alt = "path")]`
+//! 
+//!   This is very similar to the serde's `remote` attribute. But it does not check that all the fields in the definition you provided match those in the external type.
+//! 
+//!   If use external types, it probably does not implement `Schematic`. In such a case, you need to give the schema information instead by specifying another type that implements `Schematic`.
+//! 
+//!   **Note**: Rschema does not pre-implement the `Schematic` for types provided by non-standard crates. It is to prevent cyclic package dependency, in the case that external crates come to implement `Schematic` in the future.
+//! 
 //! - `#[rschema(skip)]`
 //! 
 //!   Skip not to include in schema.
@@ -202,7 +210,7 @@
 //! 
 //! - `#[rschema(pattern = "regular expressions")]`
 //! 
-//!   The regular expression to restrict a string. You should use a raw strings if necessary to avoid unnecessary escaping.
+//!   The regular expression to restrict a string. If necessary, you should use raw string literals to work around escaping.
 //! 
 //! - `#[rschema(format = "format")]`
 //! 
