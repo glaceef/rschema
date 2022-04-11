@@ -49,5 +49,7 @@ pub struct FieldAttr {
     #[darling(default)]
     pub rename: Option<String>,
     #[darling(default)]
-    pub skip: Option<bool>, // Named fields or variants only
+    pub alt: Option<syn::Path>,
+    #[darling(default)]
+    pub skip: Option<bool>,
 }

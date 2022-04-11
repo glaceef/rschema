@@ -1,7 +1,7 @@
 [package]
 name = "rschema"
 description = "A json-schema generator"
-version = "0.5.0"
+version = "0.5.1"
 edition = "2021"
 authors = ["glaceef <ma3ki0708.study@gmail.com>"]
 license = "MIT OR Apache-2.0"
@@ -16,7 +16,7 @@ readme = "README.md"
 
 [dependencies]
 rschema-core = { version = "0.4.0", path = "rschema-core" }
-rschema-derive = { version = "0.4.0", path = "rschema-derive" }
+rschema-derive = { version = "0.4.1", path = "rschema-derive" }
 
 [dev-dependencies]
 serde = { version = "1.0.136", features = ["derive"] }
