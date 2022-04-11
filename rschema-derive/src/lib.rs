@@ -97,6 +97,22 @@ fn quote_fn_type(body: TokenStream2) -> TokenStream2 {
     }
 }
 
+fn rename_ident(
+    ident: &proc_macro2::Ident,
+    rename: Option<&String>,
+    rename_all: Option<Case>,
+) -> String {
+    if let Some(rename) = rename {
+        rename.clone()
+    } else {
+        let ident_str = ident.to_string();
+        match rename_all {
+            Some(case) => ident_str.to_case(case.into()),
+            None => ident_str,
+        }
+    }
+}
+
 fn quote_option_str(val: &Option<String>) -> TokenStream2 {
     match val {
         Some(v) => quote! { Some(#v.into()) },
@@ -126,6 +142,11 @@ fn quote_ty(Field{ attr, ty, .. }: &Field) -> TokenStream2 {
     let max_items = quote_option(&attr.max_items);
     let unique_items = quote_option(&attr.unique_items);
 
+    let ty = match attr.alt {
+        Some(ref alt) => quote!{ #alt },
+        None => quote!{ #ty },
+    };
+
     quote! {
         <#ty as Schematic>::__type(
             #min_length,
@@ -141,22 +162,6 @@ fn quote_ty(Field{ attr, ty, .. }: &Field) -> TokenStream2 {
             #max_items,
             #unique_items,
         )
-    }
-}
-
-fn rename_ident(
-    ident: &proc_macro2::Ident,
-    rename: Option<&String>,
-    rename_all: Option<Case>,
-) -> String {
-    if let Some(rename) = rename {
-        rename.clone()
-    } else {
-        let ident_str = ident.to_string();
-        match rename_all {
-            Some(case) => ident_str.to_case(case.into()),
-            None => ident_str,
-        }
     }
 }
 
