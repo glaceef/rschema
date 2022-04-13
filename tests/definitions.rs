@@ -10,7 +10,7 @@ mod external_crate {
 
     #[derive(Debug, Schematic)]
     #[rschema(additional_properties)]
-    #[rschema(definition)]
+    #[rschema(definitions)]
     pub struct Sample {
         prop_string: String,
     }
@@ -24,13 +24,13 @@ struct NoDefSample {
 }
 
 #[derive(Debug, Schematic)]
-#[rschema(definition)]
+#[rschema(definitions)]
 struct Sample {
     prop_string: String,
 }
 
 #[derive(Debug, Schematic)]
-#[rschema(definition)]
+#[rschema(definitions)]
 struct NestedSample {
     prop_sample: Sample,
 }

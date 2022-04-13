@@ -41,7 +41,7 @@ pub struct ContainerAttr {
     // ref =   : 下記参照。$idと組み合わせることを記載。
     // https://json-schema.org/understanding-json-schema/structuring.html#ref
     #[darling(default)]
-    pub definition: Option<bool>,
+    pub definitions: Option<bool>,
 }
 
 impl From<EmptyStructAttr> for ContainerAttr {
@@ -64,7 +64,7 @@ impl From<StructAttr> for ContainerAttr {
         ContainerAttr {
             additional_properties: attr.additional_properties,
             rename_all: attr.rename_all,
-            definition: attr.definition,
+            definitions: attr.definitions,
             ..Default::default()
         }
     }
@@ -80,8 +80,8 @@ impl From<TupleStructAttr> for ContainerAttr {
 }
 
 impl ContainerAttribute for ContainerAttr {
-    fn definition(&self) -> bool {
-        !is_falsy(&self.definition)
+    fn definitions(&self) -> bool {
+        !is_falsy(&self.definitions)
     }
 }
 

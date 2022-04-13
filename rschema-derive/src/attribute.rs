@@ -1,7 +1,7 @@
 use crate::Case;
 
 pub trait ContainerAttribute {
-    fn definition(&self) -> bool;
+    fn definitions(&self) -> bool;
 }
 
 pub trait EnumAttribute {

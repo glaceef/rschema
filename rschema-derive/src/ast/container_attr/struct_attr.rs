@@ -12,5 +12,5 @@ pub struct StructAttr {
     pub rename_all: Option<Case>,
 
     #[darling(default)]
-    pub definition: Option<bool>,
+    pub definitions: Option<bool>,
 }

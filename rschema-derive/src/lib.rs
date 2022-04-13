@@ -508,7 +508,7 @@ fn fn_defs_map_body(
         .collect();
 
     // $defs に定義するかどうか
-    let stmt_insert_self = attr.definition().then(|| {
+    let stmt_insert_self = attr.definitions().then(|| {
         // 名前を決定する記述。
         // 外部から渡すことになった場合はここを変える。
         let def_name = quote! {

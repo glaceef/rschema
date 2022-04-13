@@ -38,6 +38,6 @@ impl DefinitionsMap {
     }
 
     pub fn build(self) -> Definitions {
-        FromIterator::from_iter(self.map.into_values())
+        Definitions::from_iter(self.map.into_values())
     }
 }
