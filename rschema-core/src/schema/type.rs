@@ -62,7 +62,9 @@ pub enum Type {
     /// 
     Tuple(TupleKeys),
 
-    Ref(String),
+    /// A reference to another schema.
+    /// 
+    Ref(&'static str),
 }
 
 macro_rules! keys_match_block {

@@ -1,3 +1,5 @@
+use indexmap::IndexMap;
+
 use super::Type;
 
-pub type Definitions = std::collections::HashMap<String, Type>;
+pub type Definitions = IndexMap<&'static str, Type>;

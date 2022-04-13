@@ -84,10 +84,6 @@ impl StructAttribute for VariantAttr {
     fn rename_all(&self) -> Option<Case> {
         self.rename_all
     }
-
-    fn definition(&self) -> bool {
-        false
-    }
 }
 
 impl TupleStructAttribute for VariantAttr {

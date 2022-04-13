@@ -1,5 +1,9 @@
 use crate::Case;
 
+pub trait ContainerAttribute {
+    fn definition(&self) -> bool;
+}
+
 pub trait EnumAttribute {
     fn rename_all(&self) -> Option<Case>;
 }
@@ -7,7 +11,6 @@ pub trait EnumAttribute {
 pub trait StructAttribute {
     fn additional_properties(&self) -> bool;
     fn rename_all(&self) -> Option<Case>;
-    fn definition(&self) -> bool;
 }
 
 pub trait TupleStructAttribute {

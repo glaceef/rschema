@@ -15,6 +15,7 @@ mod data;
 
 use ast::Container;
 use attribute::{
+    ContainerAttribute,
     EnumAttribute,
     StructAttribute,
     TupleStructAttribute,
@@ -78,53 +79,31 @@ fn fn_type(container: &Container) -> TokenStream2 {
 }
 */
 
-fn quote_fn_defs_map(body: TokenStream2) -> TokenStream2 {
-    quote! {
-        fn __defs_map() -> rschema::DefinitionsMap {
-            #body
-        }
-    }
-}
-
-fn fn_defs_map_body(fields: &[Field]) -> TokenStream2 {
-    let stmts: Vec<TokenStream2> = fields
-        .iter()
-        .map(|field| {
-            let Field { ty, .. } = field;
-
-            quote! {
-                if let Some(def) = <#ty as Schematic>::__def() {
-                    let name = stringify!(#ty);
-                    let actual_name = map.insert::<#ty>(
-                        name.into(),
-                        def,
-                    );
-                }
-                map.append::<#ty>();
-            }
-        })
-        .collect();
-
-    quote! {
-        let mut map = rschema::DefinitionsMap::new();
-        #(
-            #stmts
-        )*
-        map
-    }
-}
-
 fn impl_body(container: &Container) -> TokenStream2 {
     let (
-        fn_type_body,
+        fn_type,
         fn_defs_map,
     ) = match container.data {
         Data::Struct(ref fields) => {
-            let fn_defs_map = quote_fn_defs_map(fn_defs_map_body(fields));
+            // 自身の __type() の中身
+            let mut fn_type_body = fn_type_body_for_struct(&container.attr, fields);
+
+            let fn_defs_map = fn_defs_map(
+                &container.attr,
+                fields,
+                &mut fn_type_body,
+            );
+            let fn_type = quote_fn_type(fn_type_body);
+
             (
-                fn_type_body_for_struct(&container.attr, fields),
+                fn_type,
                 Some(fn_defs_map),
             )
+
+            // (
+            //     fn_type_body_for_struct(&container.attr, fields),
+            //     Some(fn_defs_map),
+            // )
         },
         Data::UnitStruct => {
             (
@@ -152,35 +131,8 @@ fn impl_body(container: &Container) -> TokenStream2 {
         },
     };
 
-    let (
-        fn_type,
-        fn_def,
-    ) = {
-        // $defs に定義する場合は body の中身を置き換える。
-        if container.attr.definition() {
-            let fn_def = fn_def(fn_type_body);
-
-            // __type() は代わりに ref を返す
-            let def = container.ident.to_string();
-            let fn_type_body = quote! {
-                rschema::Type::Ref(#def.into())
-            };
-
-            (
-                quote_fn_type(fn_type_body),
-                Some(fn_def),
-            )
-        } else {
-            (
-                quote_fn_type(fn_type_body),
-                None, // デフォルト実装
-            )
-        }
-    };
-
     quote! {
         #fn_type
-        #fn_def
         #fn_defs_map
     }
 }
@@ -536,12 +488,75 @@ fn fn_type_body_for_enum(
     }
 }
 
-fn fn_def(
-    fn_type_body: TokenStream2,
-) -> TokenStream2 {
+fn quote_stmt_append_defs(Field{ ty, .. }: &Field) -> TokenStream2 {
     quote! {
-        fn __def() -> Option<rschema::Type> {
-            Some(#fn_type_body)
+        // このプロパティの型が持っている DefinitionsMap を取り込む。
+        // __def() の結果の insert は行わない。なぜなら __defs_map() は、
+        // この型が definition = true の場合、自身の実装を含んだものを返すからだ。
+        map.append::<#ty>();
+    }
+}
+
+fn fn_defs_map_body(
+    attr: &impl ContainerAttribute,
+    fields: &[Field],
+    fn_type_body: &mut TokenStream2,
+) -> TokenStream2 {
+    let stmts: Vec<TokenStream2> = fields
+        .iter()
+        .map(quote_stmt_append_defs)
+        .collect();
+
+    // $defs に定義するかどうか
+    let stmt_insert_self = attr.definition().then(|| {
+        // 名前を決定する記述。
+        // 外部から渡すことになった場合はここを変える。
+        let def_name = quote! {
+            std::any::type_name::<Self>()
+        };
+
+        // __type() の返却値を Type::Ref に置き換える。
+        let new_fn_type_body = quote!{
+            rschema::Type::Ref(#def_name)
+        };
+        let def = std::mem::replace(fn_type_body, new_fn_type_body);
+
+        quote! {
+            map.insert::<Self>(
+                #def_name,
+                #def,
+            );
+        }
+    });
+
+    quote! {
+        let mut map = rschema::DefinitionsMap::new();
+        #stmt_insert_self
+        #(
+            #stmts
+        )*
+        map
+    }
+}
+
+fn quote_fn_defs_map(body: TokenStream2) -> TokenStream2 {
+    quote! {
+        fn __defs_map() -> rschema::DefinitionsMap {
+            #body
         }
     }
+}
+
+fn fn_defs_map(
+    attr: &impl ContainerAttribute,
+    fields: &[Field],
+    fn_type_body: &mut TokenStream2,
+) -> TokenStream2 {
+    let fn_defs_map_body = fn_defs_map_body(
+        attr,
+        fields,
+        fn_type_body,
+    );
+
+    quote_fn_defs_map(fn_defs_map_body)
 }

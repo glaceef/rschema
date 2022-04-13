@@ -82,16 +82,11 @@ pub trait Schematic {
         )
     }
 
-    // definition = true の場合、自身の実体を返すメソッド
-    // __defs() に含めてしまえばよい？
-    // 自身のものと自身のフィールドから来るものは分けておかないと無理？
-    fn __def() -> Option<Type> {
-        None
+    fn __defs() -> Definitions {
+        let defs_map = Self::__defs_map();
+        defs_map.build()
     }
 
-    // 自身のフィールドの型が definition = true であった場合、
-    // その型IDと実体のマップを返す。
-    // TypeID も必要なのでおそらく HashMap ではムリ
     fn __defs_map() -> DefinitionsMap {
         DefinitionsMap::new()
     }

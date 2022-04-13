@@ -5,6 +5,7 @@ use darling::{
 
 use crate::{
     Case,
+    ContainerAttribute,
     EnumAttribute,
     StructAttribute,
     TupleStructAttribute,
@@ -33,6 +34,12 @@ pub struct ContainerAttr {
     #[darling(default)]
     pub unique_items: Option<bool>,
 
+    // bool    : 通常の使い方。std::any::type_name によって決められた名前で $defs に登録するが、
+    //           その名前がユニーク性を保証していないことを明記する。可能であれば name を指定する
+    //           こと、exportする構造体では名前の衝突を防ぐため name を指定しないことを記載。
+    // name =  : $defs のキー名を指定。衝突した場合の挙動を明記。
+    // ref =   : 下記参照。$idと組み合わせることを記載。
+    // https://json-schema.org/understanding-json-schema/structuring.html#ref
     #[darling(default)]
     pub definition: Option<bool>,
 }
@@ -72,6 +79,12 @@ impl From<TupleStructAttr> for ContainerAttr {
     }
 }
 
+impl ContainerAttribute for ContainerAttr {
+    fn definition(&self) -> bool {
+        !is_falsy(&self.definition)
+    }
+}
+
 impl EnumAttribute for ContainerAttr {
     fn rename_all(&self) -> Option<Case> {
         self.rename_all
@@ -85,10 +98,6 @@ impl StructAttribute for ContainerAttr {
 
     fn rename_all(&self) -> Option<Case> {
         self.rename_all
-    }
-
-    fn definition(&self) -> bool {
-        !is_falsy(&self.definition)
     }
 }
 

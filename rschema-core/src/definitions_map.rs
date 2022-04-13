@@ -1,9 +1,6 @@
 use indexmap::IndexMap;
 
-use std::{
-    any::TypeId,
-    collections::HashMap,
-};
+use std::any::TypeId;
 
 use crate::{
     Definitions,
@@ -13,7 +10,8 @@ use crate::{
 
 #[derive(Debug)]
 pub struct DefinitionsMap {
-    pub map: IndexMap<TypeId, (String, Type)>,
+    // 現状、名前を指定できるようになった場合に衝突を検知できない。
+    pub map: IndexMap<TypeId, (&'static str, Type)>,
 }
 
 impl DefinitionsMap {
@@ -23,33 +21,24 @@ impl DefinitionsMap {
         }
     }
 
-    // これは呼ばれないこともある
     pub fn insert<T: 'static + Schematic>(
         &mut self,
-        name: String,
+        name: &'static str,
         def: Type,
     ) {
-        // 自身の直接のプロパティについての情報を追加
         let id = TypeId::of::<T>();
-        // IDが衝突した場合は上書きしないようにしているが、
-        // カスタマイズされていると内容が異なるのでどちらも残さなければいけなそう。
-        self.map.entry(id).or_insert((name, def));
+        self.map
+            .entry(id)
+            .or_insert((name, def));
     }
 
-    // これはいったんすべてのプロパティについて呼び出す。
-    // そのプロパティの型の definitions_map が空だったら何もしない。
+    // 他の型の DefinitionsMap を
     pub fn append<T: Schematic>(&mut self) {
         let definitions_map = <T as Schematic>::__defs_map();
-        for (id, item) in definitions_map.map.into_iter() {
-            self.map.insert(id, item);
-        }
+        self.map.extend(definitions_map.map);
     }
 
     pub fn build(self) -> Definitions {
-        let mut defs = Definitions::new();
-        for (_id, (name, def)) in self.map.into_iter() {
-            defs.insert(name, def);
-        }
-        defs
+        FromIterator::from_iter(self.map.into_values())
     }
 }

@@ -75,15 +75,13 @@ impl Schema {
     /// Create a schema object from the given type `T`.
     /// 
     pub fn new<T: Schematic>(title: &str) -> Self {
-        let defs_map = T::__defs_map();
-
         Schema {
             schema: None,
             id: None,
             title: title.into(),
             description: None,
             ty: T::__type_no_attr(),
-            defs: defs_map.build(), // __defs() は自身の実装も含まれるようにすべきか？
+            defs: T::__defs(),
         }
     }
 
