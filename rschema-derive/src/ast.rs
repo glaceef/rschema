@@ -72,7 +72,7 @@ impl<'a> Container<'a> {
             },
         };
 
-        Ok(Container {
+        Ok(Self {
             attr,
             ident: &input.ident,
             generics: &input.generics,

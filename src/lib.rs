@@ -267,6 +267,8 @@
 pub use rschema_core::{
     AdditionalProperties,
     ArrayKeys,
+    Definitions,
+    DefinitionsMap,
     Draft,
     EnumKeys,
     Error,

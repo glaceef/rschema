@@ -4,10 +4,15 @@ use std::fs;
 
 use crate::{
     Draft,
-    Type,
     Result,
     Schematic,
 };
+
+mod defs;
+pub mod r#type;
+
+pub use defs::Definitions;
+pub use r#type::Type;
 
 /// This is a structure representing the JSON schema itself.
 /// 
@@ -60,18 +65,25 @@ pub struct Schema {
 
     #[serde(flatten)]
     ty: Type,
+
+    #[serde(rename = "$defs")]
+    #[serde(skip_serializing_if = "Definitions::is_empty")]
+    defs: Definitions,
 }
 
 impl Schema {
     /// Create a schema object from the given type `T`.
     /// 
     pub fn new<T: Schematic>(title: &str) -> Self {
+        let defs_map = T::__defs_map();
+
         Schema {
             schema: None,
             id: None,
             title: title.into(),
             description: None,
             ty: T::__type_no_attr(),
+            defs: defs_map.build(), // __defs() は自身の実装も含まれるようにすべきか？
         }
     }
 

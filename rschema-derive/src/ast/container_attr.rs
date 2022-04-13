@@ -32,6 +32,9 @@ pub struct ContainerAttr {
 
     #[darling(default)]
     pub unique_items: Option<bool>,
+
+    #[darling(default)]
+    pub definition: Option<bool>,
 }
 
 impl From<EmptyStructAttr> for ContainerAttr {
@@ -54,6 +57,7 @@ impl From<StructAttr> for ContainerAttr {
         ContainerAttr {
             additional_properties: attr.additional_properties,
             rename_all: attr.rename_all,
+            definition: attr.definition,
             ..Default::default()
         }
     }
@@ -81,6 +85,10 @@ impl StructAttribute for ContainerAttr {
 
     fn rename_all(&self) -> Option<Case> {
         self.rename_all
+    }
+
+    fn definition(&self) -> bool {
+        !is_falsy(&self.definition)
     }
 }
 
