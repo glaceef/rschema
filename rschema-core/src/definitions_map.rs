@@ -32,7 +32,6 @@ impl DefinitionsMap {
             .or_insert((name, def));
     }
 
-    // 他の型の DefinitionsMap を
     pub fn append<T: Schematic>(&mut self) {
         let definitions_map = <T as Schematic>::__defs_map();
         self.map.extend(definitions_map.map);
