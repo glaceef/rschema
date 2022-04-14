@@ -9,41 +9,95 @@ mod external_crate {
     use super::*;
 
     #[derive(Debug, Schematic)]
-    #[rschema(additional_properties)]
     #[rschema(definitions)]
-    pub struct Sample {
-        prop_string: String,
+    pub struct Struct {
+        prop_value: i32,
     }
+
+    #[derive(Debug, Schematic)]
+    #[rschema(definitions)]
+    pub struct Tuple(i32, String);
 }
 
 #[derive(Debug, Schematic)]
-struct NoDefSample {
-    prop_string: String,
+struct NoDefStruct {
+    prop_value: i32,
 
-    prop_sample: Sample,
+    prop_struct: Struct,
 }
 
 #[derive(Debug, Schematic)]
 #[rschema(definitions)]
-struct Sample {
-    prop_string: String,
+struct Struct {
+    prop_value: i32,
 }
 
 #[derive(Debug, Schematic)]
 #[rschema(definitions)]
-struct NestedSample {
-    prop_sample: Sample,
+struct NestedStruct {
+    prop_struct: Struct,
+}
+
+#[derive(Debug, Schematic)]
+#[rschema(definitions)]
+struct Alt2 {
+    prop_value: i32,
+}
+
+#[derive(Debug)]
+struct Alt {
+    prop_value: i32,
+}
+
+// #[derive(Debug, Schematic)]
+// // #[rschema(definitions)]
+// struct NewTypeStruct(i32);
+
+#[derive(Debug, Schematic)]
+struct NoDefTuple(i32, String);
+
+#[derive(Debug, Schematic)]
+#[rschema(definitions)]
+struct Tuple(i32, String);
+
+#[derive(Debug, Schematic)]
+#[rschema(definitions)]
+struct NestedTuple(i32, Tuple);
+
+#[derive(Debug, Schematic)]
+enum Enum {
+    Tuple(i32),
+
+    Struct {
+        prop_struct: Struct,
+        prop_tuple: Tuple,
+    },
 }
 
 #[derive(Debug, Schematic)]
 struct Definitions {
-    prop_no_def_sample: NoDefSample,
+    /*
+    prop_no_def_struct: NoDefStruct,
 
-    prop_sample: Sample,
+    prop_struct: Struct,
 
-    prop_sample_external: external_crate::Sample,
+    prop_struct_external: external_crate::Struct,
 
-    prop_nested_sample: NestedSample,
+    prop_nested_struct: NestedStruct,
+
+    #[rschema(alt = "Alt2")]
+    prop_alt: Alt,
+
+    prop_no_def_tuple: NoDefTuple,
+
+    prop_tuple: Tuple,
+
+    prop_tuple_external: external_crate::Tuple,
+
+    prop_nexted_tuple: NestedTuple,
+    */
+
+    prop_enum: Enum,
 }
 
 #[test]
@@ -54,53 +108,53 @@ fn it_tests_definitions() -> rschema::Result<()> {
   "title": "Definitions",
   "type": "object",
   "properties": {
-    "prop_no_def_sample": {
+    "prop_no_def_struct": {
       "type": "object",
       "properties": {
-        "prop_string": {
-          "type": "string"
+        "prop_value": {
+          "type": "number"
         },
-        "prop_sample": {
-          "$ref": "#/$defs/definitions::Sample"
+        "prop_struct": {
+          "$ref": "#/$defs/definitions::Struct"
         }
       },
       "additionalProperties": false
     },
-    "prop_sample": {
-      "$ref": "#/$defs/definitions::Sample"
+    "prop_struct": {
+      "$ref": "#/$defs/definitions::Struct"
     },
-    "prop_sample_external": {
-      "$ref": "#/$defs/definitions::external_crate::Sample"
+    "prop_struct_external": {
+      "$ref": "#/$defs/definitions::external_crate::Struct"
     },
-    "prop_nested_sample": {
-      "$ref": "#/$defs/definitions::NestedSample"
+    "prop_nested_struct": {
+      "$ref": "#/$defs/definitions::NestedStruct"
     }
   },
   "additionalProperties": false,
   "$defs": {
-    "definitions::Sample": {
+    "definitions::Struct": {
       "type": "object",
       "properties": {
-        "prop_string": {
-          "type": "string"
+        "prop_value": {
+          "type": "number"
         }
       },
       "additionalProperties": false
     },
-    "definitions::external_crate::Sample": {
+    "definitions::external_crate::Struct": {
       "type": "object",
       "properties": {
-        "prop_string": {
-          "type": "string"
+        "prop_value": {
+          "type": "number"
         }
       },
-      "additionalProperties": true
+      "additionalProperties": false
     },
-    "definitions::NestedSample": {
+    "definitions::NestedStruct": {
       "type": "object",
       "properties": {
-        "prop_sample": {
-          "$ref": "#/$defs/definitions::Sample"
+        "prop_struct": {
+          "$ref": "#/$defs/definitions::Struct"
         }
       },
       "additionalProperties": false

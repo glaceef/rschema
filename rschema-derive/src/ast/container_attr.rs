@@ -12,15 +12,17 @@ use crate::{
     is_falsy,
 };
 
-mod empty_struct_attr;
 mod enum_attr;
+mod newtype_struct_attr;
 mod struct_attr;
 mod tuple_struct_attr;
+mod unit_struct_attr;
 
-pub use empty_struct_attr::EmptyStructAttr;
 pub use enum_attr::EnumAttr;
+pub use newtype_struct_attr::NewTypeStructAttr;
 pub use struct_attr::StructAttr;
 pub use tuple_struct_attr::TupleStructAttr;
+pub use unit_struct_attr::UnitStructAttr;
 
 #[derive(Debug, Default, FromAttributes, FromDeriveInput)]
 #[darling(attributes(rschema))]
@@ -44,18 +46,18 @@ pub struct ContainerAttr {
     pub definitions: Option<bool>,
 }
 
-impl From<EmptyStructAttr> for ContainerAttr {
-    fn from(_attr: EmptyStructAttr) -> Self {
-        ContainerAttr::default()
-    }
-}
-
 impl From<EnumAttr> for ContainerAttr {
     fn from(attr: EnumAttr) -> Self {
         ContainerAttr {
             rename_all: attr.rename_all,
             ..Default::default()
         }
+    }
+}
+
+impl From<NewTypeStructAttr> for ContainerAttr {
+    fn from(_attr: NewTypeStructAttr) -> Self {
+        ContainerAttr::default()
     }
 }
 
@@ -74,8 +76,15 @@ impl From<TupleStructAttr> for ContainerAttr {
     fn from(attr: TupleStructAttr) -> Self {
         ContainerAttr {
             unique_items: attr.unique_items,
+            definitions: attr.definitions,
             ..Default::default()
         }
+    }
+}
+
+impl From<UnitStructAttr> for ContainerAttr {
+    fn from(_attr: UnitStructAttr) -> Self {
+        ContainerAttr::default()
     }
 }
 

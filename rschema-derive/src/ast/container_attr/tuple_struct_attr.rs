@@ -5,4 +5,7 @@ use darling::FromDeriveInput;
 pub struct TupleStructAttr {
     #[darling(default)]
     pub unique_items: Option<bool>,
+
+    #[darling(default)]
+    pub definitions: Option<bool>,
 }

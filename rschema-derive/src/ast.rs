@@ -8,10 +8,11 @@ mod type_generics;
 
 pub use container_attr::{
     ContainerAttr,
-    EmptyStructAttr,
     EnumAttr,
+    NewTypeStructAttr,
     StructAttr,
     TupleStructAttr,
+    UnitStructAttr,
 };
 use impl_generics::ImplGenerics;
 use type_generics::TypeGenerics;
@@ -51,12 +52,12 @@ impl<'a> Container<'a> {
 
                         // unit struct
                         syn::Fields::Unit => {
-                            EmptyStructAttr::from_derive_input(&input)?.into()
+                            UnitStructAttr::from_derive_input(&input)?.into()
                         },
 
                         // newtype struct
                         syn::Fields::Unnamed(ref fields) if fields.unnamed.len() == 1 => {
-                            EmptyStructAttr::from_derive_input(&input)?.into()
+                            NewTypeStructAttr::from_derive_input(&input)?.into()
                         },
 
                         // tuple struct

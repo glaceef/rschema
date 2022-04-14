@@ -102,10 +102,18 @@ fn parse_field(
 
     // In most cases, It is not recommended to skip unnamed fields.
     // However, Rschema does not check it. Because there might be a reason.
-    let field = is_falsy(&attr.skip).then(|| Field {
-        attr,
-        ident: field.ident.as_ref(),
-        ty: &field.ty,
+    let field = is_falsy(&attr.skip).then(|| {
+        // Treat this field as the given type.
+        let ty = match attr.alt {
+            Some(ref alt) => alt.clone().into(),
+            None => field.ty.clone(),
+        };
+
+        Field {
+            attr,
+            ident: field.ident.as_ref(),
+            ty,
+        }
     });
     Ok(field)
 }

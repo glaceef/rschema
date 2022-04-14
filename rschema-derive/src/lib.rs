@@ -99,34 +99,49 @@ fn impl_body(container: &Container) -> TokenStream2 {
                 fn_type,
                 Some(fn_defs_map),
             )
-
-            // (
-            //     fn_type_body_for_struct(&container.attr, fields),
-            //     Some(fn_defs_map),
-            // )
         },
         Data::UnitStruct => {
+            let fn_type_body = fn_type_body_for_unit_struct();
             (
-                fn_type_body_for_unit_struct(),
+                quote_fn_type(fn_type_body),
                 None, // デフォルト実装
             )
         },
         Data::NewTypeStruct(ref field) => {
+            let fn_type_body = fn_type_body_for_newtype_struct(field);
             (
-                fn_type_body_for_newtype_struct(field),
+                quote_fn_type(fn_type_body),
                 None,
             )
         },
         Data::TupleStruct(ref fields) => {
+            let mut fn_type_body = fn_type_body_for_tuple_struct(&container.attr, fields);
+
+            let fn_defs_map = fn_defs_map(
+                &container.attr,
+                fields,
+                &mut fn_type_body,
+            );
+            let fn_type = quote_fn_type(fn_type_body);
+
             (
-                fn_type_body_for_tuple_struct(&container.attr, fields),
-                None,
+                fn_type,
+                Some(fn_defs_map),
             )
         },
         Data::Enum(ref variants) => {
+            let mut fn_type_body = fn_type_body_for_enum(container, variants);
+
+            let fn_defs_map = fn_defs_map(
+                &container.attr,
+                fields,
+                &mut fn_type_body,
+            );
+            let fn_type = quote_fn_type(fn_type_body);
+
             (
-                fn_type_body_for_enum(container, variants),
-                None,
+                fn_type,
+                Some(fn_defs_map),
             )
         },
     };
@@ -188,7 +203,11 @@ fn quote_option(val: &Option<impl ToTokens>) -> TokenStream2 {
     }
 }
 
-fn quote_ty(Field{ attr, ty, .. }: &Field) -> TokenStream2 {
+fn quote_ty(
+    field: &Field,
+) -> TokenStream2 {
+    let Field { attr, ty, .. } = field;
+
     // params for each types
     let min_length = quote_option(&attr.min_length);
     let max_length = quote_option(&attr.max_length);
@@ -202,11 +221,6 @@ fn quote_ty(Field{ attr, ty, .. }: &Field) -> TokenStream2 {
     let min_items = quote_option(&attr.min_items);
     let max_items = quote_option(&attr.max_items);
     let unique_items = quote_option(&attr.unique_items);
-
-    let ty = match attr.alt {
-        Some(ref alt) => quote!{ #alt },
-        None => quote!{ #ty },
-    };
 
     quote! {
         <#ty as Schematic>::__type(
