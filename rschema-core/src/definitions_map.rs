@@ -37,6 +37,10 @@ impl DefinitionsMap {
         self.map.extend(definitions_map.map);
     }
 
+    pub fn append2(&mut self, definitions_map: DefinitionsMap) {
+        self.map.extend(definitions_map.map);
+    }
+
     pub fn build(self) -> Definitions {
         Definitions::from_iter(self.map.into_values())
     }

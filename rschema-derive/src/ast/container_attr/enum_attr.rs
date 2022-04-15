@@ -7,4 +7,7 @@ use crate::Case;
 pub struct EnumAttr {
     #[darling(default)]
     pub rename_all: Option<Case>,
+
+    #[darling(default)]
+    pub definitions: Option<bool>,
 }

@@ -50,14 +50,18 @@ impl From<EnumAttr> for ContainerAttr {
     fn from(attr: EnumAttr) -> Self {
         ContainerAttr {
             rename_all: attr.rename_all,
+            definitions: attr.definitions,
             ..Default::default()
         }
     }
 }
 
 impl From<NewTypeStructAttr> for ContainerAttr {
-    fn from(_attr: NewTypeStructAttr) -> Self {
-        ContainerAttr::default()
+    fn from(attr: NewTypeStructAttr) -> Self {
+        ContainerAttr {
+            definitions: attr.definitions,
+            ..Default::default()
+        }
     }
 }
 

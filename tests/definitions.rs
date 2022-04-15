@@ -49,9 +49,12 @@ struct Alt {
     prop_value: i32,
 }
 
-// #[derive(Debug, Schematic)]
-// // #[rschema(definitions)]
-// struct NewTypeStruct(i32);
+#[derive(Debug, Schematic)]
+#[rschema(definitions)]
+struct NewTypeStruct(
+    #[rschema(minimum = 0)]
+    i32
+);
 
 #[derive(Debug, Schematic)]
 struct NoDefTuple(i32, String);
@@ -65,6 +68,7 @@ struct Tuple(i32, String);
 struct NestedTuple(i32, Tuple);
 
 #[derive(Debug, Schematic)]
+#[rschema(definitions)]
 enum Enum {
     Tuple(i32),
 
@@ -76,7 +80,6 @@ enum Enum {
 
 #[derive(Debug, Schematic)]
 struct Definitions {
-    /*
     prop_no_def_struct: NoDefStruct,
 
     prop_struct: Struct,
@@ -88,6 +91,8 @@ struct Definitions {
     #[rschema(alt = "Alt2")]
     prop_alt: Alt,
 
+    prop_new_type: NewTypeStruct,
+
     prop_no_def_tuple: NoDefTuple,
 
     prop_tuple: Tuple,
@@ -95,7 +100,6 @@ struct Definitions {
     prop_tuple_external: external_crate::Tuple,
 
     prop_nexted_tuple: NestedTuple,
-    */
 
     prop_enum: Enum,
 }

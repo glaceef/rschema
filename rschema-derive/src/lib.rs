@@ -81,69 +81,30 @@ fn fn_type(container: &Container) -> TokenStream2 {
 
 fn impl_body(container: &Container) -> TokenStream2 {
     let (
-        fn_type,
-        fn_defs_map,
+        fn_type_body,
+        fn_defs_map_body,
     ) = match container.data {
         Data::Struct(ref fields) => {
-            // 自身の __type() の中身
-            let mut fn_type_body = fn_type_body_for_struct(&container.attr, fields);
-
-            let fn_defs_map = fn_defs_map(
-                &container.attr,
-                fields,
-                &mut fn_type_body,
-            );
-            let fn_type = quote_fn_type(fn_type_body);
-
-            (
-                fn_type,
-                Some(fn_defs_map),
-            )
+            fn_type_body_for_struct(&container.attr, fields)
         },
         Data::UnitStruct => {
-            let fn_type_body = fn_type_body_for_unit_struct();
-            (
-                quote_fn_type(fn_type_body),
-                None, // デフォルト実装
-            )
+            fn_type_body_for_unit_struct()
         },
         Data::NewTypeStruct(ref field) => {
-            let fn_type_body = fn_type_body_for_newtype_struct(field);
-            (
-                quote_fn_type(fn_type_body),
-                None,
-            )
+            fn_type_body_for_newtype_struct(&container.attr, field)
         },
         Data::TupleStruct(ref fields) => {
-            let mut fn_type_body = fn_type_body_for_tuple_struct(&container.attr, fields);
-
-            let fn_defs_map = fn_defs_map(
-                &container.attr,
-                fields,
-                &mut fn_type_body,
-            );
-            let fn_type = quote_fn_type(fn_type_body);
-
-            (
-                fn_type,
-                Some(fn_defs_map),
-            )
+            fn_type_body_for_tuple_struct(&container.attr, fields)
         },
         Data::Enum(ref variants) => {
-            let mut fn_type_body = fn_type_body_for_enum(container, variants);
-
-            let fn_defs_map = fn_defs_map(
-                &container.attr,
-                fields,
-                &mut fn_type_body,
-            );
-            let fn_type = quote_fn_type(fn_type_body);
-
-            (
-                fn_type,
-                Some(fn_defs_map),
-            )
+            fn_type_body_for_enum(container, variants)
         },
+    };
+
+    let fn_type = quote_fn_type(fn_type_body);
+    let fn_defs_map = match fn_defs_map_body {
+        Some(body) => Some(quote_fn_defs_map(body)),
+        None => None,
     };
 
     quote! {
@@ -335,32 +296,81 @@ fn quote_additional_properties(
 }
 
 fn fn_type_body_for_struct(
-    attr: &impl StructAttribute,
+    attr: &(impl ContainerAttribute + StructAttribute),
+    // attr: &impl StructAttribute,
     fields: &[Field],
-) -> TokenStream2 {
+) -> (TokenStream2, Option<TokenStream2>) {
     let properties = quote_properties(attr, fields);
     let required = quote_required(fields);
     let additional_properties = quote_additional_properties(attr);
 
-    quote! {
+    let mut fn_type_body = quote! {
         rschema::Type::Object(rschema::ObjectKeys {
             properties: #properties,
             required: #required,
             additional_properties: #additional_properties,
         })
-    }
+    };
+    let fn_defs_map_body = fn_defs_map_body(
+        attr,
+        fields,
+        &mut fn_type_body,
+    );
+
+    (
+        fn_type_body,
+        Some(fn_defs_map_body),
+    )
 }
 
-fn fn_type_body_for_unit_struct() -> TokenStream2 {
-    quote! {
-        rschema::Type::Null
-    }
+fn fn_type_body_for_unit_struct(
+) -> (TokenStream2, Option<TokenStream2>) {
+    (
+        quote! {
+            rschema::Type::Null
+        },
+        None,
+    )
 }
 
 fn fn_type_body_for_newtype_struct(
+    attr: &impl ContainerAttribute,
     field: &Field,
-) -> TokenStream2 {
-    quote_ty(field)
+) -> (TokenStream2, Option<TokenStream2>) {
+    let mut fn_type_body = quote_ty(field);
+
+    // $defs に定義するかどうか
+    let stmt_insert_self = attr.definitions().then(|| {
+        // 名前を決定する記述。
+        // 外部から渡すことになった場合はここを変える。
+        let def_name = quote! {
+            std::any::type_name::<Self>()
+        };
+
+        // __type() の返却値を Type::Ref に置き換える。
+        let new_fn_type_body = quote!{
+            rschema::Type::Ref(#def_name)
+        };
+        let def = std::mem::replace(&mut fn_type_body, new_fn_type_body);
+
+        quote! {
+            map.insert::<Self>(
+                #def_name,
+                #def,
+            );
+        }
+    });
+
+    let fn_defs_map_body = quote! {
+        let mut map = rschema::DefinitionsMap::new();
+        #stmt_insert_self
+        map
+    };
+
+    (
+        fn_type_body,
+        Some(fn_defs_map_body),
+    )
 }
 
 fn quote_items(
@@ -400,21 +410,31 @@ fn quote_items(
 }
 
 fn fn_type_body_for_tuple_struct(
-    attr: &impl TupleStructAttribute,
+    attr: &(impl ContainerAttribute + TupleStructAttribute),
     fields: &[Field],
-) -> TokenStream2 {
+) -> (TokenStream2, Option<TokenStream2>) {
     let items = quote_items(fields);
     let items_len = fields.len();
     let unique_items = quote_option(&attr.unique_items());
 
-    quote! {
+    let mut fn_type_body = quote! {
         rschema::Type::Array(rschema::ArrayKeys {
             items: #items,
             min_items: Some(#items_len),
             max_items: Some(#items_len),
             unique_items: #unique_items,
         })
-    }
+    };
+    let fn_defs_map_body = fn_defs_map_body(
+        attr,
+        fields,
+        &mut fn_type_body,
+    );
+
+    (
+        fn_type_body,
+        Some(fn_defs_map_body),
+    )
 }
 
 fn quote_enum_units_ty(
@@ -454,30 +474,30 @@ fn quote_enum_units_ty(
 fn fn_type_body_for_enum(
     container: &Container,
     variants: &[Variant],
-) -> TokenStream2 {
-    let types: Vec<TokenStream2> = variants
+) -> (TokenStream2, Option<TokenStream2>) {
+    let (types, defses): (Vec<TokenStream2>, Vec<Option<TokenStream2>>) = variants
         .iter()
         .filter_map(|variant| {
             match variant.data {
                 Data::Struct(ref fields) => {
-                    Some(fn_type_body_for_struct(&variant.attr, &fields))
+                    Some(fn_type_body_for_struct(&variant.attr, fields))
                 },
                 Data::UnitStruct => None, // ユニットバリアントは後で処理する。
                 Data::NewTypeStruct(ref field) => {
-                    Some(fn_type_body_for_newtype_struct(field))
+                    Some(fn_type_body_for_newtype_struct(&variant.attr, field))
                 },
                 Data::TupleStruct(ref fields) => {
-                    Some(fn_type_body_for_tuple_struct(&variant.attr, &fields))
+                    Some(fn_type_body_for_tuple_struct(&variant.attr, fields))
                 },
                 Data::Enum(_) => {
                     unreachable!("There is no enum-type variants.");
                 },
             }
         })
-        .collect();
+        .unzip();
 
     let enum_units_ty = quote_enum_units_ty(&container.attr, &variants);
-    match (types.is_empty(), &enum_units_ty) {
+    let mut fn_type_body = match (types.is_empty(), &enum_units_ty) {
         ( true, None) => {
             // Zero-variant enums are prevented in advance.
             // So this message is never used.
@@ -499,7 +519,44 @@ fn fn_type_body_for_enum(
                 })
             }
         },
-    }
+    };
+    
+    // $defs に定義するかどうか
+    let stmt_insert_self = container.attr.definitions().then(|| {
+        // 名前を決定する記述。
+        // 外部から渡すことになった場合はここを変える。
+        let def_name = quote! {
+            std::any::type_name::<Self>()
+        };
+
+        // __type() の返却値を Type::Ref に置き換える。
+        let new_fn_type_body = quote!{
+            rschema::Type::Ref(#def_name)
+        };
+        let def = std::mem::replace(&mut fn_type_body, new_fn_type_body);
+
+        quote! {
+            map.insert::<Self>(
+                #def_name,
+                #def,
+            );
+        }
+    });
+    let fn_defs_map_body = quote! {
+        let mut map = rschema::DefinitionsMap::new();
+        #stmt_insert_self
+        #(
+            map.append2({
+                #defses
+            });
+        )*
+        map
+    };
+
+    (
+        fn_type_body,
+        Some(fn_defs_map_body),
+    )
 }
 
 fn quote_stmt_append_defs(Field{ ty, .. }: &Field) -> TokenStream2 {
