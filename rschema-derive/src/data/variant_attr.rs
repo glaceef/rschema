@@ -2,6 +2,8 @@ use darling::FromAttributes;
 
 use crate::{
     Case,
+    ContainerAttribute,
+    Definitions,
     StructAttribute,
     TupleStructAttribute,
     is_falsy,
@@ -73,6 +75,12 @@ impl From<UnitVariantAttr> for VariantAttr {
             skip: attr.skip,
             ..Default::default()
         }
+    }
+}
+
+impl ContainerAttribute for VariantAttr {
+    fn definitions(&self) -> &Definitions {
+        &Definitions::Skip
     }
 }
 

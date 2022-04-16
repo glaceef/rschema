@@ -120,12 +120,26 @@
 //!   - `"flatcase"`
 //!   - `"UPPERFLATCASE"`
 //! 
-//!   **Note**: For enums, the `rename_all` attribute is only effective for unit variants. 
+//!   **Note**: For enums, the `rename_all` attribute is only effective for unit variants.
 //!   Because the other variants always behave as if the `flatten` attribute of *serde* is applied.
 //! 
 //! - `#[rschema(unique_items)]`
 //! 
 //!   Indicates that the tuple struct has unique values.
+//! 
+//! - `#[rschema(defs)]`
+//! 
+//!   Define in `$defs` with an auto-generated name.
+//! 
+//!   **Note**: This uses `std::any::type_name()` to generate as unique a name as possible.
+//!   However, it is not guaranteed to be unique. 
+//! 
+//! - `#[rschema(defs = "name")]`
+//! 
+//!   Define in `$defs` with the given name.
+//! 
+//!   **Note**: Any name can be given, but if a name is duplicated, the definition is overwritten.
+//!   Therefore, it is recommended that do not use this for types that are published.
 //! 
 //! 
 //! ## Variant attributes
@@ -267,6 +281,8 @@
 pub use rschema_core::{
     AdditionalProperties,
     ArrayKeys,
+    Definitions,
+    DefinitionsMap,
     Draft,
     EnumKeys,
     Error,

@@ -6,7 +6,7 @@ use super::FieldAttr;
 pub struct Field<'a> {
     pub attr: FieldAttr,
     pub ident: Option<&'a syn::Ident>,
-    pub ty: &'a syn::Type,
+    pub ty: syn::Type,
 }
 
 impl<'a> Field<'a> {

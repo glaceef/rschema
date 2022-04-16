@@ -61,6 +61,10 @@ pub enum Type {
     /// For an `array` type property. In particular, it has ordered and composite type items.
     /// 
     Tuple(TupleKeys),
+
+    /// A reference to another schema.
+    /// 
+    Ref(&'static str),
 }
 
 macro_rules! keys_match_block {
@@ -96,6 +100,23 @@ struct Wrapper<'a, T> {
     inner: &'a T,
 }
 
+macro_rules! ref_match_block {
+    ($def:expr, $serializer:expr) => {
+        {
+            let ref_ = Ref {
+                r#ref: format!("#/$defs/{}", $def),
+            };
+            ref_.serialize($serializer)
+        }
+    };
+}
+
+#[derive(Serialize)]
+struct Ref {
+    #[serde(rename = "$ref")]
+    r#ref: String,
+}
+
 impl Serialize for Type {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -110,6 +131,7 @@ impl Serialize for Type {
             Self::Object(ref keys) => keys_match_block!( object, keys, serializer),
             Self::Enum(  ref keys) => keys.serialize(serializer),
             Self::Tuple( ref keys) => keys_match_block!(  tuple, keys, serializer),
+            Self::Ref(ref def) => ref_match_block!(def, serializer),
         }
     }
 }
