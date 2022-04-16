@@ -1,5 +1,4 @@
 use convert_case::Casing;
-use darling::ToTokens;
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
@@ -12,6 +11,7 @@ mod ast;
 mod attribute;
 mod case;
 mod data;
+mod tokens;
 
 use ast::Container;
 use attribute::{
@@ -26,6 +26,7 @@ use data::{
     Field,
     Variant,
 };
+use tokens::*;
 
 pub(crate) fn is_falsy(b: &Option<bool>) -> bool {
     *b != Some(true)
@@ -56,29 +57,6 @@ fn expand_derive_schematic(
     Ok(impl_block.into())
 }
 
-/*
-fn fn_type(container: &Container) -> TokenStream2 {
-    let fn_type_body = match container.data {
-        Data::Struct(ref fields) => {
-            fn_type_body_for_struct(&container.attr, fields)
-        },
-        Data::UnitStruct => {
-            fn_type_body_for_unit_struct()
-        },
-        Data::NewTypeStruct(ref field) => {
-            fn_type_body_for_newtype_struct(field)
-        },
-        Data::TupleStruct(ref fields) => {
-            fn_type_body_for_tuple_struct(&container.attr, fields)
-        },
-        Data::Enum(ref variants) => {
-            fn_type_body_for_enum(container, variants)
-        },
-    };
-    quote_fn_type(fn_type_body)
-}
-*/
-
 fn impl_body(container: &Container) -> TokenStream2 {
     let (
         fn_type_body,
@@ -101,36 +79,12 @@ fn impl_body(container: &Container) -> TokenStream2 {
         },
     };
 
-    let fn_type = quote_fn_type(fn_type_body);
-    let fn_defs_map = match fn_defs_map_body {
-        Some(body) => Some(quote_fn_defs_map(body)),
-        None => None,
-    };
+    let fn_type = FnType::new(fn_type_body);
+    let fn_defs_map = fn_defs_map_body.map(FnDefsMap::new);
 
     quote! {
         #fn_type
         #fn_defs_map
-    }
-}
-
-fn quote_fn_type(body: TokenStream2) -> TokenStream2 {
-    quote! {
-        fn __type(
-            min_length: Option<u64>,
-            max_length: Option<u64>,
-            pattern: Option<String>,
-            format: Option<String>,
-            minimum: Option<i64>,
-            maximum: Option<i64>,
-            multiple_of: Option<i64>,
-            exclusive_minimum: Option<i64>,
-            exclusive_maximum: Option<i64>,
-            min_items: Option<usize>,
-            max_items: Option<usize>,
-            unique_items: Option<bool>,
-        ) -> rschema::Type {
-            #body
-        }
     }
 }
 
@@ -150,170 +104,38 @@ fn rename_ident(
     }
 }
 
-fn quote_option_str(val: &Option<String>) -> TokenStream2 {
-    match val {
-        Some(v) => quote! { Some(#v.into()) },
-        None    => quote! { None },
-    }
-}
-
-fn quote_option(val: &Option<impl ToTokens>) -> TokenStream2 {
-    match val {
-        Some(v) => quote! { Some(#v) },
-        None    => quote! { None },
-    }
-}
-
-fn quote_ty(
-    field: &Field,
-) -> TokenStream2 {
-    let Field { attr, ty, .. } = field;
-
-    // params for each types
-    let min_length = quote_option(&attr.min_length);
-    let max_length = quote_option(&attr.max_length);
-    let format = quote_option_str(&attr.format);
-    let pattern = quote_option_str(&attr.pattern);
-    let minimum = quote_option(&attr.minimum);
-    let maximum = quote_option(&attr.maximum);
-    let multiple_of = quote_option(&attr.multiple_of);
-    let exclusive_minimum = quote_option(&attr.exclusive_minimum);
-    let exclusive_maximum = quote_option(&attr.exclusive_maximum);
-    let min_items = quote_option(&attr.min_items);
-    let max_items = quote_option(&attr.max_items);
-    let unique_items = quote_option(&attr.unique_items);
-
-    quote! {
-        <#ty as Schematic>::__type(
-            #min_length,
-            #max_length,
-            #pattern,
-            #format,
-            #minimum,
-            #maximum,
-            #multiple_of,
-            #exclusive_minimum,
-            #exclusive_maximum,
-            #min_items,
-            #max_items,
-            #unique_items,
-        )
-    }
-}
-
-fn quote_properties(
-    struct_attr: &impl StructAttribute,
-    fields: &[Field],
-) -> TokenStream2 {
-    let stmts: Vec<TokenStream2> = fields
-        .iter()
-        .map(|field| { // この中身をメソッドに切り出す
-            let (attr, ident) = if let Field {
-                attr,
-                ident: Some(ident),
-                ..
-            } = field {
-                (attr, ident)
-            } else {
-                // Do not call this for unnamed fields.
-                unreachable!("Oh, that's a bug. Trying to generate properties from unnamed fields.");
-            };
-
-            let fixed_ident = rename_ident(
-                ident,
-                attr.rename.as_ref(),
-                struct_attr.rename_all(),
-            );
-
-            // common params
-            let title = quote_option_str(&attr.title);
-            let description = quote_option_str(&attr.description);
-            let comment = quote_option_str(&attr.comment);
-            let deprecated = quote_option(&attr.deprecated);
-            let ty = quote_ty(field);
-
-            quote! {
-                properties.insert(
-                    #fixed_ident,
-                    rschema::Property {
-                        title: #title,
-                        description: #description,
-                        comment: #comment,
-                        deprecated: #deprecated,
-                        ty: #ty,
-                    },
-                );
-            }
-        })
-        .collect();
-
-    quote! {
-        {
-            let mut properties = rschema::Properties::new();
-            #(
-                #stmts
-            )*
-            properties
-        }
-    }
-}
-
-fn quote_required(
-    fields: &[Field],
-) -> TokenStream2 {
-    let idents: Vec<TokenStream2> = fields
-        .iter()
-        .filter_map(|field| {
-            if let Some(ref ident) = field.ident {
-                field.required().then(|| quote! {
-                    stringify!(#ident).into()
-                })
-            } else {
-                // Do not call this for unnamed fields.
-                unreachable!("Oh, that's a bug. Trying to create a list of required properties from unnamed fields.");
-            }
-        })
-        .collect();
-
-    quote! {
-        vec![
-            #(
-                #idents,
-            )*
-        ]
-    }
-}
-
-fn quote_additional_properties(
-    attr: &impl StructAttribute,
-) -> TokenStream2 {
-    let additional_properties = attr.additional_properties();
-    quote! {
-        Box::new(
-            rschema::AdditionalProperties::Boolean(#additional_properties),
-        )
-    }
-}
-
-fn fn_type_body_for_struct(
-    attr: &(impl ContainerAttribute + StructAttribute),
-    // attr: &impl StructAttribute,
-    fields: &[Field],
-) -> (TokenStream2, Option<TokenStream2>) {
-    let properties = quote_properties(attr, fields);
-    let required = quote_required(fields);
-    let additional_properties = quote_additional_properties(attr);
-
-    let mut fn_type_body = quote! {
-        rschema::Type::Object(rschema::ObjectKeys {
-            properties: #properties,
-            required: #required,
-            additional_properties: #additional_properties,
-        })
-    };
-    let fn_defs_map_body = fn_defs_map_body(
+fn fn_type_body_for_struct<'a>(
+    attr: &'a (impl ContainerAttribute + StructAttribute),
+    fields: &'a [Field<'a >],
+) -> (FnTypeBody2<'a>, Option<FnDefsMapBody>) {
+    let mut fn_type_body = FnTypeBody2::for_struct(attr, fields);
+    let fn_defs_map_body = FnDefsMapBody::with_fields(
         attr,
+        &mut fn_type_body,
         fields,
+    );
+
+    (
+        fn_type_body,
+        Some(fn_defs_map_body),
+    )
+}
+
+fn fn_type_body_for_unit_struct<'a>(
+) -> (FnTypeBody2<'a>, Option<FnDefsMapBody>) {
+    (
+        FnTypeBody2::UnitStruct,
+        None,
+    )
+}
+
+fn fn_type_body_for_newtype_struct<'a>(
+    attr: &'a impl ContainerAttribute,
+    field: &'a Field<'a>,
+) -> (FnTypeBody2<'a>, Option<FnDefsMapBody>) {
+    let mut fn_type_body = FnTypeBody2::for_newtype(field);
+    let fn_defs_map_body = FnDefsMapBody::new(
+        attr,
         &mut fn_type_body,
     );
 
@@ -323,112 +145,15 @@ fn fn_type_body_for_struct(
     )
 }
 
-fn fn_type_body_for_unit_struct(
-) -> (TokenStream2, Option<TokenStream2>) {
-    (
-        quote! {
-            rschema::Type::Null
-        },
-        None,
-    )
-}
-
-fn fn_type_body_for_newtype_struct(
-    attr: &impl ContainerAttribute,
-    field: &Field,
-) -> (TokenStream2, Option<TokenStream2>) {
-    let mut fn_type_body = quote_ty(field);
-
-    // $defs に定義するかどうか
-    let stmt_insert_self = attr.definitions().then(|| {
-        // 名前を決定する記述。
-        // 外部から渡すことになった場合はここを変える。
-        let def_name = quote! {
-            std::any::type_name::<Self>()
-        };
-
-        // __type() の返却値を Type::Ref に置き換える。
-        let new_fn_type_body = quote!{
-            rschema::Type::Ref(#def_name)
-        };
-        let def = std::mem::replace(&mut fn_type_body, new_fn_type_body);
-
-        quote! {
-            map.insert::<Self>(
-                #def_name,
-                #def,
-            );
-        }
-    });
-
-    let fn_defs_map_body = quote! {
-        let mut map = rschema::DefinitionsMap::new();
-        #stmt_insert_self
-        map
-    };
-
-    (
-        fn_type_body,
-        Some(fn_defs_map_body),
-    )
-}
-
-fn quote_items(
-    fields: &[Field],
-) -> TokenStream2 {
-    let properties: Vec<TokenStream2> = fields
-        .iter()
-        .map(|field| {
-            let Field { attr, .. } = field;
-
-            // common params
-            let title = quote_option_str(&attr.title);
-            let description = quote_option_str(&attr.description);
-            let comment = quote_option_str(&attr.comment);
-            let deprecated = quote_option(&attr.deprecated);
-            let ty = quote_ty(field);
-
-            quote! {
-                rschema::Property {
-                    title: #title,
-                    description: #description,
-                    comment: #comment,
-                    deprecated: #deprecated,
-                    ty: #ty,
-                }
-            }
-        })
-        .collect();
-
-    quote! {
-        Box::new(rschema::Items::Tuple(vec![
-            #(
-                #properties,
-            )*
-        ]))
-    }
-}
-
-fn fn_type_body_for_tuple_struct(
-    attr: &(impl ContainerAttribute + TupleStructAttribute),
-    fields: &[Field],
-) -> (TokenStream2, Option<TokenStream2>) {
-    let items = quote_items(fields);
-    let items_len = fields.len();
-    let unique_items = quote_option(&attr.unique_items());
-
-    let mut fn_type_body = quote! {
-        rschema::Type::Array(rschema::ArrayKeys {
-            items: #items,
-            min_items: Some(#items_len),
-            max_items: Some(#items_len),
-            unique_items: #unique_items,
-        })
-    };
-    let fn_defs_map_body = fn_defs_map_body(
+fn fn_type_body_for_tuple_struct<'a>(
+    attr: &'a (impl ContainerAttribute + TupleStructAttribute),
+    fields: &'a [Field<'a>],
+) -> (FnTypeBody2<'a>, Option<FnDefsMapBody>) {
+    let mut fn_type_body = FnTypeBody2::for_tuple(attr, fields);
+    let fn_defs_map_body = FnDefsMapBody::with_fields(
         attr,
-        fields,
         &mut fn_type_body,
+        fields,
     );
 
     (
@@ -471,11 +196,11 @@ fn quote_enum_units_ty(
     })
 }
 
-fn fn_type_body_for_enum(
-    container: &Container,
-    variants: &[Variant],
-) -> (TokenStream2, Option<TokenStream2>) {
-    let (types, defses): (Vec<TokenStream2>, Vec<Option<TokenStream2>>) = variants
+fn fn_type_body_for_enum<'a>(
+    container: &'a Container,
+    variants: &'a [Variant],
+) -> (FnTypeBody2<'a>, Option<FnDefsMapBody>) {
+    let (types, def_maps): (Vec<FnTypeBody2>, Vec<Option<FnDefsMapBody>>) = variants
         .iter()
         .filter_map(|variant| {
             match variant.data {
@@ -497,137 +222,27 @@ fn fn_type_body_for_enum(
         .unzip();
 
     let enum_units_ty = quote_enum_units_ty(&container.attr, &variants);
-    let mut fn_type_body = match (types.is_empty(), &enum_units_ty) {
-        ( true, None) => {
-            // Zero-variant enums are prevented in advance.
-            // So this message is never used.
-            unreachable!("Rschema does not support zero-variant enums.");
-        },
-        ( true, Some(ty)) => {
-            // Only unit variants
-            quote! { #ty }
-        },
-        _ => {
-            quote! {
-                rschema::Type::Enum(rschema::EnumKeys {
-                    any_of: vec![
-                        #(
-                            #types,
-                        )*
-                        #enum_units_ty // Don't put a comma at the end.
-                    ],
-                })
-            }
-        },
-    };
-    
-    // $defs に定義するかどうか
-    let stmt_insert_self = container.attr.definitions().then(|| {
-        // 名前を決定する記述。
-        // 外部から渡すことになった場合はここを変える。
-        let def_name = quote! {
-            std::any::type_name::<Self>()
-        };
 
-        // __type() の返却値を Type::Ref に置き換える。
-        let new_fn_type_body = quote!{
-            rschema::Type::Ref(#def_name)
-        };
-        let def = std::mem::replace(&mut fn_type_body, new_fn_type_body);
+    let mut fn_type_body = FnTypeBody2::for_enum(
+        types,
+        enum_units_ty,
+    );
 
-        quote! {
-            map.insert::<Self>(
-                #def_name,
-                #def,
-            );
-        }
-    });
-    let fn_defs_map_body = quote! {
-        let mut map = rschema::DefinitionsMap::new();
-        #stmt_insert_self
-        #(
-            map.append2({
-                #defses
-            });
-        )*
-        map
-    };
+    let fn_defs_map_body = FnDefsMapBody::with_stmts(
+        &container.attr,
+        &mut fn_type_body,
+        def_maps
+            .iter()
+            .map(|def_map| quote! {
+                map.append2({
+                    #def_map
+                });
+            })
+            .collect()
+    );
 
     (
         fn_type_body,
         Some(fn_defs_map_body),
     )
-}
-
-fn quote_stmt_append_defs(Field{ ty, .. }: &Field) -> TokenStream2 {
-    quote! {
-        // このプロパティの型が持っている DefinitionsMap を取り込む。
-        // __def() の結果の insert は行わない。なぜなら __defs_map() は、
-        // この型が definition = true の場合、自身の実装を含んだものを返すからだ。
-        map.append::<#ty>();
-    }
-}
-
-fn fn_defs_map_body(
-    attr: &impl ContainerAttribute,
-    fields: &[Field],
-    fn_type_body: &mut TokenStream2,
-) -> TokenStream2 {
-    let stmts: Vec<TokenStream2> = fields
-        .iter()
-        .map(quote_stmt_append_defs)
-        .collect();
-
-    // $defs に定義するかどうか
-    let stmt_insert_self = attr.definitions().then(|| {
-        // 名前を決定する記述。
-        // 外部から渡すことになった場合はここを変える。
-        let def_name = quote! {
-            std::any::type_name::<Self>()
-        };
-
-        // __type() の返却値を Type::Ref に置き換える。
-        let new_fn_type_body = quote!{
-            rschema::Type::Ref(#def_name)
-        };
-        let def = std::mem::replace(fn_type_body, new_fn_type_body);
-
-        quote! {
-            map.insert::<Self>(
-                #def_name,
-                #def,
-            );
-        }
-    });
-
-    quote! {
-        let mut map = rschema::DefinitionsMap::new();
-        #stmt_insert_self
-        #(
-            #stmts
-        )*
-        map
-    }
-}
-
-fn quote_fn_defs_map(body: TokenStream2) -> TokenStream2 {
-    quote! {
-        fn __defs_map() -> rschema::DefinitionsMap {
-            #body
-        }
-    }
-}
-
-fn fn_defs_map(
-    attr: &impl ContainerAttribute,
-    fields: &[Field],
-    fn_type_body: &mut TokenStream2,
-) -> TokenStream2 {
-    let fn_defs_map_body = fn_defs_map_body(
-        attr,
-        fields,
-        fn_type_body,
-    );
-
-    quote_fn_defs_map(fn_defs_map_body)
 }

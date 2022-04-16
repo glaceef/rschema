@@ -41,7 +41,8 @@ struct NestedStruct {
 #[derive(Debug, Schematic)]
 #[rschema(definitions)]
 struct Alt2 {
-    prop_value: i32,
+    // prop_value: i32,
+    r#i32: i32,
 }
 
 #[derive(Debug)]
@@ -132,6 +133,37 @@ fn it_tests_definitions() -> rschema::Result<()> {
     },
     "prop_nested_struct": {
       "$ref": "#/$defs/definitions::NestedStruct"
+    },
+    "prop_alt": {
+      "$ref": "#/$defs/definitions::Alt2"
+    },
+    "prop_new_type": {
+      "$ref": "#/$defs/definitions::NewTypeStruct"
+    },
+    "prop_no_def_tuple": {
+      "type": "array",
+      "items": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "prop_tuple": {
+      "$ref": "#/$defs/definitions::Tuple"
+    },
+    "prop_tuple_external": {
+      "$ref": "#/$defs/definitions::external_crate::Tuple"
+    },
+    "prop_nexted_tuple": {
+      "$ref": "#/$defs/definitions::NestedTuple"
+    },
+    "prop_enum": {
+      "$ref": "#/$defs/definitions::Enum"
     }
   },
   "additionalProperties": false,
@@ -162,6 +194,77 @@ fn it_tests_definitions() -> rschema::Result<()> {
         }
       },
       "additionalProperties": false
+    },
+    "definitions::Alt2": {
+      "type": "object",
+      "properties": {
+        "r#i32": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false
+    },
+    "definitions::NewTypeStruct": {
+      "type": "number",
+      "minimum": 0
+    },
+    "definitions::Tuple": {
+      "type": "array",
+      "items": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "definitions::external_crate::Tuple": {
+      "type": "array",
+      "items": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "definitions::NestedTuple": {
+      "type": "array",
+      "items": [
+        {
+          "type": "number"
+        },
+        {
+          "$ref": "#/$defs/definitions::Tuple"
+        }
+      ],
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "definitions::Enum": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "prop_struct": {
+              "$ref": "#/$defs/definitions::Struct"
+            },
+            "prop_tuple": {
+              "$ref": "#/$defs/definitions::Tuple"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
     }
   }
 }"##;
