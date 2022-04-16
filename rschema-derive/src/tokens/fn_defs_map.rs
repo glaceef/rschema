@@ -22,12 +22,12 @@ impl ToTokens for FnDefsMapBody {
         let ref stmts = self.stmts;
 
         tokens.extend(quote! {
-            let mut map = rschema::DefinitionsMap::new();
+            let mut defs_map = rschema::DefinitionsMap::new();
             #stmt_insert_self
             #(
                 #stmts
             )*
-            map
+            defs_map
         });
     }
 }
@@ -50,7 +50,7 @@ impl FnDefsMapBody {
             let def = std::mem::replace(fn_type_body, new_fn_type_body);
 
             quote! {
-                map.insert::<Self>(
+                defs_map.insert::<Self>(
                     #def_name,
                     #def,
                 );
@@ -63,22 +63,11 @@ impl FnDefsMapBody {
         }
     }
 
-    pub fn with_fields(
-        attr: &impl ContainerAttribute,
-        fn_type_body: &mut FnTypeBody,
-        fields: &[Field],
-    ) -> Self {
-        let mut body = FnDefsMapBody::new(
-            attr,
-            fn_type_body,
-        );
-
-        body.stmts = fields
-            .iter()
-            .map(quote_stmt_append_defs)
-            .collect();
-
-        body
+    pub fn empty() -> Self {
+        Self {
+            stmt_insert_self: None,
+            stmts: vec![],
+        }
     }
 
     pub fn with_stmts(
@@ -90,10 +79,39 @@ impl FnDefsMapBody {
             attr,
             fn_type_body,
         );
-
         body.stmts = stmts;
 
         body
+    }
+
+    pub fn with_fields(
+        attr: &impl ContainerAttribute,
+        fn_type_body: &mut FnTypeBody,
+        fields: &[Field],
+    ) -> Self {
+        FnDefsMapBody::with_stmts(
+            attr,
+            fn_type_body,
+            fields
+                .iter()
+                .map(quote_stmt_append_defs)
+                .collect(),
+        )
+    }
+
+    pub fn with_defs_maps(
+        attr: &impl ContainerAttribute,
+        fn_type_body: &mut FnTypeBody,
+        defs_maps: Vec<FnDefsMapBody>,
+    ) -> Self {
+        FnDefsMapBody::with_stmts(
+            attr,
+            fn_type_body,
+            defs_maps
+                .iter()
+                .map(stmt_extend_defs_map)
+                .collect(),
+        )
     }
 }
 
@@ -122,6 +140,16 @@ impl FnDefsMap {
 fn quote_stmt_append_defs(Field{ ty, .. }: &Field) -> TokenStream2 {
     quote! {
         // このプロパティの型が持っている DefinitionsMap を取り込む。
-        map.append::<#ty>();
+        defs_map.extend_ty::<#ty>();
+    }
+}
+
+fn stmt_extend_defs_map(
+    defs_map: &FnDefsMapBody,
+) -> TokenStream2 {
+    quote! {
+        defs_map.extend({
+            #defs_map
+        });
     }
 }

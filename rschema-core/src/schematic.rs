@@ -83,8 +83,7 @@ pub trait Schematic {
     }
 
     fn __defs() -> Definitions {
-        let defs_map = Self::__defs_map();
-        defs_map.build()
+        Self::__defs_map().build()
     }
 
     fn __defs_map() -> DefinitionsMap {

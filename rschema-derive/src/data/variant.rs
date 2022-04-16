@@ -9,3 +9,9 @@ pub struct Variant<'a> {
     pub ident: &'a syn::Ident,
     pub data: Data<'a>,
 }
+
+impl<'a> Variant<'a> {
+    pub fn is_unit(&self) -> bool {
+        self.data == Data::UnitStruct
+    }
+}

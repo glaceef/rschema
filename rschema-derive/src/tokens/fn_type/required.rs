@@ -17,14 +17,7 @@ impl<'a> ToTokens for Required<'a> {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let required_idents: Vec<&Ident> = self.fields
             .iter()
-            .filter_map(|field| {
-                if let Some(ident) = field.ident {
-                    field.required().then(|| ident)
-                } else {
-                    // Do not call this for unnamed fields.
-                    unreachable!("Oh, that's a bug. Trying to create a list of required properties from unnamed fields.");
-                }
-            })
+            .filter_map(filter_required_idents)
             .collect();
 
         tokens.extend(quote! {
@@ -38,9 +31,19 @@ impl<'a> ToTokens for Required<'a> {
 }
 
 impl<'a> Required<'a> {
-    pub fn new(fields: &'a [Field<'a>]) -> Self {
-        Self {
-            fields,
-        }
+    pub fn new(fields: &'a [Field]) -> Self {
+        Self { fields }
+    }
+}
+
+fn filter_required_idents<'a>(
+    field: &'a Field,
+) -> Option<&'a Ident> {
+    match field.ident {
+        Some(ident) => field.required().then(|| ident),
+        None => {
+            // Do not call this for unnamed fields.
+            unreachable!("Oh, that's a bug. Trying to create a list of required properties from unnamed fields.");
+        },
     }
 }

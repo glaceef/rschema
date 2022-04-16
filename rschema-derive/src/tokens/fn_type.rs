@@ -5,23 +5,32 @@ use quote::{
 };
 
 use crate::{
+    Case,
     ContainerAttribute,
+    EnumAttribute,
     Field,
     StructAttribute,
     TupleStructAttribute,
+    Variant,
 };
 
-use super::*;
+use super::utils::{
+    self,
+    quote_ty,
+    rename_ident,
+};
 
 mod additional_properties;
 mod items;
 mod properties;
 mod required;
+mod unique_items;
 
 pub use additional_properties::AdditionalProperties;
 pub use items::Items;
 pub use properties::Properties;
 pub use required::Required;
+pub use unique_items::UniqueItems;
 
 pub enum FnTypeBody<'a> {
     Struct {
@@ -37,12 +46,12 @@ pub enum FnTypeBody<'a> {
     TupleStruct {
         items: Items<'a>,
         items_len: usize,
-        unique_items: Option<bool>,
+        unique_items: UniqueItems,
     },
 
     Enum {
         types: Vec<FnTypeBody<'a>>,
-        enum_units_ty: Option<TokenStream2>,
+        enum_units_type: Option<TokenStream2>,
     },
 
     Ref(TokenStream2),
@@ -74,7 +83,6 @@ impl<'a> ToTokens for FnTypeBody<'a> {
                 items_len,
                 unique_items,
             } => {
-                let unique_items = quote_option(unique_items);
                 quote! {
                     rschema::Type::Array(rschema::ArrayKeys {
                         items: #items,
@@ -87,9 +95,9 @@ impl<'a> ToTokens for FnTypeBody<'a> {
 
             Self::Enum {
                 types,
-                enum_units_ty,
+                enum_units_type,
             } => {
-                match (types.is_empty(), enum_units_ty) {
+                match (types.is_empty(), enum_units_type) {
                     ( true, None) => {
                         // Zero-variant enums are prevented in advance.
                         // So this message is never used.
@@ -106,7 +114,7 @@ impl<'a> ToTokens for FnTypeBody<'a> {
                                     #(
                                         #types,
                                     )*
-                                    #enum_units_ty // Don't put a comma at the end.
+                                    #enum_units_type // Don't put a comma at the end.
                                 ],
                             })
                         }
@@ -126,47 +134,42 @@ impl<'a> ToTokens for FnTypeBody<'a> {
 impl<'a> FnTypeBody<'a> {
     pub fn for_struct(
         attr: &'a (impl ContainerAttribute + StructAttribute),
-        fields: &'a [Field<'a>],
+        fields: &'a [Field],
     ) -> Self {
-        let properties = Properties::new(attr, fields);
-        let required = Required::new(fields);
-        let additional_properties = AdditionalProperties::new(attr);
-
         Self::Struct {
-            properties,
-            required,
-            additional_properties,
+            properties: Properties::new(attr, fields),
+            required: Required::new(fields),
+            additional_properties: AdditionalProperties::new(attr),
         }
     }
 
     pub fn for_newtype(
-        field: &'a Field<'a>,
+        field: &'a Field,
     ) -> Self {
         Self::NewTypeStruct(field)
     }
 
     pub fn for_tuple(
         attr: &'a (impl ContainerAttribute + TupleStructAttribute),
-        fields: &'a [Field<'a>],
+        fields: &'a [Field],
     ) -> Self {
-        let items = Items::new(fields);
-        let items_len = fields.len();
-        let unique_items = attr.unique_items();
-
         Self::TupleStruct {
-            items,
-            items_len,
-            unique_items,
+            items: Items::new(fields),
+            items_len: fields.len(),
+            unique_items: UniqueItems::new(attr),
         }
     }
 
     pub fn for_enum(
+        attr: &impl EnumAttribute,
+        variants: &[Variant],
         types: Vec<FnTypeBody<'a>>,
-        enum_units_ty: Option<TokenStream2>,
     ) -> Self {
+        let enum_units_type = quote_enum_units_type(attr, variants);
+
         Self::Enum {
             types,
-            enum_units_ty,
+            enum_units_type,
         }
     }
 }
@@ -204,4 +207,43 @@ impl<'a> FnType<'a> {
     pub fn new(body: FnTypeBody<'a>) -> Self {
         Self { body }
     }
+}
+
+fn unit_ident(
+    variant: &Variant,
+    rename_all: Option<Case>,
+) -> Option<String> {
+    variant.is_unit().then(|| {
+        rename_ident(
+            &variant.ident,
+            variant.attr.rename.as_ref(),
+            rename_all,
+        )
+    })
+}
+
+fn quote_enum_units_type(
+    attr: &impl EnumAttribute,
+    variants: &[Variant],
+) -> Option<TokenStream2> {
+    let idents: Vec<String> = variants
+        .iter()
+        .filter_map(|variant| unit_ident(variant, attr.rename_all()))
+        .collect();
+
+    // ユニットバリアントが存在しない場合、トークンを埋め込まない。
+    if idents.is_empty() {
+        return None;
+    }
+
+    Some(quote! {
+        rschema::Type::String(rschema::StringKeys {
+            enm: vec![
+                #(
+                    #idents.into(),
+                )*
+            ],
+            ..Default::default()
+        })
+    })
 }

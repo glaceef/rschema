@@ -129,7 +129,7 @@ fn fields_from_ast(
 
 fn parse_variant<'a>(
     variant: &'a syn::Variant,
-) -> darling::Result<Option<Variant<'a>>> {
+) -> darling::Result<Option<Variant>> {
     let attr: VariantAttr = match variant.fields {
         // struct variant
         syn::Fields::Named(_) => {
