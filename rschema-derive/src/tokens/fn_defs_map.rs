@@ -9,7 +9,7 @@ use crate::{
     Field,
 };
 
-use super::FnTypeBody2;
+use super::FnTypeBody;
 
 pub struct FnDefsMapBody {
     stmt_insert_self: Option<TokenStream2>,
@@ -35,7 +35,7 @@ impl ToTokens for FnDefsMapBody {
 impl FnDefsMapBody {
     pub fn new(
         attr: &impl ContainerAttribute,
-        fn_type_body: &mut FnTypeBody2,
+        fn_type_body: &mut FnTypeBody,
     ) -> Self {
         // $defs に定義するかどうか
         let stmt_insert_self = attr.definitions().then(|| {
@@ -46,7 +46,7 @@ impl FnDefsMapBody {
             };
 
             // __type() の返却値を Type::Ref に置き換える。
-            let new_fn_type_body = FnTypeBody2::Ref(def_name.clone());
+            let new_fn_type_body = FnTypeBody::Ref(def_name.clone());
             let def = std::mem::replace(fn_type_body, new_fn_type_body);
 
             quote! {
@@ -65,7 +65,7 @@ impl FnDefsMapBody {
 
     pub fn with_fields(
         attr: &impl ContainerAttribute,
-        fn_type_body: &mut FnTypeBody2,
+        fn_type_body: &mut FnTypeBody,
         fields: &[Field],
     ) -> Self {
         let mut body = FnDefsMapBody::new(
@@ -83,7 +83,7 @@ impl FnDefsMapBody {
 
     pub fn with_stmts(
         attr: &impl ContainerAttribute,
-        fn_type_body: &mut FnTypeBody2,
+        fn_type_body: &mut FnTypeBody,
         stmts: Vec<TokenStream2>,
     ) -> Self {
         let mut body = FnDefsMapBody::new(

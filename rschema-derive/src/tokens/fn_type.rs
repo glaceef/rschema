@@ -23,7 +23,7 @@ pub use items::Items;
 pub use properties::Properties;
 pub use required::Required;
 
-pub enum FnTypeBody2<'a> {
+pub enum FnTypeBody<'a> {
     Struct {
         properties: Properties<'a>,
         required: Required<'a>,
@@ -41,14 +41,14 @@ pub enum FnTypeBody2<'a> {
     },
 
     Enum {
-        types: Vec<FnTypeBody2<'a>>,
+        types: Vec<FnTypeBody<'a>>,
         enum_units_ty: Option<TokenStream2>,
     },
 
     Ref(TokenStream2),
 }
 
-impl<'a> ToTokens for FnTypeBody2<'a> {
+impl<'a> ToTokens for FnTypeBody<'a> {
     fn to_tokens(&self, tokens: &mut TokenStream2) {
         let token_stream = match self {
             Self::Struct {
@@ -123,7 +123,7 @@ impl<'a> ToTokens for FnTypeBody2<'a> {
     }
 }
 
-impl<'a> FnTypeBody2<'a> {
+impl<'a> FnTypeBody<'a> {
     pub fn for_struct(
         attr: &'a (impl ContainerAttribute + StructAttribute),
         fields: &'a [Field<'a>],
@@ -161,7 +161,7 @@ impl<'a> FnTypeBody2<'a> {
     }
 
     pub fn for_enum(
-        types: Vec<FnTypeBody2<'a>>,
+        types: Vec<FnTypeBody<'a>>,
         enum_units_ty: Option<TokenStream2>,
     ) -> Self {
         Self::Enum {
@@ -172,7 +172,7 @@ impl<'a> FnTypeBody2<'a> {
 }
 
 pub struct FnType<'a> {
-    body: FnTypeBody2<'a>,
+    body: FnTypeBody<'a>,
 }
 
 impl<'a> ToTokens for FnType<'a> {
@@ -201,7 +201,7 @@ impl<'a> ToTokens for FnType<'a> {
 }
 
 impl<'a> FnType<'a> {
-    pub fn new(body: FnTypeBody2<'a>) -> Self {
+    pub fn new(body: FnTypeBody<'a>) -> Self {
         Self { body }
     }
 }

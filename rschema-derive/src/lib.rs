@@ -107,8 +107,8 @@ fn rename_ident(
 fn fn_type_body_for_struct<'a>(
     attr: &'a (impl ContainerAttribute + StructAttribute),
     fields: &'a [Field<'a >],
-) -> (FnTypeBody2<'a>, Option<FnDefsMapBody>) {
-    let mut fn_type_body = FnTypeBody2::for_struct(attr, fields);
+) -> (FnTypeBody<'a>, Option<FnDefsMapBody>) {
+    let mut fn_type_body = FnTypeBody::for_struct(attr, fields);
     let fn_defs_map_body = FnDefsMapBody::with_fields(
         attr,
         &mut fn_type_body,
@@ -122,9 +122,9 @@ fn fn_type_body_for_struct<'a>(
 }
 
 fn fn_type_body_for_unit_struct<'a>(
-) -> (FnTypeBody2<'a>, Option<FnDefsMapBody>) {
+) -> (FnTypeBody<'a>, Option<FnDefsMapBody>) {
     (
-        FnTypeBody2::UnitStruct,
+        FnTypeBody::UnitStruct,
         None,
     )
 }
@@ -132,8 +132,8 @@ fn fn_type_body_for_unit_struct<'a>(
 fn fn_type_body_for_newtype_struct<'a>(
     attr: &'a impl ContainerAttribute,
     field: &'a Field<'a>,
-) -> (FnTypeBody2<'a>, Option<FnDefsMapBody>) {
-    let mut fn_type_body = FnTypeBody2::for_newtype(field);
+) -> (FnTypeBody<'a>, Option<FnDefsMapBody>) {
+    let mut fn_type_body = FnTypeBody::for_newtype(field);
     let fn_defs_map_body = FnDefsMapBody::new(
         attr,
         &mut fn_type_body,
@@ -148,8 +148,8 @@ fn fn_type_body_for_newtype_struct<'a>(
 fn fn_type_body_for_tuple_struct<'a>(
     attr: &'a (impl ContainerAttribute + TupleStructAttribute),
     fields: &'a [Field<'a>],
-) -> (FnTypeBody2<'a>, Option<FnDefsMapBody>) {
-    let mut fn_type_body = FnTypeBody2::for_tuple(attr, fields);
+) -> (FnTypeBody<'a>, Option<FnDefsMapBody>) {
+    let mut fn_type_body = FnTypeBody::for_tuple(attr, fields);
     let fn_defs_map_body = FnDefsMapBody::with_fields(
         attr,
         &mut fn_type_body,
@@ -199,8 +199,8 @@ fn quote_enum_units_ty(
 fn fn_type_body_for_enum<'a>(
     container: &'a Container,
     variants: &'a [Variant],
-) -> (FnTypeBody2<'a>, Option<FnDefsMapBody>) {
-    let (types, def_maps): (Vec<FnTypeBody2>, Vec<Option<FnDefsMapBody>>) = variants
+) -> (FnTypeBody<'a>, Option<FnDefsMapBody>) {
+    let (types, def_maps): (Vec<FnTypeBody>, Vec<Option<FnDefsMapBody>>) = variants
         .iter()
         .filter_map(|variant| {
             match variant.data {
@@ -223,7 +223,7 @@ fn fn_type_body_for_enum<'a>(
 
     let enum_units_ty = quote_enum_units_ty(&container.attr, &variants);
 
-    let mut fn_type_body = FnTypeBody2::for_enum(
+    let mut fn_type_body = FnTypeBody::for_enum(
         types,
         enum_units_ty,
     );
