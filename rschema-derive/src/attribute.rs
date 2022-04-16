@@ -1,4 +1,11 @@
-use crate::Case;
+use crate::{
+    Case,
+    Definitions,
+};
+
+pub trait ContainerAttribute {
+    fn definitions(&self) -> &Definitions;
+}
 
 pub trait EnumAttribute {
     fn rename_all(&self) -> Option<Case>;

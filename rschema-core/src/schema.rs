@@ -4,10 +4,15 @@ use std::fs;
 
 use crate::{
     Draft,
-    Type,
     Result,
     Schematic,
 };
+
+mod defs;
+pub mod r#type;
+
+pub use defs::Definitions;
+pub use r#type::Type;
 
 /// This is a structure representing the JSON schema itself.
 /// 
@@ -60,6 +65,10 @@ pub struct Schema {
 
     #[serde(flatten)]
     ty: Type,
+
+    #[serde(rename = "$defs")]
+    #[serde(skip_serializing_if = "Definitions::is_empty")]
+    defs: Definitions,
 }
 
 impl Schema {
@@ -72,6 +81,7 @@ impl Schema {
             title: title.into(),
             description: None,
             ty: T::__type_no_attr(),
+            defs: T::__defs(),
         }
     }
 
