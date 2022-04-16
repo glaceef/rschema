@@ -13,12 +13,14 @@ use crate::{
 };
 
 mod enum_attr;
+mod definitions;
 mod newtype_struct_attr;
 mod struct_attr;
 mod tuple_struct_attr;
 mod unit_struct_attr;
 
 pub use enum_attr::EnumAttr;
+pub use definitions::Definitions;
 pub use newtype_struct_attr::NewTypeStructAttr;
 pub use struct_attr::StructAttr;
 pub use tuple_struct_attr::TupleStructAttr;
@@ -36,21 +38,21 @@ pub struct ContainerAttr {
     #[darling(default)]
     pub unique_items: Option<bool>,
 
-    // bool    : 通常の使い方。std::any::type_name によって決められた名前で $defs に登録するが、
-    //           その名前がユニーク性を保証していないことを明記する。可能であれば name を指定する
-    //           こと、exportする構造体では名前の衝突を防ぐため name を指定しないことを記載。
-    // name =  : $defs のキー名を指定。衝突した場合の挙動を明記。
-    // ref =   : 下記参照。$idと組み合わせることを記載。
+    // bool   : 通常の使い方。std::any::type_name によって決められた名前で $defs に登録するが、
+    //          その名前がユニーク性を保証していないことを明記する。可能であれば name を指定する
+    //          こと、exportする構造体では名前の衝突を防ぐため name を指定しないことを記載。
+    // name = : $defs のキー名を指定。衝突した場合の挙動を明記。
+    // ref =  : 下記参照。$idと組み合わせることを記載。
     // https://json-schema.org/understanding-json-schema/structuring.html#ref
     #[darling(default)]
-    pub definitions: Option<bool>,
+    pub defs: Definitions,
 }
 
 impl From<EnumAttr> for ContainerAttr {
     fn from(attr: EnumAttr) -> Self {
         ContainerAttr {
             rename_all: attr.rename_all,
-            definitions: attr.definitions,
+            defs: attr.defs,
             ..Default::default()
         }
     }
@@ -59,7 +61,7 @@ impl From<EnumAttr> for ContainerAttr {
 impl From<NewTypeStructAttr> for ContainerAttr {
     fn from(attr: NewTypeStructAttr) -> Self {
         ContainerAttr {
-            definitions: attr.definitions,
+            defs: attr.defs,
             ..Default::default()
         }
     }
@@ -70,7 +72,7 @@ impl From<StructAttr> for ContainerAttr {
         ContainerAttr {
             additional_properties: attr.additional_properties,
             rename_all: attr.rename_all,
-            definitions: attr.definitions,
+            defs: attr.defs,
             ..Default::default()
         }
     }
@@ -80,7 +82,7 @@ impl From<TupleStructAttr> for ContainerAttr {
     fn from(attr: TupleStructAttr) -> Self {
         ContainerAttr {
             unique_items: attr.unique_items,
-            definitions: attr.definitions,
+            defs: attr.defs,
             ..Default::default()
         }
     }
@@ -93,8 +95,8 @@ impl From<UnitStructAttr> for ContainerAttr {
 }
 
 impl ContainerAttribute for ContainerAttr {
-    fn definitions(&self) -> bool {
-        !is_falsy(&self.definitions)
+    fn definitions(&self) -> &Definitions {
+        &self.defs
     }
 }
 

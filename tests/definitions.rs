@@ -9,13 +9,13 @@ mod external_crate {
     use super::*;
 
     #[derive(Debug, Schematic)]
-    #[rschema(definitions)]
+    #[rschema(defs)]
     pub struct Struct {
         prop_value: i32,
     }
 
     #[derive(Debug, Schematic)]
-    #[rschema(definitions)]
+    #[rschema(defs)]
     pub struct Tuple(i32, String);
 }
 
@@ -27,22 +27,22 @@ struct NoDefStruct {
 }
 
 #[derive(Debug, Schematic)]
-#[rschema(definitions)]
+#[rschema(defs = "Struct")]
 struct Struct {
     prop_value: i32,
 }
 
 #[derive(Debug, Schematic)]
-#[rschema(definitions)]
+#[rschema(defs)]
 struct NestedStruct {
     prop_struct: Struct,
 }
 
 #[derive(Debug, Schematic)]
-#[rschema(definitions)]
+#[rschema(defs)]
 struct Alt2 {
-    // prop_value: i32,
-    r#i32: i32,
+    prop_value: i32,
+    // r#i32: i32,
 }
 
 #[derive(Debug)]
@@ -51,7 +51,7 @@ struct Alt {
 }
 
 #[derive(Debug, Schematic)]
-#[rschema(definitions)]
+#[rschema(defs)]
 struct NewTypeStruct(
     #[rschema(minimum = 0)]
     i32
@@ -61,15 +61,15 @@ struct NewTypeStruct(
 struct NoDefTuple(i32, String);
 
 #[derive(Debug, Schematic)]
-#[rschema(definitions)]
+#[rschema(defs)]
 struct Tuple(i32, String);
 
 #[derive(Debug, Schematic)]
-#[rschema(definitions)]
+#[rschema(defs)]
 struct NestedTuple(i32, Tuple);
 
 #[derive(Debug, Schematic)]
-#[rschema(definitions)]
+#[rschema(defs)]
 enum Enum {
     Tuple(i32),
 
@@ -120,13 +120,13 @@ fn it_tests_definitions() -> rschema::Result<()> {
           "type": "number"
         },
         "prop_struct": {
-          "$ref": "#/$defs/definitions::Struct"
+          "$ref": "#/$defs/Struct"
         }
       },
       "additionalProperties": false
     },
     "prop_struct": {
-      "$ref": "#/$defs/definitions::Struct"
+      "$ref": "#/$defs/Struct"
     },
     "prop_struct_external": {
       "$ref": "#/$defs/definitions::external_crate::Struct"
@@ -168,7 +168,7 @@ fn it_tests_definitions() -> rschema::Result<()> {
   },
   "additionalProperties": false,
   "$defs": {
-    "definitions::Struct": {
+    "Struct": {
       "type": "object",
       "properties": {
         "prop_value": {
@@ -190,7 +190,7 @@ fn it_tests_definitions() -> rschema::Result<()> {
       "type": "object",
       "properties": {
         "prop_struct": {
-          "$ref": "#/$defs/definitions::Struct"
+          "$ref": "#/$defs/Struct"
         }
       },
       "additionalProperties": false
@@ -198,7 +198,7 @@ fn it_tests_definitions() -> rschema::Result<()> {
     "definitions::Alt2": {
       "type": "object",
       "properties": {
-        "r#i32": {
+        "prop_value": {
           "type": "number"
         }
       },
@@ -256,7 +256,7 @@ fn it_tests_definitions() -> rschema::Result<()> {
           "type": "object",
           "properties": {
             "prop_struct": {
-              "$ref": "#/$defs/definitions::Struct"
+              "$ref": "#/$defs/Struct"
             },
             "prop_tuple": {
               "$ref": "#/$defs/definitions::Tuple"

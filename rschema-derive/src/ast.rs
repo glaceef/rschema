@@ -8,6 +8,7 @@ mod type_generics;
 
 pub use container_attr::{
     ContainerAttr,
+    Definitions,
     EnumAttr,
     NewTypeStructAttr,
     StructAttr,

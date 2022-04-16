@@ -1,6 +1,12 @@
 use darling::FromDeriveInput;
 
-use crate::Case;
+use super::{
+    Case,
+    definitions::{
+        Definitions,
+        and_then,
+    },
+};
 
 #[derive(Debug, FromDeriveInput)]
 #[darling(attributes(rschema))]
@@ -12,5 +18,6 @@ pub struct StructAttr {
     pub rename_all: Option<Case>,
 
     #[darling(default)]
-    pub definitions: Option<bool>,
+    #[darling(and_then = "and_then")]
+    pub defs: Definitions,
 }

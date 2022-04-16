@@ -11,7 +11,10 @@ mod case;
 mod data;
 mod tokens;
 
-use ast::Container;
+use ast::{
+    Container,
+    Definitions,
+};
 use attribute::{
     ContainerAttribute,
     EnumAttribute,

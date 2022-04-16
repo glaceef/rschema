@@ -1,7 +1,10 @@
-use crate::Case;
+use crate::{
+    Case,
+    Definitions,
+};
 
 pub trait ContainerAttribute {
-    fn definitions(&self) -> bool;
+    fn definitions(&self) -> &Definitions;
 }
 
 pub trait EnumAttribute {
