@@ -79,7 +79,16 @@ enum Enum {
 }
 
 #[derive(Debug, Schematic)]
-struct Definitions {
+// #[rschema(defs = "Struct")]
+struct Struct2<'a> {
+    prop_value_ref: &'a mut i32,
+}
+
+#[derive(Debug, Schematic)]
+struct Definitions<'a> {
+    prop_struct: Struct2<'a>,
+
+    /*
     prop_no_def_struct: NoDefStruct,
 
     prop_struct: Struct,
@@ -102,6 +111,7 @@ struct Definitions {
     prop_nexted_tuple: NestedTuple,
 
     prop_enum: Enum,
+    */
 }
 
 #[test]

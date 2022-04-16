@@ -93,6 +93,86 @@ pub trait Schematic {
     }
 }
 
+impl<T: Schematic> Schematic for &T {
+    fn __type(
+        min_length: Option<u64>,
+        max_length: Option<u64>,
+        pattern: Option<String>,
+        format: Option<String>,
+        minimum: Option<i64>,
+        maximum: Option<i64>,
+        multiple_of: Option<i64>,
+        exclusive_minimum: Option<i64>,
+        exclusive_maximum: Option<i64>,
+        min_items: Option<usize>,
+        max_items: Option<usize>,
+        unique_items: Option<bool>,
+    ) -> Type {
+        T::__type(
+            min_length,
+            max_length,
+            pattern,
+            format,
+            minimum,
+            maximum,
+            multiple_of,
+            exclusive_minimum,
+            exclusive_maximum,
+            min_items,
+            max_items,
+            unique_items,
+        )
+    }
+
+    fn __type_no_attr() -> Type {
+        T::__type_no_attr()
+    }
+
+    fn __defs_map() -> DefinitionsMap {
+        DefinitionsMap::new()
+    }
+}
+
+impl<T: Schematic> Schematic for &mut T {
+    fn __type(
+        min_length: Option<u64>,
+        max_length: Option<u64>,
+        pattern: Option<String>,
+        format: Option<String>,
+        minimum: Option<i64>,
+        maximum: Option<i64>,
+        multiple_of: Option<i64>,
+        exclusive_minimum: Option<i64>,
+        exclusive_maximum: Option<i64>,
+        min_items: Option<usize>,
+        max_items: Option<usize>,
+        unique_items: Option<bool>,
+    ) -> Type {
+        T::__type(
+            min_length,
+            max_length,
+            pattern,
+            format,
+            minimum,
+            maximum,
+            multiple_of,
+            exclusive_minimum,
+            exclusive_maximum,
+            min_items,
+            max_items,
+            unique_items,
+        )
+    }
+
+    fn __type_no_attr() -> Type {
+        T::__type_no_attr()
+    }
+
+    fn __defs_map() -> DefinitionsMap {
+        DefinitionsMap::new()
+    }
+}
+
 macro_rules! impl_for_str {
     ($ty:ty) => {
         impl Schematic for $ty {
