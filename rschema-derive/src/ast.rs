@@ -79,7 +79,7 @@ impl<'a> Container<'a> {
             ident: &input.ident,
             generics: &input.generics,
             data: data,
-            source: input, // 現状不要
+            source: input,
         })
     }
 

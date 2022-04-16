@@ -38,76 +38,18 @@ impl FnDefsMapBody {
         attr: &impl ContainerAttribute,
         fn_type_body: &mut FnTypeBody,
     ) -> Self {
-        /*
-        // $defs に定義するかどうか
-        let stmt_insert_self = attr.definitions().then(|| {
-            // 名前を決定する記述。
-            // 外部から渡すことになった場合はここを変える。
-            let def_name = quote! {
-                std::any::type_name::<Self>()
-            };
-
-            // __type() の返却値を Type::Ref に置き換える。
-            let new_fn_type_body = FnTypeBody::Ref(def_name.clone());
-            let def = std::mem::replace(fn_type_body, new_fn_type_body);
-
-            quote! {
-                defs_map.insert::<Self>(
-                    #def_name,
-                    #def,
-                );
-            }
-        });
-        */
-
         let stmt_insert_self = match attr.definitions() {
             Definitions::Named(name) => {
-                // 名前を決定する記述。
-                // 外部から渡すことになった場合はここを変える。
+                // Defined in `$defs` with the given name.
                 let def_name = quote! { #name };
-
-                /*
-                // __type() の返却値を Type::Ref に置き換える。
-                let new_fn_type_body = FnTypeBody::Ref(def_name.clone());
-                let def = std::mem::replace(fn_type_body, new_fn_type_body);
-
-                Some(quote! {
-                    defs_map.insert::<Self>(
-                        #def_name,
-                        #def,
-                    );
-                })
-                */
-
-                quote_stmt_insert_defs(
-                    def_name,
-                    fn_type_body,
-                )
+                quote_stmt_insert_defs(def_name, fn_type_body)
             },
             Definitions::Auto => {
-                // 名前を決定する記述。
-                // 外部から渡すことになった場合はここを変える。
+                // Defined in `$defs` with the auto-generated name.
                 let def_name = quote! {
                     std::any::type_name::<Self>()
                 };
-
-                /*
-                // __type() の返却値を Type::Ref に置き換える。
-                let new_fn_type_body = FnTypeBody::Ref(def_name.clone());
-                let def = std::mem::replace(fn_type_body, new_fn_type_body);
-
-                Some(quote! {
-                    defs_map.insert::<Self>(
-                        #def_name,
-                        #def,
-                    );
-                })
-                */
-
-                quote_stmt_insert_defs(
-                    def_name,
-                    fn_type_body,
-                )
+                quote_stmt_insert_defs(def_name, fn_type_body)
             },
             Definitions::Skip => None,
         };
@@ -174,10 +116,11 @@ fn quote_stmt_insert_defs(
     def_name: TokenStream2,
     fn_type_body: &mut FnTypeBody,
 ) -> Option<TokenStream2> {
-    // __type() の返却値を Type::Ref に置き換える。
+    // Make `__type()` return `Type::Ref(def_name)`.
     let new_fn_type_body = FnTypeBody::Ref(def_name.clone());
     let def = std::mem::replace(fn_type_body, new_fn_type_body);
 
+    // Instead, the original return value of `__type()` is defined in `$defs`.
     Some(quote! {
         defs_map.insert::<Self>(
             #def_name,

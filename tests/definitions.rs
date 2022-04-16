@@ -42,7 +42,6 @@ struct NestedStruct {
 #[rschema(defs)]
 struct Alt2 {
     prop_value: i32,
-    // r#i32: i32,
 }
 
 #[derive(Debug)]

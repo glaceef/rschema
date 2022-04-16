@@ -2,6 +2,7 @@ use convert_case::Casing;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{
     ToTokens,
+    format_ident,
     quote,
 };
 
@@ -18,7 +19,7 @@ pub fn rename_ident(
     if let Some(rename) = rename {
         rename.clone()
     } else {
-        let ident_str = ident.to_string();
+        let ident_str = format_ident!("{}", ident).to_string();
         match rename_all {
             Some(case) => ident_str.to_case(case.into()),
             None => ident_str,

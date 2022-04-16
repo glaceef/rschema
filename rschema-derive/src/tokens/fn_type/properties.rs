@@ -83,7 +83,7 @@ fn stmt_insert_property<'a>(
 
     quote! {
         properties.insert(
-            #fixed_ident,
+            #fixed_ident.into(),
             rschema::Property {
                 title: #title,
                 description: #description,

@@ -39,7 +39,7 @@ use crate::{
 ///   - char
 ///   - str(&str)
 /// - **Compound types**:
-///   - [T; 0]
+///   - [T; N]
 ///   - tuples up to size 12
 /// - **Common standard library types**:
 ///   - String
@@ -47,6 +47,8 @@ use crate::{
 /// - **Wrapper types**:
 ///   - Box\<T\>
 /// - **Collection types**:
+///   - HashMap\<K, V, H\>
+///   - HashSet\<T, H\>
 ///   - Vec\<T\>
 /// 
 pub trait Schematic {
@@ -291,30 +293,6 @@ macro_rules! impls_tuple_for {
 // See https://qiita.com/9laceef/items/e24f9541ef3924112f6b for these macros.
 impls_tuple_for!(12);
 
-impl<T: Schematic> Schematic for Option<T> {
-    fn __type(
-        min_length: Option<u64>,
-        max_length: Option<u64>,
-        pattern: Option<String>,
-        format: Option<String>,
-        minimum: Option<i64>,
-        maximum: Option<i64>,
-        multiple_of: Option<i64>,
-        exclusive_minimum: Option<i64>,
-        exclusive_maximum: Option<i64>,
-        min_items: Option<usize>,
-        max_items: Option<usize>,
-        unique_items: Option<bool>,
-    ) -> Type {
-        Type::Enum(EnumKeys {
-            any_of: vec![
-                T::__type_no_attr(),
-                Type::Null,
-            ],
-        })
-    }
-}
-
 impl<T: Schematic, const N: usize> Schematic for [T; N] {
     fn __type(
         min_length: Option<u64>,
@@ -339,7 +317,7 @@ impl<T: Schematic, const N: usize> Schematic for [T; N] {
     }
 }
 
-impl<T: Schematic> Schematic for Vec<T> {
+impl<T: Schematic> Schematic for Option<T> {
     fn __type(
         min_length: Option<u64>,
         max_length: Option<u64>,
@@ -354,11 +332,11 @@ impl<T: Schematic> Schematic for Vec<T> {
         max_items: Option<usize>,
         unique_items: Option<bool>,
     ) -> Type {
-        Type::Array(ArrayKeys {
-            items: Box::new(Items::Single(T::__type_no_attr())),
-            min_items,
-            max_items,
-            unique_items,
+        Type::Enum(EnumKeys {
+            any_of: vec![
+                T::__type_no_attr(),
+                Type::Null,
+            ],
         })
     }
 }
@@ -440,6 +418,30 @@ impl<T: Schematic, S> Schematic for HashSet<T, S> {
             min_items,
             max_items,
             unique_items: Some(true),
+        })
+    }
+}
+
+impl<T: Schematic> Schematic for Vec<T> {
+    fn __type(
+        min_length: Option<u64>,
+        max_length: Option<u64>,
+        pattern: Option<String>,
+        format: Option<String>,
+        minimum: Option<i64>,
+        maximum: Option<i64>,
+        multiple_of: Option<i64>,
+        exclusive_minimum: Option<i64>,
+        exclusive_maximum: Option<i64>,
+        min_items: Option<usize>,
+        max_items: Option<usize>,
+        unique_items: Option<bool>,
+    ) -> Type {
+        Type::Array(ArrayKeys {
+            items: Box::new(Items::Single(T::__type_no_attr())),
+            min_items,
+            max_items,
+            unique_items,
         })
     }
 }

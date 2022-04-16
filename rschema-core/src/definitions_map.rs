@@ -18,22 +18,19 @@ type DefsMapItem = (&'static str, Type);
 type InnerMap = IndexMap<TypeId, DefsMapItem>;
 
 #[derive(Debug)]
-pub struct DefinitionsMap {
-    // 現状、名前を指定できるようになった場合に衝突を検知できない。
-    pub map: InnerMap,
-}
+pub struct DefinitionsMap(InnerMap);
 
 impl Deref for DefinitionsMap {
     type Target = InnerMap;
 
     fn deref(&self) -> &Self::Target {
-        &self.map
+        &self.0
     }
 }
 
 impl DerefMut for DefinitionsMap {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.map
+        &mut self.0
     }
 }
 
@@ -42,15 +39,13 @@ impl IntoIterator for DefinitionsMap {
     type IntoIter = indexmap::map::IntoIter<TypeId, DefsMapItem>;
 
     fn into_iter(self) -> Self::IntoIter {
-        self.map.into_iter()
+        self.0.into_iter()
     }
 }
 
 impl DefinitionsMap {
     pub fn new() -> Self {
-        Self {
-            map: IndexMap::new(),
-        }
+        Self(IndexMap::new())
     }
 
     pub fn insert<T: 'static + Schematic>(
@@ -68,6 +63,6 @@ impl DefinitionsMap {
     }
 
     pub fn build(self) -> Definitions {
-        Definitions::from_iter(self.map.into_values())
+        Definitions::from_iter(self.0.into_values())
     }
 }
