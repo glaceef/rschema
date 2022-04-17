@@ -6,21 +6,31 @@ use rschema::{
 };
 
 #[derive(Debug, Schematic)]
-struct NullProperty {
+struct UnitStruct;
+
+#[derive(Debug, Schematic)]
+struct NullProperties {
     #[rschema(title = "null")]
     prop_null: (),
+
+    #[rschema(title = "null2")]
+    prop_null2: UnitStruct,
 }
 
 #[test]
 fn it_generates_null_schema() -> rschema::Result<()> {
-    let schema_str = Schema::new::<NullProperty>("Null Property")
+    let schema_str = Schema::new::<NullProperties>("Null Properties")
         .to_string_pretty()?;
     let schema_str2 = r#"{
-  "title": "Null Property",
+  "title": "Null Properties",
   "type": "object",
   "properties": {
     "prop_null": {
       "title": "null",
+      "type": "null"
+    },
+    "prop_null2": {
+      "title": "null2",
       "type": "null"
     }
   },
