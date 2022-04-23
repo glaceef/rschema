@@ -30,7 +30,7 @@ struct StringProperties<'a> {
 }
 
 #[test]
-fn it_generates_string_schema() -> rschema::Result<()> {
+fn it_tests_string_properties() -> rschema::Result<()> {
     let schema_str = Schema::new::<StringProperties>("String Properties")
         .to_string_pretty()?;
     let schema_str2 = r#"{

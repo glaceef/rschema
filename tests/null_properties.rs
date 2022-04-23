@@ -18,7 +18,7 @@ struct NullProperties {
 }
 
 #[test]
-fn it_generates_null_schema() -> rschema::Result<()> {
+fn it_tests_null_properties() -> rschema::Result<()> {
     let schema_str = Schema::new::<NullProperties>("Null Properties")
         .to_string_pretty()?;
     let schema_str2 = r#"{

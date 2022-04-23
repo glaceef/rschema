@@ -7,41 +7,31 @@ use rschema::{
 
 #[derive(Debug, Schematic)]
 #[rschema(additional_properties)]
-struct RequiredProperties {
-    #[rschema(
-        title = "i32",
-        required,
-    )]
+struct StructAttributes {
+    #[rschema(required)]
     prop_required1: i32,
 
-    #[rschema(
-        title = "String",
-        required,
-    )]
+    #[rschema(required)]
     prop_required2: String,
 
-    #[rschema(title = "bool")]
     prop_not_required: bool,
 }
 
 #[test]
-fn it_generates_required_properties() -> rschema::Result<()> {
-    let schema_str = Schema::new::<RequiredProperties>("RequiredProperties")
+fn it_tests_struct_attributes() -> rschema::Result<()> {
+    let schema_str = Schema::new::<StructAttributes>("StructAttributes")
         .to_string_pretty()?;
     let schema_str2 = r#"{
-  "title": "RequiredProperties",
+  "title": "StructAttributes",
   "type": "object",
   "properties": {
     "prop_required1": {
-      "title": "i32",
       "type": "number"
     },
     "prop_required2": {
-      "title": "String",
       "type": "string"
     },
     "prop_not_required": {
-      "title": "bool",
       "type": "boolean"
     }
   },

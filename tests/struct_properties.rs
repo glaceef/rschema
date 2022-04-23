@@ -15,40 +15,12 @@ struct EmptyTupleStruct();
 struct NewTypeStruct(i32);
 
 #[derive(Debug, Schematic)]
-struct NewTypeStructWithAttr(
-    #[rschema(
-        minimum = 0,
-        maximum = 100,
-    )]
-    i32,
-);
-
-#[derive(Debug, Schematic)]
-struct TupleStruct(
-    #[rschema(
-        title = "i32",
-        minimum = 0,
-        maximum = 100,
-    )]
-    i32,
-
-    String,
-);
+struct TupleStruct(i32, String);
 
 #[derive(Debug, Schematic)]
 struct NestedStruct {
     #[rschema(title = "i32")]
     value: i32,
-}
-
-#[derive(Debug, Schematic)]
-#[rschema(rename_all = "Train-Case")]
-struct RenamedStruct {
-    #[rschema(title = "i32")]
-    value_number: i32,
-
-    #[rschema(title = "String")]
-    value_string: String,
 }
 
 #[derive(Debug, Schematic)]
@@ -62,21 +34,15 @@ struct StructProperties {
     #[rschema(title = "NewTypeStruct")]
     prop_new_type_struct: NewTypeStruct,
 
-    #[rschema(title = "NewTypeStructWithAttr")]
-    prop_new_type_struct_with_attr: NewTypeStructWithAttr,
-
     #[rschema(title = "TupleStruct")]
     prop_tuple_struct: TupleStruct,
 
     #[rschema(title = "NestedStruct")]
     prop_nested_struct: NestedStruct,
-
-    #[rschema(title = "RenamedStruct")]
-    prop_renamed_struct: RenamedStruct,
 }
 
 #[test]
-fn it_generates_struct_schema() -> rschema::Result<()> {
+fn it_tests_struct_properties() -> rschema::Result<()> {
     let schema_str = Schema::new::<StructProperties>("Struct Properties")
         .to_string_pretty()?;
     let schema_str2 = r#"{
@@ -98,21 +64,12 @@ fn it_generates_struct_schema() -> rschema::Result<()> {
       "title": "NewTypeStruct",
       "type": "number"
     },
-    "prop_new_type_struct_with_attr": {
-      "title": "NewTypeStructWithAttr",
-      "type": "number",
-      "minimum": 0,
-      "maximum": 100
-    },
     "prop_tuple_struct": {
       "title": "TupleStruct",
       "type": "array",
       "items": [
         {
-          "title": "i32",
-          "type": "number",
-          "minimum": 0,
-          "maximum": 100
+          "type": "number"
         },
         {
           "type": "string"
@@ -128,21 +85,6 @@ fn it_generates_struct_schema() -> rschema::Result<()> {
         "value": {
           "title": "i32",
           "type": "number"
-        }
-      },
-      "additionalProperties": false
-    },
-    "prop_renamed_struct": {
-      "title": "RenamedStruct",
-      "type": "object",
-      "properties": {
-        "Value-Number": {
-          "title": "i32",
-          "type": "number"
-        },
-        "Value-String": {
-          "title": "String",
-          "type": "string"
         }
       },
       "additionalProperties": false

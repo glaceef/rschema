@@ -12,7 +12,7 @@ struct BooleanProperty {
 }
 
 #[test]
-fn it_generates_boolean_schema() -> rschema::Result<()> {
+fn it_tests_boolean_property() -> rschema::Result<()> {
     let schema_str = Schema::new::<BooleanProperty>("Boolean Property")
         .to_string_pretty()?;
     let schema_str2 = r#"{

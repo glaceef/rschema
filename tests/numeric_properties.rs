@@ -45,17 +45,17 @@ struct NumericProperties {
 
     #[rschema(
         title = "All keywords",
-        minimum = 0,
-        maximum = 100,
-        multiple_of = 10,
-        exclusive_minimum = 0,
-        exclusive_maximum = 100,
+        minimum = 1,
+        maximum = 2,
+        multiple_of = 3,
+        exclusive_minimum = 4,
+        exclusive_maximum = 5,
     )]
     prop_all_keywords: i32,
 }
 
 #[test]
-fn it_generates_numeric_schema() -> rschema::Result<()> {
+fn it_tests_numeric_properties() -> rschema::Result<()> {
     let schema_str = Schema::new::<NumericProperties>("Numeric Properties")
         .to_string_pretty()?;
     let schema_str2 = r#"{
@@ -113,11 +113,11 @@ fn it_generates_numeric_schema() -> rschema::Result<()> {
     "prop_all_keywords": {
       "title": "All keywords",
       "type": "number",
-      "minimum": 0,
-      "maximum": 100,
-      "multipleOf": 10,
-      "exclusiveMinimum": 0,
-      "exclusiveMaximum": 100
+      "minimum": 1,
+      "maximum": 2,
+      "multipleOf": 3,
+      "exclusiveMinimum": 4,
+      "exclusiveMaximum": 5
     }
   },
   "additionalProperties": false

@@ -10,108 +10,62 @@ mod external_crate {
 
     #[derive(Debug, Schematic)]
     #[rschema(defs)]
-    pub struct Struct {
+    pub struct PrivateStruct {
         prop_value: i32,
     }
 
     #[derive(Debug, Schematic)]
     #[rschema(defs)]
-    pub struct Tuple(i32, String);
-}
+    pub struct Struct {
+        prop_value: i32,
 
-#[derive(Debug, Schematic)]
-struct NoDefStruct {
-    prop_value: i32,
-
-    prop_struct: Struct,
-}
-
-#[derive(Debug, Schematic)]
-#[rschema(defs = "Struct")]
-struct Struct {
-    prop_value: i32,
+        prop_private: PrivateStruct,
+    }
 }
 
 #[derive(Debug, Schematic)]
 #[rschema(defs)]
 struct NestedStruct {
-    prop_struct: Struct,
-}
-
-#[derive(Debug, Schematic)]
-#[rschema(defs)]
-struct Alt2 {
-    prop_value: i32,
-}
-
-#[derive(Debug)]
-struct Alt {
     prop_value: i32,
 }
 
 #[derive(Debug, Schematic)]
 #[rschema(defs)]
-struct NewTypeStruct(
-    #[rschema(minimum = 0)]
-    i32
-);
+struct Struct {
+    prop_value: i32,
 
-#[derive(Debug, Schematic)]
-struct NoDefTuple(i32, String);
-
-#[derive(Debug, Schematic)]
-#[rschema(defs)]
-struct Tuple(i32, String);
-
-#[derive(Debug, Schematic)]
-#[rschema(defs)]
-struct NestedTuple(i32, Tuple);
+    prop_nested_struct: NestedStruct,
+}
 
 #[derive(Debug, Schematic)]
 #[rschema(defs)]
 enum Enum {
-    Tuple(i32),
+    EmptyTupleVariant(),
 
-    Struct {
-        prop_struct: Struct,
-        prop_tuple: Tuple,
-    },
+    NewTypeVariant(i32),
+
+    TupleVariant(String, bool),
+
+    StructVariant {
+        value: i32,
+    }
 }
 
 #[derive(Debug, Schematic)]
-// #[rschema(defs = "Struct")]
-struct Struct2<'a> {
-    prop_value_ref: &'a mut i32,
+#[rschema(defs = "CustomDefinition")]
+struct NamedDefsStruct {
+    prop_value: i32,
 }
 
 #[derive(Debug, Schematic)]
-struct Definitions<'a> {
-    prop_struct: Struct2<'a>,
-
-    /*
-    prop_no_def_struct: NoDefStruct,
-
+struct Definitions {
     prop_struct: Struct,
 
-    prop_struct_external: external_crate::Struct,
-
-    prop_nested_struct: NestedStruct,
-
-    #[rschema(alt = "Alt2")]
-    prop_alt: Alt,
-
-    prop_new_type: NewTypeStruct,
-
-    prop_no_def_tuple: NoDefTuple,
-
-    prop_tuple: Tuple,
-
-    prop_tuple_external: external_crate::Tuple,
-
-    prop_nexted_tuple: NestedTuple,
-
     prop_enum: Enum,
-    */
+
+    prop_external: external_crate::Struct,
+
+    prop_named_defs_struct: NamedDefsStruct,
 }
 
 #[test]
@@ -122,75 +76,29 @@ fn it_tests_definitions() -> rschema::Result<()> {
   "title": "Definitions",
   "type": "object",
   "properties": {
-    "prop_no_def_struct": {
-      "type": "object",
-      "properties": {
-        "prop_value": {
-          "type": "number"
-        },
-        "prop_struct": {
-          "$ref": "#/$defs/Struct"
-        }
-      },
-      "additionalProperties": false
-    },
     "prop_struct": {
-      "$ref": "#/$defs/Struct"
-    },
-    "prop_struct_external": {
-      "$ref": "#/$defs/definitions::external_crate::Struct"
-    },
-    "prop_nested_struct": {
-      "$ref": "#/$defs/definitions::NestedStruct"
-    },
-    "prop_alt": {
-      "$ref": "#/$defs/definitions::Alt2"
-    },
-    "prop_new_type": {
-      "$ref": "#/$defs/definitions::NewTypeStruct"
-    },
-    "prop_no_def_tuple": {
-      "type": "array",
-      "items": [
-        {
-          "type": "number"
-        },
-        {
-          "type": "string"
-        }
-      ],
-      "minItems": 2,
-      "maxItems": 2
-    },
-    "prop_tuple": {
-      "$ref": "#/$defs/definitions::Tuple"
-    },
-    "prop_tuple_external": {
-      "$ref": "#/$defs/definitions::external_crate::Tuple"
-    },
-    "prop_nexted_tuple": {
-      "$ref": "#/$defs/definitions::NestedTuple"
+      "$ref": "#/$defs/definitions::Struct"
     },
     "prop_enum": {
       "$ref": "#/$defs/definitions::Enum"
+    },
+    "prop_external": {
+      "$ref": "#/$defs/definitions::external_crate::Struct"
+    },
+    "prop_named_defs_struct": {
+      "$ref": "#/$defs/CustomDefinition"
     }
   },
   "additionalProperties": false,
   "$defs": {
-    "Struct": {
+    "definitions::Struct": {
       "type": "object",
       "properties": {
         "prop_value": {
           "type": "number"
-        }
-      },
-      "additionalProperties": false
-    },
-    "definitions::external_crate::Struct": {
-      "type": "object",
-      "properties": {
-        "prop_value": {
-          "type": "number"
+        },
+        "prop_nested_struct": {
+          "$ref": "#/$defs/definitions::NestedStruct"
         }
       },
       "additionalProperties": false
@@ -198,13 +106,60 @@ fn it_tests_definitions() -> rschema::Result<()> {
     "definitions::NestedStruct": {
       "type": "object",
       "properties": {
-        "prop_struct": {
-          "$ref": "#/$defs/Struct"
+        "prop_value": {
+          "type": "number"
         }
       },
       "additionalProperties": false
     },
-    "definitions::Alt2": {
+    "definitions::Enum": {
+      "anyOf": [
+        {
+          "type": "array",
+          "items": [],
+          "minItems": 0,
+          "maxItems": 0
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "array",
+          "items": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        },
+        {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "definitions::external_crate::Struct": {
+      "type": "object",
+      "properties": {
+        "prop_value": {
+          "type": "number"
+        },
+        "prop_private": {
+          "$ref": "#/$defs/definitions::external_crate::PrivateStruct"
+        }
+      },
+      "additionalProperties": false
+    },
+    "definitions::external_crate::PrivateStruct": {
       "type": "object",
       "properties": {
         "prop_value": {
@@ -213,67 +168,14 @@ fn it_tests_definitions() -> rschema::Result<()> {
       },
       "additionalProperties": false
     },
-    "definitions::NewTypeStruct": {
-      "type": "number",
-      "minimum": 0
-    },
-    "definitions::Tuple": {
-      "type": "array",
-      "items": [
-        {
+    "CustomDefinition": {
+      "type": "object",
+      "properties": {
+        "prop_value": {
           "type": "number"
-        },
-        {
-          "type": "string"
         }
-      ],
-      "minItems": 2,
-      "maxItems": 2
-    },
-    "definitions::external_crate::Tuple": {
-      "type": "array",
-      "items": [
-        {
-          "type": "number"
-        },
-        {
-          "type": "string"
-        }
-      ],
-      "minItems": 2,
-      "maxItems": 2
-    },
-    "definitions::NestedTuple": {
-      "type": "array",
-      "items": [
-        {
-          "type": "number"
-        },
-        {
-          "$ref": "#/$defs/definitions::Tuple"
-        }
-      ],
-      "minItems": 2,
-      "maxItems": 2
-    },
-    "definitions::Enum": {
-      "anyOf": [
-        {
-          "type": "number"
-        },
-        {
-          "type": "object",
-          "properties": {
-            "prop_struct": {
-              "$ref": "#/$defs/Struct"
-            },
-            "prop_tuple": {
-              "$ref": "#/$defs/definitions::Tuple"
-            }
-          },
-          "additionalProperties": false
-        }
-      ]
+      },
+      "additionalProperties": false
     }
   }
 }"##;

@@ -9,18 +9,21 @@ use rschema::{
 enum Enum {
     EmptyTupleVariant(),
 
+    NewTypeVariant(i32),
+
     TupleVariant(
         #[rschema(
-            minimum = 0,
-            maximum = 100,
+            title = "value",
+            format = "myformat",
         )]
-        i32,
-
         String,
+
+        bool,
     ),
 
+    #[rschema(additional_properties)]
     StructVariant {
-        #[rschema(title = "i32")]
+        #[rschema(title = "value")]
         value: i32,
     }
 }
@@ -33,27 +36,16 @@ enum EnumUnits {
 }
 
 #[derive(Debug, Schematic)]
-#[rschema(rename_all = "camelCase")]
-enum EnumUnitsRenamed {
-    UnitVariantX,
-    UnitVariantY,
-    UnitVariantZ,
-}
-
-#[derive(Debug, Schematic)]
 struct EnumProperties {
     #[rschema(title = "Enum")]
     prop_enum: Enum,
 
     #[rschema(title = "EnumUnits")]
     prop_enum_units: EnumUnits,
-
-    #[rschema(title = "EnumUnitsRenamed")]
-    prop_enum_units_renamed: EnumUnitsRenamed,
 }
 
 #[test]
-fn it_generates_enum_schema() -> rschema::Result<()> {
+fn it_tests_enum_properties() -> rschema::Result<()> {
     let schema_str = Schema::new::<EnumProperties>("Enum Properties")
         .to_string_pretty()?;
     let schema_str2 = r#"{
@@ -70,15 +62,18 @@ fn it_generates_enum_schema() -> rschema::Result<()> {
           "maxItems": 0
         },
         {
+          "type": "number"
+        },
+        {
           "type": "array",
           "items": [
             {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 100
+              "title": "value",
+              "type": "string",
+              "format": "myformat"
             },
             {
-              "type": "string"
+              "type": "boolean"
             }
           ],
           "minItems": 2,
@@ -88,11 +83,11 @@ fn it_generates_enum_schema() -> rschema::Result<()> {
           "type": "object",
           "properties": {
             "value": {
-              "title": "i32",
+              "title": "value",
               "type": "number"
             }
           },
-          "additionalProperties": false
+          "additionalProperties": true
         }
       ]
     },
@@ -103,15 +98,6 @@ fn it_generates_enum_schema() -> rschema::Result<()> {
         "UnitVariant1",
         "UnitVariant2",
         "UnitVariant3"
-      ]
-    },
-    "prop_enum_units_renamed": {
-      "title": "EnumUnitsRenamed",
-      "type": "string",
-      "enum": [
-        "unitVariantX",
-        "unitVariantY",
-        "unitVariantZ"
       ]
     }
   },
